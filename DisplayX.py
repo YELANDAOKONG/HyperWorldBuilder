@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import json
 import networkx as nx
@@ -8,6 +8,12 @@ from pathlib import Path
 
 class BigGlobeDecisionTreeVisualizer:
     def __init__(self, base_dir):
+        """
+        Initialize the decision tree visualizer.
+
+        Args:
+            base_dir: Path to the Big Globe mod files directory
+        """
         self.base_dir = Path(base_dir)
         self.decision_tree_dir = self.base_dir / "data" / "bigglobe" / "worldgen" / "bigglobe_decision_tree"
         self.G = nx.DiGraph()
@@ -17,16 +23,35 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
     def get_file_path(self, tree_id):
+        """
+        Convert tree ID to a file path.
+
+        Args:
+            tree_id: String ID of the decision tree
+
+        Returns:
+            Path object for the corresponding JSON file
+        """
         # Convert namespace:path format to file path
         if ":" in tree_id:
             namespace, path = tree_id.split(":", 1)
             path = path.replace("/", os.sep)
-            return (self.base_dir / "data" / namespace / "worldgen" / "bigglobe_decision_tree" / path).with_suffix(".json")
+            return (self.base_dir / "data" / namespace / "worldgen" / "bigglobe_decision_tree" / path).with_suffix(
+                ".json")
         else:
             # For relative paths
             return self.decision_tree_dir / f"{tree_id}.json"
 
     def load_decision_tree(self, tree_id):
+        """
+        Load a decision tree JSON file.
+
+        Args:
+            tree_id: String ID of the decision tree
+
+        Returns:
+            Parsed JSON data or None if file not found/invalid
+        """
         file_path = self.get_file_path(tree_id)
         if not file_path.exists():
             print(f"Warning: File not found for tree ID {tree_id} at {file_path}")
@@ -43,6 +68,17 @@ class BigGlobeDecisionTreeVisualizer:
             return None
 
     def process_tree(self, tree_id, parent_id=None, edge_label=None):
+        """
+        Process a decision tree and add it to the graph.
+
+        Args:
+            tree_id: String ID of the decision tree
+            parent_id: ID of the parent node (if any)
+            edge_label: Label for the edge from parent to this node
+
+        Returns:
+            ID of the node created for this tree
+        """
         # Check if we've already processed this tree
         if tree_id in self.resolved_trees:
             child_id = self.resolved_trees[tree_id]
@@ -113,6 +149,15 @@ class BigGlobeDecisionTreeVisualizer:
         return node_id
 
     def get_condition_description(self, condition):
+        """
+        Generate a description for a condition node.
+
+        Args:
+            condition: The condition object from the decision tree
+
+        Returns:
+            A string describing the condition
+        """
         condition_type = condition.get("type", "unknown")
 
         if condition_type == "threshold":
@@ -142,7 +187,59 @@ class BigGlobeDecisionTreeVisualizer:
 
         return condition_type
 
-    def visualize_tree(self, root_tree_id, output_file=None, figsize=(15, 10)):
+    def get_node_levels(self):
+        """
+        Calculate the level of each node in the graph for hierarchical layout.
+
+        Returns:
+            Dictionary mapping node IDs to their level in the tree
+        """
+        levels = {}
+
+        # Find root nodes
+        root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
+
+        # Use BFS to calculate levels
+        for root in root_nodes:
+            queue = [(root, 0)]
+            visited = {root}
+
+            while queue:
+                node, level = queue.pop(0)
+                levels[node] = level
+
+                for neighbor in self.G.neighbors(node):
+                    if neighbor not in visited:
+                        visited.add(neighbor)
+                        queue.append((neighbor, level + 1))
+
+        return levels
+
+    def scale_layout(self, pos, scale=1.0):
+        """
+        Scale a layout to reduce node overlap.
+
+        Args:
+            pos: Position dictionary from a layout algorithm
+            scale: Factor by which to scale the layout
+
+        Returns:
+            Scaled position dictionary
+        """
+        return {node: (x * scale, y * scale) for node, (x, y) in pos.items()}
+
+    def visualize_tree(self, root_tree_id, output_file=None, figsize=(30, 20)):
+        """
+        Visualize a decision tree.
+
+        Args:
+            root_tree_id: ID of the root decision tree
+            output_file: Path to save the visualization image (optional)
+            figsize: Size of the figure in inches (width, height)
+
+        Returns:
+            The graph and positions dictionary
+        """
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
@@ -156,31 +253,40 @@ class BigGlobeDecisionTreeVisualizer:
         plt.figure(figsize=figsize)
 
         # Use a hierarchical layout from NetworkX
-        # Replaced pygraphviz with pure NetworkX layout algorithms
         try:
             pos = nx.nx_pydot.pydot_layout(self.G, prog="dot")
         except:
             # Fallback to NetworkX's built-in layout algorithms
             print("Using fallback layout algorithm - for better layout install pydot")
-            pos = nx.spring_layout(self.G, seed=42)
+            try:
+                # Try multipartite layout based on node levels
+                levels = self.get_node_levels()
+                pos = nx.multipartite_layout(self.G, subset_key=lambda node: levels.get(node, 0))
+            except:
+                # Last resort: spring layout
+                pos = nx.spring_layout(self.G, k=2.0, iterations=100, seed=42)
 
-            # For better hierarchical layout, also consider these:
-            # pos = nx.kamada_kawai_layout(self.G)
-            # pos = nx.planar_layout(self.G)
+        # Scale layout to reduce overlap
+        pos = self.scale_layout(pos, scale=3.0)
+
+        # Adjust node sizes based on label length
+        node_sizes = [max(2000, len(self.node_labels.get(node, "")) * 100) for node in self.G.nodes()]
 
         # Draw nodes with custom colors
         node_color_list = [self.node_colors.get(node, "gray") for node in self.G.nodes()]
-        nx.draw_networkx_nodes(self.G, pos, node_color=node_color_list, node_size=2000, alpha=0.8)
+        nx.draw_networkx_nodes(self.G, pos, node_color=node_color_list, node_size=node_sizes, alpha=0.8)
 
-        # Draw edges
-        nx.draw_networkx_edges(self.G, pos, arrows=True, arrowsize=20)
+        # Draw edges with improved visibility
+        nx.draw_networkx_edges(self.G, pos, arrows=True, arrowsize=20, width=1.5,
+                               edge_color='gray', alpha=0.6, connectionstyle='arc3,rad=0.1')
 
-        # Draw labels
-        nx.draw_networkx_labels(self.G, pos, labels=self.node_labels, font_size=8, font_family="sans-serif")
+        # Draw labels with improved readability
+        nx.draw_networkx_labels(self.G, pos, labels=self.node_labels, font_size=10,
+                                font_weight='bold', font_family="sans-serif")
 
         # Draw edge labels
         edge_labels = {(u, v): d["label"] for u, v, d in self.G.edges(data=True) if "label" in d}
-        nx.draw_networkx_edge_labels(self.G, pos, edge_labels=edge_labels, font_size=8)
+        nx.draw_networkx_edge_labels(self.G, pos, edge_labels=edge_labels, font_size=9)
 
         plt.axis("off")
         plt.tight_layout()
@@ -191,10 +297,118 @@ class BigGlobeDecisionTreeVisualizer:
         else:
             plt.show()
 
-        return self.G, pos  # Return graph and positions for further customization
+        return self.G, pos
 
-    def batch_visualize(self, start_dir=None, output_dir="tree_visualizations"):
-        """Visualize all decision trees in a directory"""
+    def split_and_visualize(self, root_tree_id, output_prefix, max_depth=2):
+        """
+        Split a large tree into smaller subtrees and visualize each separately.
+
+        Args:
+            root_tree_id: ID of the root decision tree
+            output_prefix: Prefix for output file paths
+            max_depth: Maximum depth for each subtree
+
+        Returns:
+            Number of subtrees created
+        """
+        self.G = nx.DiGraph()
+        self.node_labels = {}
+        self.node_colors = {}
+        self.node_counter = 0
+        self.resolved_trees = {}
+
+        # Process the entire tree
+        self.process_tree(root_tree_id)
+
+        # Find root nodes
+        root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
+
+        if not root_nodes:
+            print("No root nodes found in the graph")
+            return 0
+
+        # Create a subgraph starting from each root node
+        subtree_count = 0
+        for i, root in enumerate(root_nodes):
+            # Extract the subgraph with limited depth
+            nodes = [root]
+            visited = {root}
+            current_depth = 0
+            frontier = list(self.G.neighbors(root))
+
+            while frontier and current_depth < max_depth:
+                current_depth += 1
+                next_frontier = []
+                for node in frontier:
+                    if node not in visited:
+                        visited.add(node)
+                        nodes.append(node)
+                        next_frontier.extend(self.G.neighbors(node))
+                frontier = next_frontier
+
+            subgraph = self.G.subgraph(nodes).copy()
+
+            # Skip empty subgraphs
+            if len(subgraph) <= 1:
+                continue
+
+            # Create output file path
+            output_file = f"{output_prefix}_{i + 1}.png" if output_prefix else None
+
+            # Visualize the subgraph
+            plt.figure(figsize=(20, 15))
+
+            try:
+                pos = nx.nx_pydot.pydot_layout(subgraph, prog="dot")
+            except:
+                pos = nx.spring_layout(subgraph, k=2.0, iterations=100, seed=42)
+
+            pos = self.scale_layout(pos, scale=2.0)
+
+            # Adjust node sizes
+            sub_node_sizes = [max(2000, len(self.node_labels.get(node, "")) * 100) for node in subgraph.nodes()]
+
+            # Draw nodes
+            sub_node_colors = [self.node_colors.get(node, "gray") for node in subgraph.nodes()]
+            nx.draw_networkx_nodes(subgraph, pos, node_color=sub_node_colors, node_size=sub_node_sizes, alpha=0.8)
+
+            # Draw edges
+            nx.draw_networkx_edges(subgraph, pos, arrows=True, arrowsize=20, width=1.5,
+                                   edge_color='gray', alpha=0.6, connectionstyle='arc3,rad=0.1')
+
+            # Draw labels
+            sub_labels = {node: self.node_labels.get(node, "") for node in subgraph.nodes()}
+            nx.draw_networkx_labels(subgraph, pos, labels=sub_labels, font_size=10,
+                                    font_weight='bold', font_family="sans-serif")
+
+            # Draw edge labels
+            sub_edge_labels = {(u, v): d["label"] for u, v, d in subgraph.edges(data=True) if "label" in d}
+            nx.draw_networkx_edge_labels(subgraph, pos, edge_labels=sub_edge_labels, font_size=9)
+
+            plt.axis("off")
+            plt.tight_layout()
+
+            if output_file:
+                plt.savefig(output_file, dpi=300, bbox_inches="tight")
+                print(f"Subtree {i + 1} visualization saved to {output_file}")
+            else:
+                plt.show()
+
+            plt.close()
+            subtree_count += 1
+
+        print(f"Created {subtree_count} subtree visualizations")
+        return subtree_count
+
+    def batch_visualize(self, start_dir=None, output_dir="tree_visualizations", split=False):
+        """
+        Visualize all decision trees in a directory.
+
+        Args:
+            start_dir: Starting directory (defaults to decision_tree_dir)
+            output_dir: Directory to save visualization images
+            split: Whether to split large trees into subtrees
+        """
         if start_dir is None:
             start_dir = self.decision_tree_dir
         else:
@@ -204,24 +418,36 @@ class BigGlobeDecisionTreeVisualizer:
         os.makedirs(output_dir, exist_ok=True)
 
         # Find all JSON files in the directory and subdirectories
+        tree_count = 0
         for root, _, files in os.walk(start_dir):
             root_path = Path(root)
             for file in files:
                 if file.endswith(".json"):
                     file_path = root_path / file
-                    relative_path = file_path.relative_to(self.decision_tree_dir)
-                    tree_id = str(relative_path.with_suffix(""))
-
-                    # Create output directory structure
-                    tree_output_dir = output_dir / relative_path.parent
-                    os.makedirs(tree_output_dir, exist_ok=True)
-
-                    output_file = tree_output_dir / f"{file.replace('.json', '.png')}"
-                    print(f"Visualizing {tree_id}...")
                     try:
-                        self.visualize_tree(tree_id, output_file)
+                        relative_path = file_path.relative_to(self.decision_tree_dir)
+                        tree_id = str(relative_path.with_suffix(""))
+
+                        # Create output directory structure
+                        tree_output_dir = output_dir / relative_path.parent
+                        os.makedirs(tree_output_dir, exist_ok=True)
+
+                        output_file = tree_output_dir / f"{file.replace('.json', '.png')}"
+                        print(f"Visualizing tree: {tree_id}")
+
+                        if split:
+                            # Split and visualize the tree
+                            prefix = str(tree_output_dir / file.replace('.json', ''))
+                            self.split_and_visualize(tree_id, prefix)
+                        else:
+                            # Visualize the entire tree
+                            self.visualize_tree(tree_id, output_file)
+
+                        tree_count += 1
                     except Exception as e:
-                        print(f"Error visualizing {tree_id}: {e}")
+                        print(f"Error visualizing {file_path}: {e}")
+
+        print(f"Processed {tree_count} decision trees")
 
 
 # Example usage
@@ -231,8 +457,11 @@ if __name__ == "__main__":
 
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir)
 
-    # Visualize a specific tree (e.g., the biome root)
+    # Option 1: Visualize a specific tree
     # visualizer.visualize_tree("overworld/biome/test_cave", "OutPut/BiomeTree.png")
 
-    # Or batch visualize all trees
-    visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages")
+    # Option 2: Visualize a tree and split it into manageable subtrees
+    # visualizer.split_and_visualize("overworld/biome/test_cave", "OutPut/BiomeTree_part", max_depth=2)
+
+    # Option 3: Batch visualize all trees
+    visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True)

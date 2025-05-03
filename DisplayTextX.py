@@ -7,12 +7,13 @@ from pathlib import Path
 
 
 class BigGlobeDecisionTreeVisualizer:
-    def __init__(self, base_dir):
+    def __init__(self, base_dir, truncate_scripts=True):
         """
         Initialize the decision tree visualizer.
 
         Args:
             base_dir: Path to the Big Globe mod files directory
+            truncate_scripts: Whether to truncate long script content in display (default: True)
         """
         self.base_dir = Path(base_dir)
         self.decision_tree_dir = self.base_dir / "data" / "bigglobe" / "worldgen" / "bigglobe_decision_tree"
@@ -21,6 +22,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.node_colors = {}
         self.node_counter = 0
         self.resolved_trees = {}
+        self.truncate_scripts = truncate_scripts
 
     def get_file_path(self, tree_id):
         """
@@ -121,7 +123,11 @@ class BigGlobeDecisionTreeVisualizer:
                 result_value = tree_data["result"].get("value", "...")
             elif result_type == "scripted":
                 script = tree_data["result"].get("script", "...")
-                result_value = f"script: {script[:30]}..." if len(script) > 30 else f"script: {script}"
+                # Only truncate if the option is enabled
+                if self.truncate_scripts and len(script) > 30:
+                    result_value = f"script: {script[:30]}..."
+                else:
+                    result_value = f"script: {script}"
 
             self.node_labels[node_id] = f"Result: {result_type}\n{result_value}"
             self.node_colors[node_id] = "lightgreen"
@@ -174,7 +180,11 @@ class BigGlobeDecisionTreeVisualizer:
 
         elif condition_type == "script":
             script = condition.get("script", "")
-            return f"script: {script[:30]}..." if len(script) > 30 else f"script: {script}"
+            # Only truncate if the option is enabled
+            if self.truncate_scripts and len(script) > 30:
+                return f"script: {script[:30]}..."
+            else:
+                return f"script: {script}"
 
         elif condition_type in ["and", "or"]:
             count = len(condition.get("conditions", []))
@@ -723,13 +733,15 @@ class BigGlobeDecisionTreeVisualizer:
 
         print(f"Processed {tree_count} decision trees")
 
+
 if __name__ == "__main__":
     base_dir = "Imports/BigGlobe"
 
     if not os.path.exists("OutPut") or not os.path.isdir("OutPut"):
         os.makedirs("OutPut")
 
-    visualizer = BigGlobeDecisionTreeVisualizer(base_dir)
+    # Create visualizer with option to show full scripts instead of truncating them
+    visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
 
     visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeHtml", format="html")
     visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeMarkdown", format="markdown")

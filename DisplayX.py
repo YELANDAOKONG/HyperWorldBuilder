@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+import sys
+
 import networkx as nx
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -450,18 +452,11 @@ class BigGlobeDecisionTreeVisualizer:
         print(f"Processed {tree_count} decision trees")
 
 
-# Example usage
 if __name__ == "__main__":
-    # Update this path to your Minecraft root or extracted Big Globe mod directory
     base_dir = "Imports/BigGlobe"
 
+    if not os.path.exists("OutPut") or not os.path.isdir("OutPut"):
+        os.makedirs("OutPut")
+
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir)
-
-    # Option 1: Visualize a specific tree
-    # visualizer.visualize_tree("overworld/biome/test_cave", "OutPut/BiomeTree.png")
-
-    # Option 2: Visualize a tree and split it into manageable subtrees
-    # visualizer.split_and_visualize("overworld/biome/test_cave", "OutPut/BiomeTree_part", max_depth=2)
-
-    # Option 3: Batch visualize all trees
     visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True)

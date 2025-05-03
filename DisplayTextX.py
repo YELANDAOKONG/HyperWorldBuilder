@@ -723,33 +723,13 @@ class BigGlobeDecisionTreeVisualizer:
 
         print(f"Processed {tree_count} decision trees")
 
-# Example usage
-# if __name__ == "__main__":
-#     # Update this path to your Minecraft root or extracted Big Globe mod directory
-#     base_dir = "Imports/BigGlobe"
-#
-#     visualizer = BigGlobeDecisionTreeVisualizer(base_dir)
-#
-#     # Option 1: Visualize a specific tree
-#     # visualizer.visualize_tree("overworld/biome/test_cave", "OutPut/BiomeTree.png")
-#
-#     # Option 2: Visualize a tree and split it into manageable subtrees
-#     # visualizer.split_and_visualize("overworld/biome/test_cave", "OutPut/BiomeTree_part", max_depth=2)
-#
-#     # Option 3: Batch visualize all trees
-#     visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True)
-
 if __name__ == "__main__":
-    # Update this path to your Minecraft root or extracted Big Globe mod directory
     base_dir = "Imports/BigGlobe"
-    visualizer = BigGlobeDecisionTreeVisualizer(base_dir)
-    # Option 1: Export a specific tree as HTML
-    # visualizer.export_tree_as_html("overworld/biome/test_cave", "OutPut/BiomeTree.html")
 
-    # Option 2: Export a specific tree as Markdown
-    # visualizer.export_tree_as_markdown("overworld/biome/test_cave", "OutPut/BiomeTree.md")
-    # Option 3: Batch export all trees
+    if not os.path.exists("OutPut") or not os.path.isdir("OutPut"):
+        os.makedirs("OutPut")
+
+    visualizer = BigGlobeDecisionTreeVisualizer(base_dir)
+
     visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeHtml", format="html")
     visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeMarkdown", format="markdown")
-    # Or export as Markdown
-    # visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeExports", format="markdown")

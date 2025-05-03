@@ -1,0 +1,21 @@
+{
+	"type": "script",
+	"params": {
+		"type": "float",
+		"is_3d": true
+	},
+	"script": [
+		"mixLinear(",
+			"64.0I,",
+			"8.0I,",
+			"float(",
+				"unmixLinear(",
+					"`bigglobe:overworld/basic_surface_y` - easy_depth,",
+					"`bigglobe:overworld/basic_surface_y`,",
+					"y",
+				")",
+			")",
+		")"
+	],
+	"cache": false
+}

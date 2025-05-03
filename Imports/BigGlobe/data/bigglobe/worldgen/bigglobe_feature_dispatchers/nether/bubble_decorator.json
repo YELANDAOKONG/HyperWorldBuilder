@@ -1,0 +1,11 @@
+{
+	"type": "script",
+	"dispatcher": [
+		"for (",
+			"int z in range[minModifiableZ, maxModifiableZ],",
+			"int x in range[minModifiableX, maxModifiableX]",
+		":",
+			"placeFeature(x, 0, z, `bigglobe:nether/bubble`(x, z).decorator)",
+		")"
+	]
+}

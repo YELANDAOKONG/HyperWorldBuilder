@@ -1,0 +1,21 @@
+{
+	"type": "bigglobe:script",
+	"config": {
+		"script": [
+			"BlockState state = BlockState(",
+				"'minecraft:cocoa',",
+				"age: random.nextInt(0, 3),",
+				"facing: random.switch (",
+					"(++originZ,, 'north'),",
+					"(--originZ,, 'south'),",
+					"(--originX,, 'east'),",
+					"(++originX,, 'west')",
+				")",
+			")",
+			"if (getBlockState(originX, originY, originZ).isAir():",
+				"setBlockState(originX, originY, originZ, state)",
+			")",
+			"return(true)"
+		]
+	}
+}

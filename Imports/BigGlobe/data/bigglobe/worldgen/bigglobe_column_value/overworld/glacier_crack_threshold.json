@@ -1,0 +1,20 @@
+{
+	"type": "bigglobe:script",
+	"params": {
+		"type": "float",
+		"is_3d": false
+	},
+	"script": [
+		"min(",
+			"unmixLinear(-0.25I, -0.5I, raw_temperature),",
+			"float(unmixLinear(",
+				"sea_level,",
+				"sea_level - hilliness * 128.0L,",
+				"raw_erosion",
+			"))",
+		")"
+	],
+	"valid": {
+		"where": "raw_erosion < sea_level"
+	}
+}

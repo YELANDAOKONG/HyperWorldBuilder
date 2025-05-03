@@ -1,0 +1,22 @@
+{
+	"type": "bigglobe:script",
+	"config": {
+		"script": [
+			"BlockState state = 'minecraft:vine[north=false,south=false,east=false,west=false,up=false]'",
+			"state = state.with(",
+				"random.switch (",
+					"(++originZ,, 'north'),",
+					"(--originZ,, 'south'),",
+					"(--originX,, 'east'),",
+					"(++originX,, 'west')",
+				"),",
+				"true",
+			")",
+			"while (isYLevelValid(originY) && getBlockState(originX, originY, originZ).isAir():",
+				"setBlockState(originX, originY, originZ, state)",
+				"--originY",
+			")",
+			"return(true)"
+		]
+	}
+}

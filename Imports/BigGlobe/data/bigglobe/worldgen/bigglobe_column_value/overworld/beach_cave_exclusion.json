@@ -1,0 +1,14 @@
+{
+	"type": "bigglobe:script",
+	"params": {
+		"type": "float",
+		"is_3d": false
+	},
+	"script": [
+		"float(unmixSmooth(",
+			"river_water_y + 16.0L,",
+			"river_water_y + 8.0L,",
+			"processed_surface_y",
+		"))"
+	]
+}

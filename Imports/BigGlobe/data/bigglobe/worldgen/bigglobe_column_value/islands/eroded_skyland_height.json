@@ -1,0 +1,23 @@
+{
+	"type": "script",
+	"params": {
+		"type": "double",
+		"is_3d": false
+	},
+	"script": {
+		"template": "bigglobe:sine_wave_erosion",
+		"inputs": {
+			"dx": "exp_skyland_height_noise * dx_skyland_height_noise",
+			"dz": "exp_skyland_height_noise * dz_skyland_height_noise",
+			"minWavelength": "4 << hints.lod",
+			"maxWavelength": "32.0L",
+			"seed": "worldSeed # 16xB305F6533FB64C54UL",
+			"dampening": "16.0L",
+			"amplitude": "16.0L"
+		}
+	},
+	"valid": {
+		"where": "is_floating",
+		"fallback": 0.0
+	}
+}

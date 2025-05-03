@@ -1,0 +1,6 @@
+{
+	"type": "group",
+	"dispatchers": [
+		"bigglobe:nether/bubble_decorator"
+	]
+}

@@ -1,0 +1,19 @@
+{
+	"script": [
+		"if (start.structure == STRUCTURE:",
+			"for (int x in range[start.minX, start.maxX] % 4:",
+				"unless (world_traits.`bigglobe:biome`(x, start.maxY, start.minZ).isIn(BIOMES): return(false))",
+				"unless (world_traits.`bigglobe:biome`(x, start.maxY, start.maxZ).isIn(BIOMES): return(false))",
+			")",
+			"for (int z in range[start.minZ, start.maxZ] % 4:",
+				"unless (world_traits.`bigglobe:biome`(start.minX, start.maxY, z).isIn(BIOMES): return(false))",
+				"unless (world_traits.`bigglobe:biome`(start.maxX, start.maxY, z).isIn(BIOMES): return(false))",
+			")",
+		")",
+		"return(true)"
+	],
+	"inputs": [
+		{ "name": "STRUCTURE", "type": "Structure" },
+		{ "name": "BIOMES",    "type": "BiomeTag"  }
+	]
+}

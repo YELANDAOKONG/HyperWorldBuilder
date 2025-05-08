@@ -17,22 +17,34 @@ class Builder:
     def __init__(self, output_path):
         self.path = output_path
 
-        # Configure colorlog
+        # Configure colorlog with custom colors for different message components
         handler = colorlog.StreamHandler()
         handler.setFormatter(colorlog.ColoredFormatter(
-            '%(log_color)s[%(asctime)s] %(levelname)s - %(message)s',
+            '%(cyan)s[%(asctime)s]%(reset)s %(log_color)s%(levelname)s%(reset)s - %(blue)s%(message)s',
             datefmt='%H:%M:%S',
             log_colors={
                 'DEBUG': 'cyan',
-                'INFO': 'green',
+                'INFO': 'bold_green',
                 'WARNING': 'yellow',
                 'ERROR': 'red',
                 'CRITICAL': 'red,bg_white',
+            },
+            secondary_log_colors={
+                'message': {
+                    'INFO': 'white',
+                    'WARNING': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'red',
+                    'DEBUG': 'cyan'
+                }
             }
         ))
 
         self.logger = logging.getLogger('builder')
         self.logger.setLevel(logging.INFO)
+        # Remove any existing handlers
+        if self.logger.handlers:
+            self.logger.handlers.clear()
         self.logger.addHandler(handler)
         # Prevent log propagation to root logger
         self.logger.propagate = False
@@ -106,30 +118,3 @@ class Builder:
     def init(self):
         self.init_dirs()
         self.init_mcmeta()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -9,7 +9,7 @@ class Builder:
 
     version = "4.11.1" # Big Globe Version
     version_pack_format = 15 # Minecraft Data Pack Format
-    version_pack_description = "&6Hyper World &aCompatibility &bData Pack"
+    version_pack_description = "&6Hyper World &aCompatibility &bPack"
 
     def __init__(self, output_path):
         self.path = output_path

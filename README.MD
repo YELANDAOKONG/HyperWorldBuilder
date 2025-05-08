@@ -9,6 +9,7 @@
 - `Imports`：从相关模组中提取的部分文件、用于可视化决策树及代码引用
 - `Sources`：源代码
 - `Templates`：模版文件
+- `Temporary`：临时文件
 - `Script`：工具脚本
 - `OutPut`：构建输出的文件
 
@@ -20,3 +21,4 @@
 - `DisplayX.py`：用于可视化 Big Globe 原版决策树，生成图片文件
 - `DisplayTextX.py`：用于可视化 Big Globe 原版决策树，生成 HTML 和 MD 文件
 - `Build.py`：用于构建数据包（制作中）
+- `Debug.py`：用于快速调试数据包（制作中）

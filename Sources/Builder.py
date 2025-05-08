@@ -76,6 +76,7 @@ class Builder:
             path.join(self.path, "data", "bigglobe", "tags", "worldgen", "bigglobe_feature_dispatchers", "overworld"),
             path.join(self.path, "data", "bigglobe", "tags", "worldgen", "bigglobe_overrider"),
             path.join(self.path, "data", "bigglobe", "tags", "worldgen", "biome"),
+            path.join(self.path, "data", "bigglobe", "tags", "worldgen", "biome", "has_structure"),
             path.join(self.path, "data", "bigglobe", "tags", "worldgen", "configured_feature"),
             path.join(self.path, "data", "bigglobe", "tags", "worldgen", "configured_feature", "end"),
             path.join(self.path, "data", "bigglobe", "tags", "worldgen", "configured_feature", "islands"),
@@ -118,3 +119,63 @@ class Builder:
     def init(self):
         self.init_dirs()
         self.init_mcmeta()
+
+    ################################################################################
+
+    def delete_structure(self, name: str):
+        data = {
+            "replace": True,
+            "values": []
+        }
+        basic_path = path.join(self.path, "data", "bigglobe", "tags", "worldgen", "biome", "has_structure")
+
+        # Split the name into directory components if path separators exist
+        name_parts = name.split('/')
+        file_name = name_parts[-1] + ".json"
+
+        # Combine any subdirectories with the basic path
+        if len(name_parts) > 1:
+            dir_path = path.join(basic_path, *name_parts[:-1])
+        else:
+            dir_path = basic_path
+
+        # Create directories if they don't exist
+        if not path.exists(dir_path):
+            self.logger.info(f"Creating directory structure: {dir_path}")
+            os.makedirs(dir_path, exist_ok=True)
+
+        # Create the full file path
+        file_path = path.join(dir_path, file_name)
+
+        # Write the file
+        self.logger.info(f"Writing empty structure file: {file_path}")
+        with open(file_path, "w") as f:
+            json.dump(data, f, indent=4)
+
+        self.logger.info(f"Structure \'{name}\' has been deleted/emptied")
+
+
+    def map_origin_decision_tree(self):
+        return
+        # TODO...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

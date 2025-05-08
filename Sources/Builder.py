@@ -3,6 +3,7 @@ import json
 import os
 import os.path as path
 import tomllib
+import logging
 
 class Builder:
     color_char = "\u00A7"
@@ -13,20 +14,22 @@ class Builder:
 
     def __init__(self, output_path):
         self.path = output_path
+        logging.basicConfig(
+            level=logging.INFO,
+            format='[%(asctime)s] (%(levelname)s) - %(message)s'
+        )
 
     def handle_color(self, strs: str) -> str:
         return strs.replace("&", self.color_char).replace(self.color_char + self.color_char, "&")
 
     def clean_output(self):
-        for root, dirs, files in os.walk(self.path):
-            for f in files:
-                file_path = os.path.join(root, f)
-                os.remove(file_path)
-            for d in dirs:
-                dir_path = os.path.join(root, d)
-                os.rmdir(dir_path)
-        if not path.exists(self.path):
-            os.makedirs(self.path)
+        logging.info(f"Cleaning output directory: {self.path}")
+        if path.exists(self.path):
+            import shutil
+            shutil.rmtree(self.path)
+            logging.info(f"Output directory {self.path} cleaned")
+        logging.info(f"Creating output directory: {self.path}")
+        os.makedirs(self.path)
 
     def init_dirs(self):
         paths = [
@@ -69,6 +72,7 @@ class Builder:
         ]
         for p in paths:
             if not path.exists(p):
+                logging.info("Creating directory: %s", p)
                 os.makedirs(p)
 
     def init_mcmeta(self):

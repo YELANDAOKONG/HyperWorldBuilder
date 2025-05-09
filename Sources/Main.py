@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import os.path
 from typing import List
 
@@ -14,5 +15,8 @@ def build_main(args: List[str]) -> int:
 
     builder.delete_structure("obelisk")
     builder.delete_structure("abandonedcity")
+
+    # data = builder.map_decision_tree(os.path.join(os.path.dirname(__file__), "..", "Imports", "BigGlobe", "data", "bigglobe", "worldgen", "bigglobe_decision_tree"),  "bigglobe:overworld/biome/test_cave")
+    # print(json.dumps(data, indent=4))
 
     return 0

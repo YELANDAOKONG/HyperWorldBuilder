@@ -7,6 +7,27 @@ import logging
 import colorlog
 
 
+def get_decision_tree_node_file_path(base_path, node_id):
+    """
+    将决策树节点ID转换为文件路径。
+
+    Args:
+        base_path: 决策树文件的基础目录路径（通常是bigglobe_decision_tree目录）
+        node_id: 节点标识符，可以是相对路径或带命名空间的完整路径
+
+    Returns:
+        str: 对应节点的完整文件路径
+    """
+    if ":" in node_id:  # 处理命名空间格式 (namespace:path)
+        namespace, rel_path = node_id.split(":", 1)
+        # 忽略命名空间，直接使用相对路径部分
+        rel_path = rel_path.replace("/", os.sep)
+        return path.join(base_path, f"{rel_path}.json")
+    else:
+        # 纯相对路径
+        return path.join(base_path, f"{node_id}.json")
+
+
 class Builder:
     color_char = "\u00A7"
 
@@ -154,9 +175,92 @@ class Builder:
 
         self.logger.info(f"Structure \'{name}\' has been deleted/emptied")
 
+    def map_decision_tree(self, script_path: str, root_node: str):
+        """
+        将决策树映射到内存中的可修改数据结构。
 
-    def map_origin_decision_tree(self):
-        return # TODO...
+        Args:
+            script_path: bigglobe_decision_tree目录的路径
+            root_node: 根节点的名称/标识符
+
+        Returns:
+            dict: 包含完整决策树网络的字典，键为节点ID，值为节点数据
+        """
+        self.logger.info(f"Mapping decision tree from root node: {root_node}")
+
+        # 构建根节点文件路径
+        root_tree_path = get_decision_tree_node_file_path(script_path, root_node)
+        if not path.exists(root_tree_path):
+            self.logger.error(f"Root tree file not found: {root_tree_path}")
+            raise FileNotFoundError(f"Root tree file not found: {root_tree_path}")
+
+        # 存储所有树节点的映射
+        tree_map = {}
+
+        # 递归加载和解析决策树
+        def resolve_tree_node(node_id):
+            # 如果节点已经解析过，直接返回
+            if node_id in tree_map:
+                return tree_map[node_id]
+
+            # 确定节点文件路径
+            node_path = get_decision_tree_node_file_path(script_path, node_id)
+
+            # 检查文件是否存在
+            if not path.exists(node_path):
+                self.logger.warning(f"Tree node file not found: {node_path}")
+                return None
+
+            # 加载节点数据
+            try:
+                with open(node_path, "r") as f:
+                    node_data = json.load(f)
+
+                # 存储到映射中
+                tree_map[node_id] = node_data
+
+                # 如果是条件节点，递归解析引用的子节点
+                if "condition" in node_data:
+                    # 处理if_true分支
+                    if "if_true" in node_data:
+                        resolve_tree_node(node_data["if_true"])
+
+                    # 处理if_false分支
+                    if "if_false" in node_data:
+                        resolve_tree_node(node_data["if_false"])
+
+                    # 处理复合条件中可能嵌套的条件
+                    condition = node_data["condition"]
+                    if condition["type"] in ["and", "or"] and "conditions" in condition:
+                        # 递归检查嵌套条件中可能引用的决策树
+                        for nested_condition in condition["conditions"]:
+                            if isinstance(nested_condition, dict) and "type" in nested_condition and nested_condition[
+                                "type"] == "decision_tree":
+                                if "tree" in nested_condition:
+                                    resolve_tree_node(nested_condition["tree"])
+
+                    # 处理not条件
+                    elif condition["type"] == "not" and "condition" in condition:
+                        nested_condition = condition["condition"]
+                        if isinstance(nested_condition, dict) and "type" in nested_condition and nested_condition[
+                            "type"] == "decision_tree":
+                            if "tree" in nested_condition:
+                                resolve_tree_node(nested_condition["tree"])
+
+                return node_data
+
+            except Exception as e:
+                self.logger.error(f"Failed to parse tree node {node_id}: {e}")
+                return None
+
+        # 从根节点开始解析
+        resolve_tree_node(root_node)
+
+        self.logger.info(f"Successfully mapped decision tree with {len(tree_map)} nodes")
+        return tree_map
+
+
+
 
 
 

@@ -4,6 +4,8 @@ import os
 import os.path as path
 import tomllib
 import logging
+import zipfile
+
 import colorlog
 
 
@@ -140,6 +142,20 @@ class Builder:
     def init(self):
         self.init_dirs()
         self.init_mcmeta()
+
+    def pack_zip(self, output_path: str, delete_exists: bool = True):
+        if delete_exists:
+            if path.exists(output_path):
+                self.logger.info(f"Deleting existing datapack: {output_path}")
+                os.remove(output_path)
+
+        self.logger.info(f"Packing datapack to {output_path}")
+        with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(self.path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zipf.write(str(file_path), str(os.path.relpath(file_path, self.path)))
+        self.logger.info(f"Datapack packed to {output_path}")
 
     ################################################################################
 

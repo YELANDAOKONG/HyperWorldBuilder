@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import time
 import tempfile
 import shutil
@@ -11,7 +12,8 @@ from datetime import datetime
 
 # Import the builder module
 try:
-    from Sources.Builder import Builder
+    # from Sources.Builder import Builder
+    import Sources.Main as Main
 except ImportError:
     print("Failed to import Builder module. Make sure Sources/Builder.py exists")
     exit(1)
@@ -75,10 +77,11 @@ def build_datapack(datapack_path: str) -> bool:
         output_path = os.path.join(os.path.dirname(__file__), "OutPut", "DataPack")
 
         # Create builder instance and build the datapack
-        builder = Builder(output_path)
-        builder.clean_output()
-        builder.init_dirs()
-        builder.init_mcmeta()
+        # builder = Builder(output_path)
+        # builder.clean_output()
+        # builder.init_dirs()
+        # builder.init_mcmeta()
+        code = Main.build_main(sys.argv)
 
         # Additional build steps can be added here
 

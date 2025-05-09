@@ -92,6 +92,9 @@ def build_debug(args: List[str]) -> int:
         json.dump(test_hot, f, indent=4)
 
 
+
+    # "double base = continentalness * 0.2"
+    # "double variation = 16.0 + raw_erosion_64 * 8.0"
     raw_erosion = {
         "type": "bigglobe:script",
         "params": {
@@ -99,9 +102,14 @@ def build_debug(args: List[str]) -> int:
             "is_3d": False
         },
         "script": [
-            "double base = continentalness * 0.2", # "double base = continentalness * 0.2"
-            "double variation = 16.0 + raw_erosion_64 * 8.0", # "double variation = 16.0 + raw_erosion_64 * 8.0"
-            "return (base * variation)"
+            "double base = continentalness * 0.2",
+            "double variation = 8.0 + raw_erosion_64 * 4.0",
+            "double height = base * variation",
+            "height = min(height, 64.0)",
+            "if (continentalness < 0.0) {",
+            "    height = height * max(0.0, 1.0 + continentalness * 2.0)",
+            "}",
+            "return height"
         ]
     }
     with open(path.join(column_value_dir, "raw_erosion.json"), "w") as f:

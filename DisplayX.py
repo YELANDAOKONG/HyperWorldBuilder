@@ -485,7 +485,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.logger.info(f"Created {subtree_count} subtree visualizations")
         return subtree_count
 
-    def batch_visualize(self, start_dir=None, output_dir="tree_visualizations", split=False):
+    def batch_visualize(self, start_dir=None, output_dir="tree_visualizations", split=False, max_depth=2):
         """
         Visualize all decision trees in a directory.
 
@@ -526,7 +526,7 @@ class BigGlobeDecisionTreeVisualizer:
                         if split:
                             # Split and visualize the tree
                             prefix = str(tree_output_dir / file.replace('.json', ''))
-                            self.split_and_visualize(tree_id, prefix)
+                            self.split_and_visualize(tree_id, prefix, max_depth)
                         else:
                             # Visualize the entire tree
                             self.visualize_tree(tree_id, output_file)
@@ -545,5 +545,5 @@ if __name__ == "__main__":
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
 
     # Process all trees
-    visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True)
+    visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True, max_depth=8192)
 

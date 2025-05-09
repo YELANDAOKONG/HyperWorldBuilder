@@ -143,7 +143,7 @@ class Builder:
         self.init_dirs()
         self.init_mcmeta()
 
-    def pack_zip(self, output_path: str, delete_exists: bool = True):
+    def pack_zip(self, output_path: str, delete_exists: bool = False):
         if delete_exists:
             if path.exists(output_path):
                 self.logger.info(f"Deleting existing datapack: {output_path}")

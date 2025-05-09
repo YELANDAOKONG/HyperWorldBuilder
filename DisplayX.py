@@ -2,10 +2,13 @@
 import os
 import json
 import sys
+import logging
+import colorlog
+import shutil
+from pathlib import Path
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from pathlib import Path
 
 
 class BigGlobeDecisionTreeVisualizer:
@@ -25,6 +28,52 @@ class BigGlobeDecisionTreeVisualizer:
         self.node_counter = 0
         self.resolved_trees = {}
         self.truncate_scripts = truncate_scripts
+
+        # Configure colorlog with custom colors for different message components
+        handler = colorlog.StreamHandler()
+        handler.setFormatter(colorlog.ColoredFormatter(
+            '%(cyan)s[%(asctime)s]%(reset)s %(log_color)s%(levelname)s%(reset)s - %(blue)s%(message)s',
+            datefmt='%H:%M:%S',
+            log_colors={
+                'DEBUG': 'cyan',
+                'INFO': 'bold_green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'red,bg_white',
+            },
+            secondary_log_colors={
+                'message': {
+                    'INFO': 'white',
+                    'WARNING': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'red',
+                    'DEBUG': 'cyan'
+                }
+            }
+        ))
+
+        self.logger = logging.getLogger('visualizer')
+        self.logger.setLevel(logging.INFO)
+        # Remove any existing handlers
+        if self.logger.handlers:
+            self.logger.handlers.clear()
+        self.logger.addHandler(handler)
+        # Prevent log propagation to root logger
+        self.logger.propagate = False
+
+    def clean_output(self, output_dir):
+        """
+        Clean output directory before generating new visualizations.
+
+        Args:
+            output_dir: Directory to clean
+        """
+        self.logger.info(f"Cleaning output directory: {output_dir}")
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+            self.logger.info(f"Output directory {output_dir} cleaned")
+        self.logger.info(f"Creating output directory: {output_dir}")
+        os.makedirs(output_dir, exist_ok=True)
 
     def get_file_path(self, tree_id):
         """
@@ -58,17 +107,17 @@ class BigGlobeDecisionTreeVisualizer:
         """
         file_path = self.get_file_path(tree_id)
         if not file_path.exists():
-            print(f"Warning: File not found for tree ID {tree_id} at {file_path}")
+            self.logger.warning(f"File not found for tree ID {tree_id} at {file_path}")
             return None
 
         try:
             with open(file_path, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in file {file_path}")
+            self.logger.error(f"Invalid JSON in file {file_path}")
             return None
         except Exception as e:
-            print(f"Error loading file {file_path}: {e}")
+            self.logger.error(f"Error loading file {file_path}: {e}")
             return None
 
     def process_tree(self, tree_id, parent_id=None, edge_label=None):
@@ -123,6 +172,9 @@ class BigGlobeDecisionTreeVisualizer:
 
             if result_type == "constant":
                 result_value = tree_data["result"].get("value", "...")
+                # Handle class type constants which are objects
+                if isinstance(result_value, dict):
+                    result_value = f"Object with {len(result_value)} fields"
             elif result_type == "scripted":
                 script = tree_data["result"].get("script", "...")
                 # Only truncate if the option is enabled
@@ -172,13 +224,17 @@ class BigGlobeDecisionTreeVisualizer:
             column_value = condition.get("column_value", "?")
             min_val = condition.get("min", "?")
             max_val = condition.get("max", "?")
-            return f"{column_value}: {min_val} to {max_val}"
+            smooth_min = "smooth" if condition.get("smooth_min", True) else "sharp"
+            smooth_max = "smooth" if condition.get("smooth_max", True) else "sharp"
+            return f"{column_value}: {min_val} to {max_val} ({smooth_min}/{smooth_max})"
 
         elif condition_type == "world_trait_threshold":
             trait = condition.get("trait", "?")
             min_val = condition.get("min", "?")
             max_val = condition.get("max", "?")
-            return f"{trait}: {min_val} to {max_val}"
+            smooth_min = "smooth" if condition.get("smooth_min", True) else "sharp"
+            smooth_max = "smooth" if condition.get("smooth_max", True) else "sharp"
+            return f"{trait}: {min_val} to {max_val} ({smooth_min}/{smooth_max})"
 
         elif condition_type == "script":
             script = condition.get("script", "")
@@ -189,8 +245,13 @@ class BigGlobeDecisionTreeVisualizer:
                 return f"script: {script}"
 
         elif condition_type in ["and", "or"]:
-            count = len(condition.get("conditions", []))
-            return f"{count} conditions"
+            conditions = condition.get("conditions", [])
+            count = len(conditions)
+            if count <= 3:  # For a small number of conditions, show their types
+                condition_types = [c.get("type", "?") for c in conditions]
+                return f"{condition_type.upper()} {', '.join(condition_types)}"
+            else:
+                return f"{condition_type.upper()} {count} conditions"
 
         elif condition_type == "not":
             inner_condition = condition.get("condition", {})
@@ -259,6 +320,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
         # Process the tree
+        self.logger.info(f"Processing decision tree: {root_tree_id}")
         self.process_tree(root_tree_id)
 
         # Create visualization
@@ -267,15 +329,18 @@ class BigGlobeDecisionTreeVisualizer:
         # Use a hierarchical layout from NetworkX
         try:
             pos = nx.nx_pydot.pydot_layout(self.G, prog="dot")
+            self.logger.info("Using pydot layout algorithm")
         except:
             # Fallback to NetworkX's built-in layout algorithms
-            print("Using fallback layout algorithm - for better layout install pydot")
+            self.logger.warning("Using fallback layout algorithm - for better layout install pydot")
             try:
                 # Try multipartite layout based on node levels
                 levels = self.get_node_levels()
                 pos = nx.multipartite_layout(self.G, subset_key=lambda node: levels.get(node, 0))
+                self.logger.info("Using multipartite layout algorithm")
             except:
                 # Last resort: spring layout
+                self.logger.warning("Using spring layout algorithm as last resort")
                 pos = nx.spring_layout(self.G, k=2.0, iterations=100, seed=42)
 
         # Scale layout to reduce overlap
@@ -305,7 +370,7 @@ class BigGlobeDecisionTreeVisualizer:
 
         if output_file:
             plt.savefig(output_file, dpi=300, bbox_inches="tight")
-            print(f"Tree visualization saved to {output_file}")
+            self.logger.info(f"Tree visualization saved to {output_file}")
         else:
             plt.show()
 
@@ -330,13 +395,14 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
         # Process the entire tree
+        self.logger.info(f"Processing tree for splitting: {root_tree_id}")
         self.process_tree(root_tree_id)
 
         # Find root nodes
         root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
 
         if not root_nodes:
-            print("No root nodes found in the graph")
+            self.logger.warning("No root nodes found in the graph")
             return 0
 
         # Create a subgraph starting from each root node
@@ -373,6 +439,7 @@ class BigGlobeDecisionTreeVisualizer:
             try:
                 pos = nx.nx_pydot.pydot_layout(subgraph, prog="dot")
             except:
+                self.logger.warning(f"Falling back to spring layout for subtree {i + 1}")
                 pos = nx.spring_layout(subgraph, k=2.0, iterations=100, seed=42)
 
             pos = self.scale_layout(pos, scale=2.0)
@@ -402,14 +469,14 @@ class BigGlobeDecisionTreeVisualizer:
 
             if output_file:
                 plt.savefig(output_file, dpi=300, bbox_inches="tight")
-                print(f"Subtree {i + 1} visualization saved to {output_file}")
+                self.logger.info(f"Subtree {i + 1} visualization saved to {output_file}")
             else:
                 plt.show()
 
             plt.close()
             subtree_count += 1
 
-        print(f"Created {subtree_count} subtree visualizations")
+        self.logger.info(f"Created {subtree_count} subtree visualizations")
         return subtree_count
 
     def batch_visualize(self, start_dir=None, output_dir="tree_visualizations", split=False):
@@ -427,10 +494,13 @@ class BigGlobeDecisionTreeVisualizer:
             start_dir = Path(start_dir)
 
         output_dir = Path(output_dir)
-        os.makedirs(output_dir, exist_ok=True)
+
+        # Clean output directory before starting
+        self.clean_output(output_dir)
 
         # Find all JSON files in the directory and subdirectories
         tree_count = 0
+        self.logger.info(f"Starting batch visualization from {start_dir}")
         for root, _, files in os.walk(start_dir):
             root_path = Path(root)
             for file in files:
@@ -445,7 +515,7 @@ class BigGlobeDecisionTreeVisualizer:
                         os.makedirs(tree_output_dir, exist_ok=True)
 
                         output_file = tree_output_dir / f"{file.replace('.json', '.png')}"
-                        print(f"Visualizing tree: {tree_id}")
+                        self.logger.info(f"Visualizing tree: {tree_id}")
 
                         if split:
                             # Split and visualize the tree
@@ -457,16 +527,17 @@ class BigGlobeDecisionTreeVisualizer:
 
                         tree_count += 1
                     except Exception as e:
-                        print(f"Error visualizing {file_path}: {e}")
+                        self.logger.error(f"Error visualizing {file_path}: {e}")
 
-        print(f"Processed {tree_count} decision trees")
+        self.logger.info(f"Processed {tree_count} decision trees")
 
 
 if __name__ == "__main__":
     base_dir = "Imports/BigGlobe"
 
-    if not os.path.exists("OutPut") or not os.path.isdir("OutPut"):
-        os.makedirs("OutPut")
-
+    # Clean and create output directory
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
+
+    # Process all trees
     visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True)
+

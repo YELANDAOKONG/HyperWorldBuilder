@@ -35,9 +35,15 @@ def build_debug(args: List[str]) -> int:
 
     tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree", "overworld")
     column_value_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_column_value", "overworld")
+    configured_feature = path.join(output_path, "data", "bigglobe", "worldgen", "configured_feature")
     os.makedirs(tree_dir, exist_ok=True)
     os.makedirs(path.join(tree_dir, "biome"), exist_ok=True)
+    os.makedirs(path.join(tree_dir, "surface_state"), exist_ok=True)
     os.makedirs(column_value_dir, exist_ok=True)
+    os.makedirs(configured_feature, exist_ok=True)
+    os.makedirs(path.join(configured_feature, "overworld"), exist_ok=True)
+    os.makedirs(path.join(configured_feature, "overworld", "flowers"), exist_ok=True)
+
 
     lavender_field = {
         "result": {
@@ -60,6 +66,32 @@ def build_debug(args: List[str]) -> int:
     with open(path.join(tree_dir, "biome", "test_warm.json"), "w") as f:
         json.dump(test_warm, f, indent=4)
 
+
+    test_hot = {
+        "condition": {
+            "type": "world_trait_threshold",
+            "min": 0.5,
+            "max": 0.75,
+            "trait": "bigglobe:temperature_at_surface"
+        },
+        "if_true": "bigglobe:overworld/surface_state/lavender_field",
+        "if_false": "bigglobe:overworld/surface_state/lavender_field"
+    }
+    lavender_field_surface_state = {
+        "result": {
+            "type": "constant",
+            "value": {
+                "surfaceState": "minecraft:grass_block",
+                "subsurfaceState": "minecraft:dirt"
+            }
+        }
+    }
+    with open(path.join(tree_dir, "surface_state", "test_hot.json"), "w") as f:
+        json.dump(lavender_field_surface_state, f, indent=4)
+    with open(path.join(tree_dir, "surface_state", "lavender_field.json"), "w") as f:
+        json.dump(test_hot, f, indent=4)
+
+
     raw_erosion = {
         "type": "bigglobe:script",
         "params": {
@@ -67,13 +99,212 @@ def build_debug(args: List[str]) -> int:
             "is_3d": False
         },
         "script": [
-            "double base = continentalness * 0.2",
-            "double variation = 16.0 + raw_erosion_64 * 8.0",
+            "double base = continentalness * 0.2", # "double base = continentalness * 0.2"
+            "double variation = 16.0 + raw_erosion_64 * 8.0", # "double variation = 16.0 + raw_erosion_64 * 8.0"
             "return (base * variation)"
         ]
     }
     with open(path.join(column_value_dir, "raw_erosion.json"), "w") as f:
         json.dump(raw_erosion, f, indent=4)
+
+
+    flowers = {
+        "type": "bigglobe:flower",
+        "config": {
+            "seed": "flowers",
+            "distance": 32,
+            "variation": 32,
+            "spawn_chance": 1,
+            "randomize_chance": 0.2,
+            "randomize_radius": {
+                "type": "uniform",
+                "min": 12,
+                "max": 24
+            },
+            "noise": {
+                "type": "abs",
+                "grid": {
+                    "type": "sum",
+                    "layers": [
+                        {
+                            "type": "smooth",
+                            "scale": 32,
+                            "amplitude": 0.25
+                        },
+                        {
+                            "type": "smooth",
+                            "scale": 16,
+                            "amplitude": 0.25
+                        },
+                        {
+                            "type": "smooth",
+                            "scale": 8,
+                            "amplitude": 0.25
+                        },
+                        {
+                            "type": "smooth",
+                            "scale": 4,
+                            "amplitude": 0.25
+                        }
+                    ]
+                }
+            },
+            "entries": [
+                {
+                    "weight": 80,
+                    "restrictions": {
+                        "type": "and",
+                        "restrictions": [
+                            {
+                                "type": "range",
+                                "property": "bigglobe:overworld/height_adjusted_foliage",
+                                "min": 0.4,
+                                "mid": 0.5,
+                                "max": 0.6
+                            },
+                            {
+                                "type": "range",
+                                "property": "bigglobe:overworld/height_adjusted_temperature",
+                                "min": 0.7,
+                                "mid": 0.75,
+                                "max": 0.8
+                            },
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/hilliness",
+                                "min": 0,
+                                "max": 0.4,
+                                "smooth_max": True
+                            }
+                        ]
+                    },
+                    "radius": {
+                        "type": "uniform",
+                        "min": 48,
+                        "max": 96
+                    },
+                    "state": "biomesoplenty:tall_lavender[half=lower]"
+                },
+                {
+                    "defaults": {
+                        "restrictions": {
+                            "type": "and",
+                            "restrictions": [
+                                {
+                                    "type": "range",
+                                    "property": "bigglobe:overworld/height_adjusted_foliage",
+                                    "min": 0.3,
+                                    "mid": 0.5,
+                                    "max": 0.7
+                                },
+                                {
+                                    "type": "range",
+                                    "property": "bigglobe:overworld/height_adjusted_temperature",
+                                    "min": 0.6,
+                                    "mid": 0.75,
+                                    "max": 0.9
+                                }
+                            ]
+                        }
+                    },
+                    "variations": [
+                        {
+                            "weight": 100,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 32,
+                                "max": 64
+                            },
+                            "state": "biomesoplenty:lavender"
+                        },
+                        {
+                            "weight": 40,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 24,
+                                "max": 48
+                            },
+                            "state": "biomesoplenty:tall_lavender[half=lower]"
+                        },
+                        {
+                            "weight": 15,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 16,
+                                "max": 32
+                            },
+                            "state": "minecraft:cornflower"
+                        },
+                        {
+                            "weight": 10,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 12,
+                                "max": 24
+                            },
+                            "state": "minecraft:allium"
+                        },
+                        {
+                            "weight": 10,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 12,
+                                "max": 24
+                            },
+                            "state": "minecraft:azure_bluet"
+                        },
+                        {
+                            "weight": 8,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 12,
+                                "max": 24
+                            },
+                            "state": "minecraft:oxeye_daisy"
+                        },
+                        {
+                            "weight": 5,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 8,
+                                "max": 16
+                            },
+                            "state": "minecraft:grass"
+                        },
+                        {
+                            "weight": 5,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 8,
+                                "max": 16
+                            },
+                            "state": "minecraft:tall_grass[half=lower]"
+                        },
+                        {
+                            "weight": 3,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 8,
+                                "max": 16
+                            },
+                            "state": "minecraft:dandelion"
+                        },
+                        {
+                            "weight": 2,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 8,
+                                "max": 16
+                            },
+                            "state": "minecraft:poppy"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    with open(path.join(configured_feature, "overworld", "flowers", "flowers.json"), "w") as f:
+        json.dump(flowers, f, indent=4)
 
 
     return 0

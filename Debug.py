@@ -60,7 +60,7 @@ processed_dirs = set()
 logger = setup_logger()
 
 
-def build_datapack(datapack_path: str) -> bool:
+def build_datapack(datapack_path: str, sys_args: List[str], debug_option: bool = False) -> bool:
     """
     Build a Minecraft datapack
 
@@ -69,25 +69,25 @@ def build_datapack(datapack_path: str) -> bool:
 
     Returns:
         bool: True if build was successful, False otherwise
+        sys_args: The system arguments passed to the build script
+        debug_option: Whether to build in debug option
     """
     try:
         logger.info(f"Building datapack from: {datapack_path}")
 
         # Set up output path as specified
-        output_path = os.path.join(os.path.dirname(__file__), "OutPut", "DataPack")
+        # output_path = os.path.join(os.path.dirname(__file__), "OutPut", "DataPack")
 
         # Create builder instance and build the datapack
         # builder = Builder(output_path)
         # builder.clean_output()
         # builder.init_dirs()
         # builder.init_mcmeta()
-        args = sys.argv.copy()
-        if "--debug" in args:
-            args.remove("--debug")
+        if debug_option:
             logger.info("Building in debug mode...")
-            code = Main.build_debug(args)
+            code = Main.build_debug(sys_args)
         else:
-            code = Main.build_main(args)
+            code = Main.build_main(sys_args)
 
         logger.info("Build completed successfully")
         return True
@@ -185,12 +185,14 @@ def is_minecraft_world_folder(path: str) -> bool:
         return False
 
 
-def scan_temp_directory(temp_dir: str) -> None:
+def scan_temp_directory(temp_dir: str, sys_args: List[str], debug_option: bool = False) -> None:
     """
     Scan temporary directory for new Minecraft world folders
 
     Args:
         temp_dir: Temporary directory to scan
+        sys_args: The system arguments passed to the build script
+        debug_option: Whether to build in debug option
     """
     try:
         # List all directories in the temporary directory
@@ -206,9 +208,12 @@ def scan_temp_directory(temp_dir: str) -> None:
                     processed_dirs.add(full_path)
 
                     # Build the datapack
-                    if build_datapack(full_path):
+                    if build_datapack(full_path, sys_args, debug_option):
                         # Get source directory where datapack was built
-                        source_dir = os.path.join(os.path.dirname(__file__), "OutPut", "DataPack")
+                        if not debug_option:
+                            source_dir = os.path.join(os.path.dirname(__file__), "OutPut", "DataPack")
+                        else:
+                            source_dir = os.path.join(os.path.dirname(__file__), "OutPut", "DataPackDebug")
 
                         # Copy to a DataPack folder within the world directory
                         copy_to_target(source_dir, full_path)
@@ -219,7 +224,7 @@ def scan_temp_directory(temp_dir: str) -> None:
         logger.error(f"Error scanning temporary directory: {str(e)}")
 
 
-def main():
+def main(sys_args: List[str], debug_option: bool = False):
     try:
         # Directory to monitor (system temporary directory)
         watch_dir = tempfile.gettempdir()
@@ -230,7 +235,7 @@ def main():
         while True:
             try:
                 # Scan temporary directory for new Minecraft worlds
-                scan_temp_directory(watch_dir)
+                scan_temp_directory(watch_dir, sys_args, debug_option)
 
                 # Wait before next scan
                 time.sleep(2)  # Scan every 2 seconds
@@ -249,7 +254,12 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        args = sys.argv.copy()
+        if "--debug" in args:
+            args.remove("--debug")
+            main(args, True)
+        else:
+            main(args, False)
     except Exception as e:
         logger.critical(f"Fatal error: {str(e)}")
         # Sleep before exiting to ensure the error message is seen

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os.path
+from os import path
 from typing import List
 
 from Sources.Builder import Builder
@@ -30,5 +31,29 @@ def build_debug(args: List[str]) -> int:
 
     builder.delete_structure("obelisk")
     builder.delete_structure("abandonedcity")
+
+
+    tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree", "overworld")
+    lavender_field = {
+        "result": {
+            "type": "constant",
+            "value": "biomesoplenty:lavender_field"
+        }
+    }
+    test_warm = {
+        "condition": {
+            "type": "world_trait_threshold",
+            "min": -0.125,
+            "max":  0.125,
+            "trait": "bigglobe:temperature_at_surface"
+        },
+        "if_true": "bigglobe:overworld/biome/lavender_field",
+        "if_false": "bigglobe:overworld/biome/lavender_field"
+    }
+    with open(path.join(tree_dir, "biome", "lavender_field.json"), "w") as f:
+        json.dump(lavender_field, f, indent=4)
+    with open(path.join(tree_dir, "biome", "test_warm.json"), "w") as f:
+        json.dump(test_warm, f, indent=4)
+
     return 0
 

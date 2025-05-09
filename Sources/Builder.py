@@ -154,7 +154,7 @@ class Builder:
             for root, dirs, files in os.walk(self.path):
                 for file in files:
                     file_path = os.path.join(root, file)
-                    zipf.write(str(file_path), str(os.path.relpath(file_path, self.path)))
+                    zipf.write(str(file_path), str(os.path.relpath(str(file_path), self.path)))
         self.logger.info(f"Datapack packed to {output_path}")
 
     ################################################################################

@@ -34,6 +34,11 @@ def build_debug(args: List[str]) -> int:
 
 
     tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree", "overworld")
+    column_value_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_column_value", "overworld")
+    os.makedirs(tree_dir, exist_ok=True)
+    os.makedirs(path.join(tree_dir, "biome"), exist_ok=True)
+    os.makedirs(column_value_dir, exist_ok=True)
+
     lavender_field = {
         "result": {
             "type": "constant",
@@ -54,6 +59,22 @@ def build_debug(args: List[str]) -> int:
         json.dump(lavender_field, f, indent=4)
     with open(path.join(tree_dir, "biome", "test_warm.json"), "w") as f:
         json.dump(test_warm, f, indent=4)
+
+    raw_erosion = {
+        "type": "bigglobe:script",
+        "params": {
+            "type": "double",
+            "is_3d": False
+        },
+        "script": [
+            "double base = continentalness * 0.2",
+            "double variation = 16.0 + raw_erosion_64 * 8.0",
+            "return (base * variation)"
+        ]
+    }
+    with open(path.join(column_value_dir, "raw_erosion.json"), "w") as f:
+        json.dump(raw_erosion, f, indent=4)
+
 
     return 0
 

@@ -6,6 +6,7 @@ import tempfile
 import shutil
 import logging
 import colorlog
+import importlib
 import re
 from typing import List, Set
 from datetime import datetime
@@ -83,6 +84,7 @@ def build_datapack(datapack_path: str, sys_args: List[str], debug_option: bool =
         # builder.clean_output()
         # builder.init_dirs()
         # builder.init_mcmeta()
+        importlib.reload(Main)
         if debug_option:
             logger.info("Building in debug mode...")
             code = Main.build_debug(sys_args)

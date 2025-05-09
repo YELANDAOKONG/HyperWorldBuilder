@@ -25,6 +25,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
+        self.node_paths = {}  # New attribute to track node paths
         self.node_counter = 0
         self.resolved_trees = {}
         self.truncate_scripts = truncate_scripts
@@ -147,6 +148,7 @@ class BigGlobeDecisionTreeVisualizer:
             self.G.add_node(node_id)
             self.node_labels[node_id] = f"Missing: {tree_id}"
             self.node_colors[node_id] = "gray"
+            self.node_paths[node_id] = tree_id  # Store the path for this node
 
             if parent_id is not None:
                 self.G.add_edge(parent_id, node_id, label=edge_label or "")
@@ -158,6 +160,7 @@ class BigGlobeDecisionTreeVisualizer:
         node_id = f"node_{self.node_counter}"
         self.node_counter += 1
         self.G.add_node(node_id)
+        self.node_paths[node_id] = tree_id  # Store the path for this node
 
         if parent_id is not None:
             self.G.add_edge(parent_id, node_id, label=edge_label or "")
@@ -316,6 +319,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
+        self.node_paths = {}  # Initialize node paths dictionary
         self.node_counter = 0
         self.resolved_trees = {}
 
@@ -325,6 +329,7 @@ class BigGlobeDecisionTreeVisualizer:
 
         # Create visualization
         plt.figure(figsize=figsize)
+        plt.suptitle(f"Decision Tree: {root_tree_id}", fontsize=16)
 
         # Use a hierarchical layout from NetworkX
         try:
@@ -371,14 +376,20 @@ class BigGlobeDecisionTreeVisualizer:
                                    node_color='red', node_shape='*',
                                    node_size=root_node_sizes, alpha=0.9)
 
-        # Add "ROOT" to the labels of root nodes
-        node_labels = self.node_labels.copy()
-        for root in root_nodes:
-            if root in node_labels:
-                node_labels[root] = f"ROOT\n{node_labels[root]}"
+        # Add path and ROOT to the labels of nodes
+        node_labels = {}
+        for node in self.G.nodes():
+            label = self.node_labels.get(node, "")
+            path = self.node_paths.get(node, "")
+
+            # Format the label with path
+            if node in root_nodes:
+                node_labels[node] = f"ROOT\nPath: {path}\n{label}"
+            else:
+                node_labels[node] = f"Path: {path}\n{label}"
 
         # Draw labels with improved readability
-        nx.draw_networkx_labels(self.G, pos, labels=node_labels, font_size=10,
+        nx.draw_networkx_labels(self.G, pos, labels=node_labels, font_size=9,
                                 font_weight='bold', font_family="sans-serif")
 
         # Draw edge labels
@@ -411,6 +422,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
+        self.node_paths = {}  # Initialize node paths dictionary
         self.node_counter = 0
         self.resolved_trees = {}
 
@@ -455,6 +467,7 @@ class BigGlobeDecisionTreeVisualizer:
 
             # Visualize the subgraph
             plt.figure(figsize=(20, 15))
+            plt.suptitle(f"Decision Tree: {root_tree_id} (Subtree {i + 1})", fontsize=16)
 
             try:
                 pos = nx.nx_pydot.pydot_layout(subgraph, prog="dot")
@@ -487,14 +500,20 @@ class BigGlobeDecisionTreeVisualizer:
                                        node_color='red', node_shape='*',
                                        node_size=root_node_sizes, alpha=0.9)
 
-            # Add "ROOT" to labels of root nodes
-            sub_labels = {node: self.node_labels.get(node, "") for node in subgraph.nodes()}
-            for root in sub_root_nodes:
-                if root in sub_labels:
-                    sub_labels[root] = f"ROOT\n{sub_labels[root]}"
+            # Add path and ROOT to the labels of nodes
+            sub_labels = {}
+            for node in subgraph.nodes():
+                label = self.node_labels.get(node, "")
+                path = self.node_paths.get(node, "")
+
+                # Format the label with path
+                if node in sub_root_nodes:
+                    sub_labels[node] = f"ROOT\nPath: {path}\n{label}"
+                else:
+                    sub_labels[node] = f"Path: {path}\n{label}"
 
             # Draw labels
-            nx.draw_networkx_labels(subgraph, pos, labels=sub_labels, font_size=10,
+            nx.draw_networkx_labels(subgraph, pos, labels=sub_labels, font_size=9,
                                     font_weight='bold', font_family="sans-serif")
 
             # Draw edge labels
@@ -582,6 +601,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
+        self.node_paths = {}
         self.node_counter = 0
         self.resolved_trees = {}
 
@@ -622,12 +642,13 @@ class BigGlobeDecisionTreeVisualizer:
         """
         indent = "  " * depth
         label = self.node_labels.get(node_id, 'Unknown Node').replace('\n', ' - ')
+        path = self.node_paths.get(node_id, '')
 
-        # Mark root nodes with special indicator
+        # Mark root nodes with special indicator and include path
         if self.G.in_degree(node_id) == 0:
-            markdown = f"{indent}- **[ROOT] {label}**\n"
+            markdown = f"{indent}- **[ROOT] Path: `{path}`**\n{indent}  **{label}**\n"
         else:
-            markdown = f"{indent}- **{label}**\n"
+            markdown = f"{indent}- **Path: `{path}`**\n{indent}  **{label}**\n"
 
         for _, child, data in self.G.out_edges(node_id, data=True):
             edge_label = data.get("label", "")
@@ -654,6 +675,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
+        self.node_paths = {}
         self.node_counter = 0
         self.resolved_trees = {}
 
@@ -738,6 +760,13 @@ class BigGlobeDecisionTreeVisualizer:
             .content {{
                 display: block;
             }}
+            .node-path {{
+                color: #6c757d;
+                font-family: monospace;
+                font-size: 0.9em;
+                margin-bottom: 3px;
+                display: block;
+            }}
         </style>
         <script>
             function toggleCollapse(element) {{
@@ -783,6 +812,7 @@ class BigGlobeDecisionTreeVisualizer:
         """
         label = self.node_labels.get(node_id, "Unknown Node").replace('\n', '<br>')
         node_color = self.node_colors.get(node_id, "gray")
+        path = self.node_paths.get(node_id, "")
 
         # Determine node type based on color
         if node_color == "lightgreen":
@@ -804,9 +834,11 @@ class BigGlobeDecisionTreeVisualizer:
 
         # Node content (collapsible if it has children)
         if list(self.G.successors(node_id)):
-            html += f'<button class="collapsible node-content {node_class}" onclick="toggleCollapse(this)">{label}</button>\n'
+            html += f'<button class="collapsible node-content {node_class}" onclick="toggleCollapse(this)">'
+            html += f'<span class="node-path">Path: {path}</span>{label}</button>\n'
         else:
-            html += f'<div class="node-content {node_class}">{label}</div>\n'
+            html += f'<div class="node-content {node_class}">'
+            html += f'<span class="node-path">Path: {path}</span>{label}</div>\n'
 
         # Add children if any
         children = list(self.G.out_edges(node_id, data=True))
@@ -839,6 +871,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.G = nx.DiGraph()
         self.node_labels = {}
         self.node_colors = {}
+        self.node_paths = {}
         self.node_counter = 0
         self.resolved_trees = {}
 
@@ -864,6 +897,7 @@ class BigGlobeDecisionTreeVisualizer:
         for node in self.G.nodes():
             label = self.node_labels.get(node, "Unknown Node")
             node_type = "unknown"
+            path = self.node_paths.get(node, "")
 
             if "Result:" in label:
                 node_type = "result"
@@ -883,6 +917,7 @@ class BigGlobeDecisionTreeVisualizer:
 
             tree_json["nodes"][str(node)] = {
                 "label": label,
+                "path": path,
                 "type": node_type,
                 "is_root": node in root_nodes,
                 "children": children

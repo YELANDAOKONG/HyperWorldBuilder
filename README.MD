@@ -22,3 +22,7 @@
 - `DisplayTextX.py`：用于可视化 Big Globe 原版决策树，生成 HTML 和 MD 文件
 - `Build.py`：用于构建数据包（制作中）
 - `Debug.py`：用于快速调试数据包（制作中）
+
+> 运`Build/Debug`时使用 `--debug` 参数将执行`Sources\Main.py`中的`build_debug`函数；
+> 
+> 此函数主要用于构建一些可以快速看到效果的东西（检查是否正确生成），**数据包数值极端、无法正常游玩**。

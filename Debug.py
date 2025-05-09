@@ -81,9 +81,13 @@ def build_datapack(datapack_path: str) -> bool:
         # builder.clean_output()
         # builder.init_dirs()
         # builder.init_mcmeta()
-        code = Main.build_main(sys.argv)
-
-        # Additional build steps can be added here
+        args = sys.argv.copy()
+        if "--debug" in args:
+            args.remove("--debug")
+            logger.info("Building in debug mode...")
+            code = Main.build_debug(args)
+        else:
+            code = Main.build_main(args)
 
         logger.info("Build completed successfully")
         return True

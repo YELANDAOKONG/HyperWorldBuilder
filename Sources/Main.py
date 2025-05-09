@@ -20,3 +20,15 @@ def build_main(args: List[str]) -> int:
     # print(json.dumps(data, indent=4))
 
     return 0
+
+def build_debug(args: List[str]) -> int:
+    output_path = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPackDebug")
+    builder = Builder(output_path)
+    builder.clean_output()
+    builder.init_dirs()
+    builder.init_mcmeta()
+
+    builder.delete_structure("obelisk")
+    builder.delete_structure("abandonedcity")
+    return 0
+

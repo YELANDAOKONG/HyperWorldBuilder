@@ -102,14 +102,14 @@ def build_debug(args: List[str]) -> int:
             "is_3d": False
         },
         "script": [
-            "double base = continentalness * 0.2",
-            "double variation = 8.0 + raw_erosion_64 * 4.0",
-            "double height = base * variation",
-            "height = min(height, 64.0)",
-            "if (continentalness < 0.0) {",
-            "    height = height * max(0.0, 1.0 + continentalness * 2.0)",
-            "}",
-            "return height"
+            "double computeHeight(double cont, double noise:",
+            "double base = cont * 0.2L",
+            "double variation = 8.0L + noise * 4.0L",
+            "return(min(base * variation, 64.0L))",
+            ")",
+            "double height = computeHeight(continentalness, raw_erosion_64)",
+            "if (continentalness < 0.0L: height *= max(0.0L, 1.0L + continentalness * 2.0L))",
+            "return(height)"
         ]
     }
     with open(path.join(column_value_dir, "raw_erosion.json"), "w") as f:
@@ -217,20 +217,20 @@ def build_debug(args: List[str]) -> int:
                     },
                     "variations": [
                         {
-                            "weight": 100,
+                            "weight": 1020,
                             "radius": {
                                 "type": "uniform",
                                 "min": 32,
-                                "max": 64
+                                "max": 128
                             },
                             "state": "biomesoplenty:lavender"
                         },
                         {
-                            "weight": 40,
+                            "weight": 402,
                             "radius": {
                                 "type": "uniform",
                                 "min": 24,
-                                "max": 48
+                                "max": 96
                             },
                             "state": "biomesoplenty:tall_lavender[half=lower]"
                         },

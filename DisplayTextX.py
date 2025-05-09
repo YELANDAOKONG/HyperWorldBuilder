@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+import sys
+import logging
+import colorlog
+import shutil
+from pathlib import Path
+
 import networkx as nx
 import matplotlib.pyplot as plt
-from pathlib import Path
 
 
 class BigGlobeDecisionTreeVisualizer:
@@ -23,6 +28,52 @@ class BigGlobeDecisionTreeVisualizer:
         self.node_counter = 0
         self.resolved_trees = {}
         self.truncate_scripts = truncate_scripts
+
+        # Configure colorlog with custom colors for different message components
+        handler = colorlog.StreamHandler()
+        handler.setFormatter(colorlog.ColoredFormatter(
+            '%(cyan)s[%(asctime)s]%(reset)s %(log_color)s%(levelname)s%(reset)s - %(blue)s%(message)s',
+            datefmt='%H:%M:%S',
+            log_colors={
+                'DEBUG': 'cyan',
+                'INFO': 'bold_green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'red,bg_white',
+            },
+            secondary_log_colors={
+                'message': {
+                    'INFO': 'white',
+                    'WARNING': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'red',
+                    'DEBUG': 'cyan'
+                }
+            }
+        ))
+
+        self.logger = logging.getLogger('visualizer')
+        self.logger.setLevel(logging.INFO)
+        # Remove any existing handlers
+        if self.logger.handlers:
+            self.logger.handlers.clear()
+        self.logger.addHandler(handler)
+        # Prevent log propagation to root logger
+        self.logger.propagate = False
+
+    def clean_output(self, output_dir):
+        """
+        Clean output directory before generating new visualizations.
+
+        Args:
+            output_dir: Directory to clean
+        """
+        self.logger.info(f"Cleaning output directory: {output_dir}")
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+            self.logger.info(f"Output directory {output_dir} cleaned")
+        self.logger.info(f"Creating output directory: {output_dir}")
+        os.makedirs(output_dir, exist_ok=True)
 
     def get_file_path(self, tree_id):
         """
@@ -56,17 +107,17 @@ class BigGlobeDecisionTreeVisualizer:
         """
         file_path = self.get_file_path(tree_id)
         if not file_path.exists():
-            print(f"Warning: File not found for tree ID {tree_id} at {file_path}")
+            self.logger.warning(f"File not found for tree ID {tree_id} at {file_path}")
             return None
 
         try:
             with open(file_path, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in file {file_path}")
+            self.logger.error(f"Invalid JSON in file {file_path}")
             return None
         except Exception as e:
-            print(f"Error loading file {file_path}: {e}")
+            self.logger.error(f"Error loading file {file_path}: {e}")
             return None
 
     def process_tree(self, tree_id, parent_id=None, edge_label=None):
@@ -121,6 +172,9 @@ class BigGlobeDecisionTreeVisualizer:
 
             if result_type == "constant":
                 result_value = tree_data["result"].get("value", "...")
+                # Handle class type constants which are objects
+                if isinstance(result_value, dict):
+                    result_value = f"Object with {len(result_value)} fields"
             elif result_type == "scripted":
                 script = tree_data["result"].get("script", "...")
                 # Only truncate if the option is enabled
@@ -170,13 +224,17 @@ class BigGlobeDecisionTreeVisualizer:
             column_value = condition.get("column_value", "?")
             min_val = condition.get("min", "?")
             max_val = condition.get("max", "?")
-            return f"{column_value}: {min_val} to {max_val}"
+            smooth_min = "smooth" if condition.get("smooth_min", True) else "sharp"
+            smooth_max = "smooth" if condition.get("smooth_max", True) else "sharp"
+            return f"{column_value}: {min_val} to {max_val} ({smooth_min}/{smooth_max})"
 
         elif condition_type == "world_trait_threshold":
             trait = condition.get("trait", "?")
             min_val = condition.get("min", "?")
             max_val = condition.get("max", "?")
-            return f"{trait}: {min_val} to {max_val}"
+            smooth_min = "smooth" if condition.get("smooth_min", True) else "sharp"
+            smooth_max = "smooth" if condition.get("smooth_max", True) else "sharp"
+            return f"{trait}: {min_val} to {max_val} ({smooth_min}/{smooth_max})"
 
         elif condition_type == "script":
             script = condition.get("script", "")
@@ -187,8 +245,13 @@ class BigGlobeDecisionTreeVisualizer:
                 return f"script: {script}"
 
         elif condition_type in ["and", "or"]:
-            count = len(condition.get("conditions", []))
-            return f"{count} conditions"
+            conditions = condition.get("conditions", [])
+            count = len(conditions)
+            if count <= 3:  # For a small number of conditions, show their types
+                condition_types = [c.get("type", "?") for c in conditions]
+                return f"{condition_type.upper()} {', '.join(condition_types)}"
+            else:
+                return f"{condition_type.upper()} {count} conditions"
 
         elif condition_type == "not":
             inner_condition = condition.get("condition", {})
@@ -257,6 +320,7 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
         # Process the tree
+        self.logger.info(f"Processing decision tree: {root_tree_id}")
         self.process_tree(root_tree_id)
 
         # Create visualization
@@ -265,33 +329,56 @@ class BigGlobeDecisionTreeVisualizer:
         # Use a hierarchical layout from NetworkX
         try:
             pos = nx.nx_pydot.pydot_layout(self.G, prog="dot")
+            self.logger.info("Using pydot layout algorithm")
         except:
             # Fallback to NetworkX's built-in layout algorithms
-            print("Using fallback layout algorithm - for better layout install pydot")
+            self.logger.warning("Using fallback layout algorithm - for better layout install pydot")
             try:
                 # Try multipartite layout based on node levels
                 levels = self.get_node_levels()
                 pos = nx.multipartite_layout(self.G, subset_key=lambda node: levels.get(node, 0))
+                self.logger.info("Using multipartite layout algorithm")
             except:
                 # Last resort: spring layout
+                self.logger.warning("Using spring layout algorithm as last resort")
                 pos = nx.spring_layout(self.G, k=2.0, iterations=100, seed=42)
 
         # Scale layout to reduce overlap
         pos = self.scale_layout(pos, scale=3.0)
 
-        # Adjust node sizes based on label length
-        node_sizes = [max(2000, len(self.node_labels.get(node, "")) * 100) for node in self.G.nodes()]
-
-        # Draw nodes with custom colors
-        node_color_list = [self.node_colors.get(node, "gray") for node in self.G.nodes()]
-        nx.draw_networkx_nodes(self.G, pos, node_color=node_color_list, node_size=node_sizes, alpha=0.8)
+        # Find root nodes (those with no incoming edges)
+        root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
 
         # Draw edges with improved visibility
         nx.draw_networkx_edges(self.G, pos, arrows=True, arrowsize=20, width=1.5,
                                edge_color='gray', alpha=0.6, connectionstyle='arc3,rad=0.1')
 
+        # Prepare node lists for drawing
+        normal_nodes = [n for n in self.G.nodes() if n not in root_nodes]
+
+        # Draw normal nodes
+        normal_node_sizes = [max(2000, len(self.node_labels.get(node, "")) * 100) for node in normal_nodes]
+        normal_node_colors = [self.node_colors.get(node, "gray") for node in normal_nodes]
+        if normal_nodes:  # Check if list is not empty
+            nx.draw_networkx_nodes(self.G, pos, nodelist=normal_nodes,
+                                   node_color=normal_node_colors,
+                                   node_size=normal_node_sizes, alpha=0.8)
+
+        # Draw root nodes with special styling
+        if root_nodes:  # Check if list is not empty
+            root_node_sizes = [max(3000, len(self.node_labels.get(node, "")) * 120) for node in root_nodes]
+            nx.draw_networkx_nodes(self.G, pos, nodelist=root_nodes,
+                                   node_color='red', node_shape='*',
+                                   node_size=root_node_sizes, alpha=0.9)
+
+        # Add "ROOT" to the labels of root nodes
+        node_labels = self.node_labels.copy()
+        for root in root_nodes:
+            if root in node_labels:
+                node_labels[root] = f"ROOT\n{node_labels[root]}"
+
         # Draw labels with improved readability
-        nx.draw_networkx_labels(self.G, pos, labels=self.node_labels, font_size=10,
+        nx.draw_networkx_labels(self.G, pos, labels=node_labels, font_size=10,
                                 font_weight='bold', font_family="sans-serif")
 
         # Draw edge labels
@@ -303,7 +390,7 @@ class BigGlobeDecisionTreeVisualizer:
 
         if output_file:
             plt.savefig(output_file, dpi=300, bbox_inches="tight")
-            print(f"Tree visualization saved to {output_file}")
+            self.logger.info(f"Tree visualization saved to {output_file}")
         else:
             plt.show()
 
@@ -328,13 +415,14 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
         # Process the entire tree
+        self.logger.info(f"Processing tree for splitting: {root_tree_id}")
         self.process_tree(root_tree_id)
 
         # Find root nodes
         root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
 
         if not root_nodes:
-            print("No root nodes found in the graph")
+            self.logger.warning("No root nodes found in the graph")
             return 0
 
         # Create a subgraph starting from each root node
@@ -371,23 +459,41 @@ class BigGlobeDecisionTreeVisualizer:
             try:
                 pos = nx.nx_pydot.pydot_layout(subgraph, prog="dot")
             except:
+                self.logger.warning(f"Falling back to spring layout for subtree {i + 1}")
                 pos = nx.spring_layout(subgraph, k=2.0, iterations=100, seed=42)
 
             pos = self.scale_layout(pos, scale=2.0)
 
-            # Adjust node sizes
-            sub_node_sizes = [max(2000, len(self.node_labels.get(node, "")) * 100) for node in subgraph.nodes()]
-
-            # Draw nodes
-            sub_node_colors = [self.node_colors.get(node, "gray") for node in subgraph.nodes()]
-            nx.draw_networkx_nodes(subgraph, pos, node_color=sub_node_colors, node_size=sub_node_sizes, alpha=0.8)
+            # Find root nodes in this subgraph
+            sub_root_nodes = [n for n in subgraph.nodes() if subgraph.in_degree(n) == 0]
+            normal_nodes = [n for n in subgraph.nodes() if n not in sub_root_nodes]
 
             # Draw edges
             nx.draw_networkx_edges(subgraph, pos, arrows=True, arrowsize=20, width=1.5,
                                    edge_color='gray', alpha=0.6, connectionstyle='arc3,rad=0.1')
 
-            # Draw labels
+            # Draw normal nodes
+            if normal_nodes:
+                normal_node_sizes = [max(2000, len(self.node_labels.get(node, "")) * 100) for node in normal_nodes]
+                normal_node_colors = [self.node_colors.get(node, "gray") for node in normal_nodes]
+                nx.draw_networkx_nodes(subgraph, pos, nodelist=normal_nodes,
+                                       node_color=normal_node_colors,
+                                       node_size=normal_node_sizes, alpha=0.8)
+
+            # Draw root nodes with special styling
+            if sub_root_nodes:
+                root_node_sizes = [max(3000, len(self.node_labels.get(node, "")) * 120) for node in sub_root_nodes]
+                nx.draw_networkx_nodes(subgraph, pos, nodelist=sub_root_nodes,
+                                       node_color='red', node_shape='*',
+                                       node_size=root_node_sizes, alpha=0.9)
+
+            # Add "ROOT" to labels of root nodes
             sub_labels = {node: self.node_labels.get(node, "") for node in subgraph.nodes()}
+            for root in sub_root_nodes:
+                if root in sub_labels:
+                    sub_labels[root] = f"ROOT\n{sub_labels[root]}"
+
+            # Draw labels
             nx.draw_networkx_labels(subgraph, pos, labels=sub_labels, font_size=10,
                                     font_weight='bold', font_family="sans-serif")
 
@@ -400,14 +506,14 @@ class BigGlobeDecisionTreeVisualizer:
 
             if output_file:
                 plt.savefig(output_file, dpi=300, bbox_inches="tight")
-                print(f"Subtree {i + 1} visualization saved to {output_file}")
+                self.logger.info(f"Subtree {i + 1} visualization saved to {output_file}")
             else:
                 plt.show()
 
             plt.close()
             subtree_count += 1
 
-        print(f"Created {subtree_count} subtree visualizations")
+        self.logger.info(f"Created {subtree_count} subtree visualizations")
         return subtree_count
 
     def batch_visualize(self, start_dir=None, output_dir="tree_visualizations", split=False):
@@ -425,10 +531,13 @@ class BigGlobeDecisionTreeVisualizer:
             start_dir = Path(start_dir)
 
         output_dir = Path(output_dir)
-        os.makedirs(output_dir, exist_ok=True)
+
+        # Clean output directory before starting
+        self.clean_output(output_dir)
 
         # Find all JSON files in the directory and subdirectories
         tree_count = 0
+        self.logger.info(f"Starting batch visualization from {start_dir}")
         for root, _, files in os.walk(start_dir):
             root_path = Path(root)
             for file in files:
@@ -443,7 +552,7 @@ class BigGlobeDecisionTreeVisualizer:
                         os.makedirs(tree_output_dir, exist_ok=True)
 
                         output_file = tree_output_dir / f"{file.replace('.json', '.png')}"
-                        print(f"Visualizing tree: {tree_id}")
+                        self.logger.info(f"Visualizing tree: {tree_id}")
 
                         if split:
                             # Split and visualize the tree
@@ -455,9 +564,9 @@ class BigGlobeDecisionTreeVisualizer:
 
                         tree_count += 1
                     except Exception as e:
-                        print(f"Error visualizing {file_path}: {e}")
+                        self.logger.error(f"Error visualizing {file_path}: {e}")
 
-        print(f"Processed {tree_count} decision trees")
+        self.logger.info(f"Processed {tree_count} decision trees")
 
     def export_tree_as_markdown(self, root_tree_id, output_file=None):
         """
@@ -477,12 +586,14 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
         # Process the tree
+        self.logger.info(f"Processing tree for Markdown export: {root_tree_id}")
         self.process_tree(root_tree_id)
 
         # Find root nodes
         root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
 
         if not root_nodes:
+            self.logger.warning("No root nodes found in the tree")
             return "No root nodes found in the tree."
 
         # Generate markdown
@@ -494,7 +605,7 @@ class BigGlobeDecisionTreeVisualizer:
         if output_file:
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(markdown)
-            print(f"Markdown tree saved to {output_file}")
+            self.logger.info(f"Markdown tree saved to {output_file}")
 
         return markdown
 
@@ -510,7 +621,13 @@ class BigGlobeDecisionTreeVisualizer:
             Markdown representation of the node and its children
         """
         indent = "  " * depth
-        markdown = f"{indent}- **{self.node_labels.get(node_id, 'Unknown Node').replace('\\n', ' - ')}**\n"
+        label = self.node_labels.get(node_id, 'Unknown Node').replace('\n', ' - ')
+
+        # Mark root nodes with special indicator
+        if self.G.in_degree(node_id) == 0:
+            markdown = f"{indent}- **[ROOT] {label}**\n"
+        else:
+            markdown = f"{indent}- **{label}**\n"
 
         for _, child, data in self.G.out_edges(node_id, data=True):
             edge_label = data.get("label", "")
@@ -541,12 +658,14 @@ class BigGlobeDecisionTreeVisualizer:
         self.resolved_trees = {}
 
         # Process the tree
+        self.logger.info(f"Processing tree for HTML export: {root_tree_id}")
         self.process_tree(root_tree_id)
 
         # Find root nodes
         root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
 
         if not root_nodes:
+            self.logger.warning("No root nodes found in the tree")
             return "<p>No root nodes found in the tree.</p>"
 
         # Generate HTML
@@ -579,6 +698,22 @@ class BigGlobeDecisionTreeVisualizer:
             .missing-node {{
                 background-color: #f8d7da;
                 border: 1px solid #f5c6cb;
+            }}
+            .root-node {{
+                font-weight: bold;
+                border: 2px solid #dc3545;
+                position: relative;
+            }}
+            .root-node::before {{
+                content: "ROOT";
+                position: absolute;
+                top: -15px;
+                left: 5px;
+                background-color: #dc3545;
+                color: white;
+                padding: 0 5px;
+                font-size: 0.8em;
+                border-radius: 3px;
             }}
             .edge-label {{
                 margin-left: 10px;
@@ -632,7 +767,7 @@ class BigGlobeDecisionTreeVisualizer:
         if output_file:
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(html)
-            print(f"HTML tree saved to {output_file}")
+            self.logger.info(f"HTML tree saved to {output_file}")
 
         return html
 
@@ -658,6 +793,11 @@ class BigGlobeDecisionTreeVisualizer:
             node_class = "missing-node"
         else:
             node_class = ""
+
+        # Add root-node class for root nodes
+        is_root = self.G.in_degree(node_id) == 0
+        if is_root:
+            node_class += " root-node"
 
         # Start node
         html = f'<div class="tree-node">\n'
@@ -685,14 +825,84 @@ class BigGlobeDecisionTreeVisualizer:
 
         return html
 
+    def export_tree_as_json(self, root_tree_id, output_file=None):
+        """
+        Export a decision tree as a JSON file with full structure.
+
+        Args:
+            root_tree_id: ID of the root decision tree
+            output_file: Path to save the JSON file (optional)
+
+        Returns:
+            JSON object representing the tree
+        """
+        self.G = nx.DiGraph()
+        self.node_labels = {}
+        self.node_colors = {}
+        self.node_counter = 0
+        self.resolved_trees = {}
+
+        # Process the tree
+        self.logger.info(f"Processing tree for JSON export: {root_tree_id}")
+        self.process_tree(root_tree_id)
+
+        # Find root nodes
+        root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
+
+        if not root_nodes:
+            self.logger.warning("No root nodes found in the tree")
+            return {"error": "No root nodes found in the tree"}
+
+        # Create JSON structure
+        tree_json = {
+            "tree_id": root_tree_id,
+            "nodes": {},
+            "root_nodes": [str(n) for n in root_nodes]
+        }
+
+        # Build nodes dictionary
+        for node in self.G.nodes():
+            label = self.node_labels.get(node, "Unknown Node")
+            node_type = "unknown"
+
+            if "Result:" in label:
+                node_type = "result"
+            elif "Condition:" in label:
+                node_type = "condition"
+            elif "Missing:" in label:
+                node_type = "missing"
+
+            # Get children with edge labels
+            children = []
+            for _, child, data in self.G.out_edges(node, data=True):
+                edge_label = data.get("label", "")
+                children.append({
+                    "node_id": str(child),
+                    "edge_label": edge_label
+                })
+
+            tree_json["nodes"][str(node)] = {
+                "label": label,
+                "type": node_type,
+                "is_root": node in root_nodes,
+                "children": children
+            }
+
+        if output_file:
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(tree_json, f, indent=2)
+            self.logger.info(f"JSON tree saved to {output_file}")
+
+        return tree_json
+
     def batch_export_trees(self, start_dir=None, output_dir="tree_exports", format="html"):
         """
-        Export all decision trees in a directory as HTML or Markdown files.
+        Export all decision trees in a directory as HTML, Markdown, or JSON files.
 
         Args:
             start_dir: Starting directory (defaults to decision_tree_dir)
             output_dir: Directory to save exported files
-            format: Export format, either "html" or "markdown"
+            format: Export format, either "html", "markdown", or "json"
         """
         if start_dir is None:
             start_dir = self.decision_tree_dir
@@ -700,10 +910,13 @@ class BigGlobeDecisionTreeVisualizer:
             start_dir = Path(start_dir)
 
         output_dir = Path(output_dir)
-        os.makedirs(output_dir, exist_ok=True)
+
+        # Clean output directory before starting
+        self.clean_output(output_dir)
 
         # Find all JSON files in the directory and subdirectories
         tree_count = 0
+        self.logger.info(f"Starting batch export in {format} format from {start_dir}")
         for root, _, files in os.walk(start_dir):
             root_path = Path(root)
             for file in files:
@@ -720,18 +933,23 @@ class BigGlobeDecisionTreeVisualizer:
                         # Choose format and export
                         if format.lower() == "html":
                             output_file = tree_output_dir / f"{file.replace('.json', '.html')}"
-                            print(f"Exporting tree as HTML: {tree_id}")
+                            self.logger.info(f"Exporting tree as HTML: {tree_id}")
                             self.export_tree_as_html(tree_id, output_file)
+                        elif format.lower() == "json":
+                            output_file = tree_output_dir / f"{file.replace('.json', '_tree.json')}"
+                            self.logger.info(f"Exporting tree as JSON: {tree_id}")
+                            self.export_tree_as_json(tree_id, output_file)
                         else:
                             output_file = tree_output_dir / f"{file.replace('.json', '.md')}"
-                            print(f"Exporting tree as Markdown: {tree_id}")
+                            self.logger.info(f"Exporting tree as Markdown: {tree_id}")
                             self.export_tree_as_markdown(tree_id, output_file)
 
                         tree_count += 1
                     except Exception as e:
-                        print(f"Error exporting {file_path}: {e}")
+                        self.logger.error(f"Error exporting {file_path}: {e}")
 
-        print(f"Processed {tree_count} decision trees")
+        self.logger.info(f"Processed {tree_count} decision trees")
+
 
 
 if __name__ == "__main__":
@@ -743,5 +961,6 @@ if __name__ == "__main__":
     # Create visualizer with option to show full scripts instead of truncating them
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
 
+    visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeJson", format="json")
     visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeHtml", format="html")
     visualizer.batch_export_trees(output_dir="OutPut/DecisionTreeMarkdown", format="markdown")

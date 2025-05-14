@@ -5,18 +5,17 @@
 		"is_3d": false
 	},
 	"script": [
-		"double snowHeight = height_adjusted_snow_y",
-		"double terrainHeight = processed_surface_y",
-		"if (terrainHeight - river_water_y < 32.0L:",
-			"snowHeight = mixSmooth(",
-				"terrainHeight,",
-				"snowHeight,",
-				"(terrainHeight - river_water_y) / 32.0L",
+		"double extra = world_traits.`bigglobe:temperature_at_surface` * -16.0L - 8.0L",
+		"double normalSnowmap = eroded_heightmap.low.y + extra",
+		"double riverSnowmap = mixSmooth(eroded_river.high.y, eroded_river.low.y + extra, normalSnowmap - eroded_heightmap.high.y)",
+		"double snowmap = min(normalSnowmap, max(eroded_river.high.y, riverSnowmap))",
+		"if (slope_surface_y - sea_level < 32.0L:",
+			"snowmap = mixSmooth(",
+				"slope_surface_y,",
+				"snowmap,",
+				"(slope_surface_y - sea_level) / 32.0L",
 			")",
 		")",
-		"return(snowHeight)"
-	],
-	"valid": {
-		"where": "processed_surface_y > sea_level"
-	}
+		"return(snowmap)"
+	]
 }

@@ -1,0 +1,12 @@
+{
+  "BiomesOPlenty": {
+    "minecraft": "1.20.1",
+    "mod": "19.0.0.96",
+    "loader": "fabric"
+  },
+  "BigGlobe": {
+    "minecraft": "1.20.1",
+    "mod": "5.0.0",
+    "loader": "fabric"
+  }
+}

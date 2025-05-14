@@ -33,7 +33,7 @@ def get_decision_tree_node_file_path(base_path, node_id):
 class Builder:
     color_char = "\u00A7"
 
-    version = "4.11.1"  # Big Globe Version
+    version = "5.0.0"  # Big Globe Version
     version_pack_format = 15  # Minecraft Data Pack Format
     version_pack_description = "&6Hyper World &aCompatibility &bPack"
 

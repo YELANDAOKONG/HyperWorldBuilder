@@ -1,0 +1,9 @@
+{
+	"type": "script",
+	"params": {
+		"type": "boolean",
+		"is_3d": false
+	},
+	"script": "`raw/river` < `raw/ocean_adjusted_heightmap`",
+	"cache": false
+}

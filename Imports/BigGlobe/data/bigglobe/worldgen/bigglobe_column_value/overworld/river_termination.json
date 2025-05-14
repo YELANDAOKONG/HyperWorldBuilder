@@ -1,0 +1,10 @@
+{
+	"type": "script",
+	"params": {
+		"type": "double",
+		"is_3d": false
+	},
+	"script": [
+		"max(`raw/ocean_adjusted_heightmap` * 0.1875L - 16.0L, 0.0) ^ 2"
+	]
+}

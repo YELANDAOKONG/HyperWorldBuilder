@@ -1,8 +1,8 @@
 {
 	"condition": {
 		"type": "script",
-		"script": "`bigglobe:overworld/unbounded_river_dip` < 1.0L"
+		"script": "world_traits.`bigglobe:in_river`"
 	},
 	"if_true": "bigglobe:overworld/biome/river",
-	"if_false": "bigglobe:overworld/biome/test_beach"
+	"if_false": "bigglobe:overworld/biome/test_shallow_ocean"
 }

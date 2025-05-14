@@ -9,6 +9,7 @@ from Sources.Builder import Builder
 
 def build_main(args: List[str]) -> int:
     output_path = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPack")
+    output_file = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPack.zip")
     builder = Builder(output_path)
     builder.clean_output()
     builder.init_dirs()
@@ -20,10 +21,12 @@ def build_main(args: List[str]) -> int:
     # data = builder.map_decision_tree(os.path.join(os.path.dirname(__file__), "..", "Imports", "BigGlobe", "data", "bigglobe", "worldgen", "bigglobe_decision_tree"),  "bigglobe:overworld/biome/test_cave")
     # print(json.dumps(data, indent=4))
 
+    builder.pack_zip(output_file, delete_exists=True)
     return 0
 
 def build_debug(args: List[str]) -> int:
     output_path = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPackDebug")
+    output_file = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPackDebug.zip")
     builder = Builder(output_path)
     builder.clean_output()
     builder.init_dirs()
@@ -61,10 +64,8 @@ def build_debug(args: List[str]) -> int:
         "if_true": "bigglobe:overworld/biome/lavender_field",
         "if_false": "bigglobe:overworld/biome/lavender_field"
     }
-    with open(path.join(tree_dir, "biome", "lavender_field.json"), "w") as f:
-        json.dump(lavender_field, f, indent=4)
-    with open(path.join(tree_dir, "biome", "test_warm.json"), "w") as f:
-        json.dump(test_warm, f, indent=4)
+    builder.write_raw(path.join(tree_dir, "biome", "lavender_field.json"), lavender_field)
+    builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
 
 
     test_hot = {
@@ -86,10 +87,8 @@ def build_debug(args: List[str]) -> int:
             }
         }
     }
-    with open(path.join(tree_dir, "surface_state", "test_hot.json"), "w") as f:
-        json.dump(lavender_field_surface_state, f, indent=4)
-    with open(path.join(tree_dir, "surface_state", "lavender_field.json"), "w") as f:
-        json.dump(test_hot, f, indent=4)
+    builder.write_raw(path.join(tree_dir, "surface_state", "test_hot.json"), test_hot)
+    builder.write_raw(path.join(tree_dir, "surface_state", "lavender_field.json"), lavender_field_surface_state)
 
 
 
@@ -112,9 +111,7 @@ def build_debug(args: List[str]) -> int:
             "return(height)"
         ]
     }
-    with open(path.join(column_value_dir, "raw_erosion.json"), "w") as f:
-        json.dump(raw_erosion, f, indent=4)
-
+    builder.write_raw(path.join(column_value_dir, "raw_erosion.json"), raw_erosion)
 
     flowers = {
         "type": "bigglobe:flower",
@@ -311,9 +308,9 @@ def build_debug(args: List[str]) -> int:
             ]
         }
     }
-    with open(path.join(configured_feature, "overworld", "flowers", "flowers.json"), "w") as f:
-        json.dump(flowers, f, indent=4)
+    builder.write_raw(path.join(configured_feature, "overworld", "flowers", "flowers.json"), flowers, delete_exists=True)
 
 
+    builder.pack_zip(output_file, delete_exists=True)
     return 0
 

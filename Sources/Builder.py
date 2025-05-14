@@ -159,6 +159,20 @@ class Builder:
 
     ################################################################################
 
+    def write_raw(self, file_path: str, data: dict, delete_exists: bool = True):
+        full_path = path.join(self.path, file_path)
+        dir_path = path.dirname(full_path)
+        os.makedirs(dir_path, exist_ok=True)
+        if delete_exists and path.exists(full_path):
+            self.logger.info(f"Deleting existing file: {full_path}")
+            os.remove(full_path)
+
+        with open(full_path, "w") as f:
+            json.dump(data, f, indent=4)
+        self.logger.info(f"Wrote file: {full_path}")
+
+    ################################################################################
+
     def delete_structure(self, name: str):
         data = {
             "replace": True,

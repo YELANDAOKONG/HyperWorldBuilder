@@ -65,7 +65,7 @@ def build_debug(args: List[str]) -> int:
         "if_false": "bigglobe:overworld/biome/lavender_field"
     }
     builder.write_raw(path.join(tree_dir, "biome", "lavender_field.json"), lavender_field)
-    builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
+    #builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
 
 
     test_hot = {
@@ -111,20 +111,20 @@ def build_debug(args: List[str]) -> int:
             "return(height)"
         ]
     }
-    builder.write_raw(path.join(column_value_dir, "raw_erosion.json"), raw_erosion)
+    #builder.write_raw(path.join(column_value_dir, "raw_erosion.json"), raw_erosion)
 
     flowers = {
         "type": "bigglobe:flower",
         "config": {
             "seed": "flowers",
-            "distance": 32,
-            "variation": 32,
-            "spawn_chance": 1,
-            "randomize_chance": 0.2,
+            "distance": 64,
+            "variation": 64,
+            "spawn_chance": 1.0,
+            "randomize_chance": 0.125,
             "randomize_radius": {
                 "type": "uniform",
-                "min": 12,
-                "max": 24
+                "min": 16.0,
+                "max": 32.0
             },
             "noise": {
                 "type": "abs",
@@ -156,37 +156,43 @@ def build_debug(args: List[str]) -> int:
             },
             "entries": [
                 {
-                    "weight": 80,
+                    "weight": 50.0,
                     "restrictions": {
                         "type": "and",
                         "restrictions": [
                             {
                                 "type": "range",
                                 "property": "bigglobe:overworld/height_adjusted_foliage",
-                                "min": 0.4,
-                                "mid": 0.5,
-                                "max": 0.6
+                                "min": -0.5,
+                                "mid": 0.0,
+                                "max": 0.5
                             },
                             {
                                 "type": "range",
                                 "property": "bigglobe:overworld/height_adjusted_temperature",
-                                "min": 0.7,
-                                "mid": 0.75,
-                                "max": 0.8
+                                "min": -0.5,
+                                "mid": 0.0,
+                                "max": 0.5
                             },
                             {
                                 "type": "threshold",
                                 "property": "bigglobe:overworld/hilliness",
-                                "min": 0,
-                                "max": 0.4,
-                                "smooth_max": True
+                                "min": 0.0,
+                                "max": 0.5,
+                                "smooth_max": False
+                            },
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/magicalness",
+                                "min": -0.5,
+                                "max": 0.0
                             }
                         ]
                     },
                     "radius": {
                         "type": "uniform",
-                        "min": 48,
-                        "max": 96
+                        "min": 32.0,
+                        "max": 64.0
                     },
                     "state": "biomesoplenty:tall_lavender[half=lower]"
                 },
@@ -196,112 +202,117 @@ def build_debug(args: List[str]) -> int:
                             "type": "and",
                             "restrictions": [
                                 {
-                                    "type": "range",
+                                    "type": "threshold",
                                     "property": "bigglobe:overworld/height_adjusted_foliage",
-                                    "min": 0.3,
-                                    "mid": 0.5,
-                                    "max": 0.7
+                                    "min": -0.5,
+                                    "max": 0.0
                                 },
                                 {
                                     "type": "range",
                                     "property": "bigglobe:overworld/height_adjusted_temperature",
-                                    "min": 0.6,
-                                    "mid": 0.75,
-                                    "max": 0.9
+                                    "min": -0.5,
+                                    "mid": 0.0,
+                                    "max": 0.5
+                                },
+                                {
+                                    "type": "threshold",
+                                    "property": "bigglobe:overworld/magicalness",
+                                    "min": -0.5,
+                                    "max": 0.0
                                 }
                             ]
                         }
                     },
                     "variations": [
                         {
-                            "weight": 1020,
+                            "weight": 50.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 32,
-                                "max": 128
+                                "min": 32.0,
+                                "max": 64.0
                             },
                             "state": "biomesoplenty:lavender"
                         },
                         {
-                            "weight": 402,
+                            "weight": 30.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 24,
-                                "max": 96
+                                "min": 24.0,
+                                "max": 48.0
                             },
                             "state": "biomesoplenty:tall_lavender[half=lower]"
                         },
                         {
-                            "weight": 15,
+                            "weight": 20.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 16,
-                                "max": 32
-                            },
-                            "state": "minecraft:cornflower"
-                        },
-                        {
-                            "weight": 10,
-                            "radius": {
-                                "type": "uniform",
-                                "min": 12,
-                                "max": 24
-                            },
-                            "state": "minecraft:allium"
-                        },
-                        {
-                            "weight": 10,
-                            "radius": {
-                                "type": "uniform",
-                                "min": 12,
-                                "max": 24
+                                "min": 24.0,
+                                "max": 48.0
                             },
                             "state": "minecraft:azure_bluet"
                         },
                         {
-                            "weight": 8,
+                            "weight": 20.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 12,
-                                "max": 24
+                                "min": 24.0,
+                                "max": 48.0
                             },
                             "state": "minecraft:oxeye_daisy"
                         },
                         {
-                            "weight": 5,
+                            "weight": 15.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 8,
-                                "max": 16
+                                "min": 24.0,
+                                "max": 48.0
                             },
-                            "state": "minecraft:grass"
+                            "state": "minecraft:cornflower"
                         },
                         {
-                            "weight": 5,
+                            "weight": 10.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 8,
-                                "max": 16
+                                "min": 24.0,
+                                "max": 48.0
                             },
-                            "state": "minecraft:tall_grass[half=lower]"
+                            "state": "minecraft:poppy"
                         },
                         {
-                            "weight": 3,
+                            "weight": 10.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 8,
-                                "max": 16
+                                "min": 24.0,
+                                "max": 48.0
+                            },
+                            "state": "minecraft:allium"
+                        },
+                        {
+                            "weight": 10.0,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 24.0,
+                                "max": 48.0
                             },
                             "state": "minecraft:dandelion"
                         },
                         {
-                            "weight": 2,
+                            "weight": 5.0,
                             "radius": {
                                 "type": "uniform",
-                                "min": 8,
-                                "max": 16
+                                "min": 16.0,
+                                "max": 32.0
                             },
-                            "state": "minecraft:poppy"
+                            "state": "minecraft:grass"
+                        },
+                        {
+                            "weight": 5.0,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 16.0,
+                                "max": 32.0
+                            },
+                            "state": "minecraft:tall_grass[half=lower]"
                         }
                     ]
                 }

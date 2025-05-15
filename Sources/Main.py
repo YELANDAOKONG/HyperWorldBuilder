@@ -25,6 +25,7 @@ def build_main(args: List[str]) -> int:
     return 0
 
 def build_debug(args: List[str]) -> int:
+    import_path = os.path.join(os.path.dirname(__file__), "..", "Imports", "BigGlobe")
     output_path = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPackDebug")
     output_file = os.path.join(os.path.dirname(__file__), "..", "OutPut", "DataPackDebug.zip")
     builder = Builder(output_path)
@@ -35,7 +36,8 @@ def build_debug(args: List[str]) -> int:
     builder.delete_structure("obelisk")
     builder.delete_structure("abandonedcity")
 
-
+    sources_decision_tree_dir = path.join(import_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree")
+    all_decision_tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree")
     tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree", "overworld")
     column_value_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_column_value", "overworld")
     configured_feature = path.join(output_path, "data", "bigglobe", "worldgen", "configured_feature")
@@ -49,6 +51,12 @@ def build_debug(args: List[str]) -> int:
     os.makedirs(configured_feature, exist_ok=True)
     os.makedirs(path.join(configured_feature, "overworld"), exist_ok=True)
     os.makedirs(path.join(configured_feature, "overworld", "flowers"), exist_ok=True)
+
+
+    # 是否直接劫持 test_warm 决策树 (此选项控制是否使用 Write Raw 修改决策树)
+    option_write_custom_decision_tree = False
+    # 是否应用自定义 raw_erosion 列值 (将导致问题)
+    option_write_raw_erosion = False
 
 
     lavender_field = {
@@ -67,8 +75,9 @@ def build_debug(args: List[str]) -> int:
         "if_true": "bigglobe:overworld/biome/lavender_field",
         "if_false": "bigglobe:overworld/biome/lavender_field"
     }
-    builder.write_raw(path.join(tree_dir, "biome", "lavender_field.json"), lavender_field)
-    builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
+    if option_write_custom_decision_tree:
+        builder.write_raw(path.join(tree_dir, "biome", "lavender_field.json"), lavender_field)
+        builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
 
 
     test_hot = {
@@ -90,8 +99,9 @@ def build_debug(args: List[str]) -> int:
             }
         }
     }
-    builder.write_raw(path.join(tree_dir, "surface_state", "test_hot.json"), test_hot)
-    builder.write_raw(path.join(tree_dir, "surface_state", "lavender_field.json"), lavender_field_surface_state)
+    if option_write_custom_decision_tree:
+        builder.write_raw(path.join(tree_dir, "surface_state", "test_hot.json"), test_hot)
+        builder.write_raw(path.join(tree_dir, "surface_state", "lavender_field.json"), lavender_field_surface_state)
 
 
 
@@ -114,7 +124,8 @@ def build_debug(args: List[str]) -> int:
             "return(height)"
         ]
     }
-    #builder.write_raw(path.join(column_value_dir, "raw_erosion.json"), raw_erosion)
+    if option_write_raw_erosion:
+        builder.write_raw(path.join(column_value_dir, "raw_erosion.json"), raw_erosion)
 
     flowers = {
         "type": "bigglobe:flower",
@@ -422,7 +433,6 @@ def build_debug(args: List[str]) -> int:
             ]
         }
     }
-
     builder.write_raw(path.join(configured_feature, "overworld", "flowers", "lavender_field_flowers.json"), lavender_field_flowers, delete_exists=True)
 
     surface_flowers = {
@@ -432,6 +442,78 @@ def build_debug(args: List[str]) -> int:
         ]
     }
     builder.write_raw(path.join(configured_feature_tags, "overworld", "surface_flowers.json"), surface_flowers, delete_exists=True)
+
+    ### --------- &BEGIN 决策树区域 ---------
+
+    overworld_tree = builder.map_decision_tree(sources_decision_tree_dir, "bigglobe:overworld/biome/test_cave")
+    islands_tree = builder.map_decision_tree(sources_decision_tree_dir, "bigglobe:islands/biome/test_cave")
+
+    # 创建薰衣草平原结果节点
+    lavender_field_node = {
+        "result": {
+            "type": "constant",
+            "value": "biomesoplenty:lavender_field"
+        }
+    }
+    overworld_tree["bigglobe:overworld/biome/lavender_field"] = lavender_field_node
+    islands_tree["bigglobe:islands/biome/lavender_field"] = lavender_field_node
+
+    # 创建魔法值条件节点
+    test_lavender_field_node = {
+        "condition": {
+            "type": "world_trait_threshold",
+            "trait": "bigglobe:magicalness",
+            "min": 0.2,
+            "max": 0.4,
+            "smooth_min": True,
+            "smooth_max": True
+        },
+        "if_true": "bigglobe:overworld/biome/lavender_field",
+        "if_false": "bigglobe:overworld/biome/temperate_plains"
+    }
+    overworld_tree["bigglobe:overworld/biome/test_lavender_field"] = test_lavender_field_node
+
+    # 修改主世界温带平原的引用
+    # 找到 temperate_test_wasteland 节点并修改其 if_false 分支
+    if "bigglobe:overworld/biome/temperate_test_wasteland" in overworld_tree:
+        wasteland_node = overworld_tree["bigglobe:overworld/biome/temperate_test_wasteland"]
+        if isinstance(wasteland_node, dict) and "if_false" in wasteland_node:
+            # 只替换指向 temperate_plains 的引用
+            if wasteland_node["if_false"] == "bigglobe:overworld/biome/temperate_plains":
+                wasteland_node["if_false"] = "bigglobe:overworld/biome/test_lavender_field"
+
+    # 为浮岛创建相同的魔法值条件节点，注意路径要使用islands命名空间
+    islands_test_lavender_field_node = {
+        "condition": {
+            "type": "world_trait_threshold",
+            "trait": "bigglobe:magicalness",
+            "min": 0.2,
+            "max": 0.4,
+            "smooth_min": True,
+            "smooth_max": True
+        },
+        "if_true": "bigglobe:islands/biome/lavender_field",
+        "if_false": "bigglobe:islands/biome/temperate_plains"  # 修正：使用islands路径
+    }
+    islands_tree["bigglobe:islands/biome/test_lavender_field"] = islands_test_lavender_field_node
+
+    # 修改群岛温带平原的引用
+    # 找到 temperate_test_wasteland 节点并修改其 if_false 分支
+    if "bigglobe:islands/biome/temperate_test_wasteland" in islands_tree:
+        islands_wasteland_node = islands_tree["bigglobe:islands/biome/temperate_test_wasteland"]
+        if isinstance(islands_wasteland_node, dict) and "if_false" in islands_wasteland_node:
+            # 只替换指向 temperate_plains 的引用，使用正确的islands路径
+            if islands_wasteland_node["if_false"] == "bigglobe:islands/biome/temperate_plains":  # 修正：检查islands路径
+                islands_wasteland_node["if_false"] = "bigglobe:islands/biome/test_lavender_field"
+
+    # 写回决策树
+    builder.write_decision_tree(overworld_tree, all_decision_tree_dir)
+    builder.write_decision_tree(islands_tree, all_decision_tree_dir)
+
+    # 验证
+    builder.verify_decision_tree(overworld_tree, all_decision_tree_dir)
+    builder.verify_decision_tree(islands_tree, all_decision_tree_dir)
+
 
 
     builder.pack_zip(output_file, delete_exists=True)

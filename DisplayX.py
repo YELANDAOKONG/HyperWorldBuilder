@@ -612,11 +612,15 @@ class BigGlobeDecisionTreeVisualizer:
 
 
 if __name__ == "__main__":
-    base_dir = "Imports/BigGlobe"
+    base_dir = os.path.join("Imports", "BigGlobe")
+    output_dir = os.path.join("OutPut", "DecisionTreeImages")
+
+    if not os.path.exists(output_dir) or not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
 
     # Clean and create output directory
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
 
     # Process all trees
-    visualizer.batch_visualize(output_dir="OutPut/DecisionTreeImages", split=True, max_depth=8192)
+    visualizer.batch_visualize(output_dir=output_dir, split=True, max_depth=8192)
 

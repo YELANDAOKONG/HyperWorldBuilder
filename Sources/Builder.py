@@ -289,8 +289,172 @@ class Builder:
         self.logger.info(f"Successfully mapped decision tree with {len(tree_map)} nodes")
         return tree_map
 
+    def write_decision_tree(self, tree_map, output_base_path=None):
+        """
+        将已映射的决策树写回文件系统。
 
+        Args:
+            tree_map: 决策树映射，键为节点ID，值为节点数据
+            output_base_path: 输出的基础路径，默认为当前数据包路径下的决策树目录
+        """
+        if output_base_path is None:
+            output_base_path = path.join(self.path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree")
 
+        self.logger.info(f"Writing decision tree with {len(tree_map)} nodes to {output_base_path}")
+
+        for node_id, node_data in tree_map.items():
+            # 跳过不是字符串的节点ID（可能是内部引用）
+            if not isinstance(node_id, str):
+                continue
+
+            # 确定节点文件路径
+            node_path = ""
+            if ":" in node_id:  # 处理命名空间格式 (namespace:path)
+                namespace, rel_path = node_id.split(":", 1)
+                # 确保命名空间对应的基础目录存在
+                namespace_dir = path.join(output_base_path)
+                os.makedirs(namespace_dir, exist_ok=True)
+
+                # 将路径分隔符标准化
+                rel_path = rel_path.replace("/", os.sep)
+                node_path = path.join(namespace_dir, f"{rel_path}.json")
+            else:
+                # 纯相对路径
+                node_path = path.join(output_base_path, f"{node_id}.json")
+
+            # 确保目录存在
+            node_dir = path.dirname(node_path)
+            if not path.exists(node_dir):
+                os.makedirs(node_dir, exist_ok=True)
+
+            # 写入节点数据
+            with open(node_path, "w") as f:
+                json.dump(node_data, f, indent=4)
+
+            self.logger.info(f"Wrote decision tree node: {node_id} -> {node_path}")
+
+        self.logger.info(f"Decision tree writing complete - {len(tree_map)} nodes processed")
+        return tree_map
+
+    def insert_decision_node(self, tree_map, parent_node_id, new_node_id, condition_data, result_data=None, branch_type="if_false"):
+        """
+        在决策树中插入新节点，通常作为条件分支。
+        Args:
+            tree_map: 决策树映射
+            parent_node_id: 父节点ID
+            new_node_id: 新节点ID
+            condition_data: 条件配置
+            result_data: 结果配置（如果是结果节点）
+            branch_type: 在哪个分支插入，'if_true' 或 'if_false'
+        Returns:
+            更新后的树映射
+        """
+        if parent_node_id not in tree_map:
+            self.logger.error(f"Parent node {parent_node_id} not found in tree map")
+            return tree_map
+
+        # 获取父节点数据
+        parent_node = tree_map[parent_node_id]
+
+        # 保存原始分支目标
+        original_branch_target = parent_node.get(branch_type)
+        if not original_branch_target:
+            self.logger.warning(f"Parent node {parent_node_id} has no {branch_type} branch")
+            return tree_map
+
+        # 创建条件节点
+        condition_node = {
+            "condition": condition_data,
+        }
+
+        # 如果提供了结果数据，创建结果节点
+        if result_data:
+            result_node = {
+                "result": result_data
+            }
+            tree_map[new_node_id] = result_node
+            condition_node["if_true"] = new_node_id
+        else:
+            # 如果没有结果数据，假设结果节点已存在
+            condition_node["if_true"] = new_node_id
+
+        # 设置否定分支为原始目标
+        condition_node["if_false"] = original_branch_target
+
+        # 创建条件节点ID (通常会是类似 test_新节点名称)
+        condition_node_id = f"test_{new_node_id.split('/')[-1]}" if "/" in new_node_id else f"test_{new_node_id}"
+        if ":" in new_node_id:
+            namespace, path_part = new_node_id.split(":", 1)
+            dir_part = "/".join(path_part.split("/")[:-1])
+            name_part = path_part.split("/")[-1]
+            condition_node_id = f"{namespace}:{dir_part}/test_{name_part}"
+
+        # 添加条件节点到映射
+        tree_map[condition_node_id] = condition_node
+
+        # 更新父节点的分支指向条件节点
+        parent_node[branch_type] = condition_node_id
+
+        self.logger.info(f"Inserted decision node: {condition_node_id} with {branch_type} branch from {parent_node_id}")
+        self.logger.info(f"  - True branch points to: {new_node_id}")
+        self.logger.info(f"  - False branch points to: {original_branch_target}")
+
+        return tree_map
+
+    def verify_decision_tree(self, tree_map, output_base_path=None):
+        """
+        验证决策树是否正确写入文件系统。
+
+        Args:
+            tree_map: 决策树映射
+            output_base_path: 输出的基础路径
+
+        Returns:
+            bool: 所有节点是否都被正确写入
+        """
+        if output_base_path is None:
+            output_base_path = path.join(self.path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree")
+
+        self.logger.info(f"Verifying decision tree with {len(tree_map)} nodes in {output_base_path}")
+        all_valid = True
+
+        for node_id, node_data in tree_map.items():
+            if not isinstance(node_id, str):
+                continue
+
+            # 构建应该存在的文件路径
+            if ":" in node_id:
+                namespace, rel_path = node_id.split(":", 1)
+                rel_path = rel_path.replace("/", os.sep)
+                node_path = path.join(output_base_path, f"{rel_path}.json")
+            else:
+                node_path = path.join(output_base_path, f"{node_id}.json")
+
+            # 检查文件是否存在
+            if not path.exists(node_path):
+                self.logger.error(f"Node file missing: {node_path} for node ID: {node_id}")
+                all_valid = False
+                continue
+
+            # 检查文件内容是否匹配
+            try:
+                with open(node_path, "r") as f:
+                    file_data = json.load(f)
+
+                # 简单比较JSON内容是否相等
+                if file_data != node_data:
+                    self.logger.error(f"Node data mismatch for {node_id}")
+                    all_valid = False
+            except Exception as e:
+                self.logger.error(f"Error reading node file {node_path}: {e}")
+                all_valid = False
+
+        if all_valid:
+            self.logger.info("All decision tree nodes verified successfully")
+        else:
+            self.logger.warning("Decision tree verification failed")
+
+        return all_valid
 
 
 

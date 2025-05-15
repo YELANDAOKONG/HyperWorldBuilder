@@ -611,16 +611,49 @@ class BigGlobeDecisionTreeVisualizer:
         self.logger.info(f"Processed {tree_count} decision trees")
 
 
-if __name__ == "__main__":
-    base_dir = os.path.join("Imports", "BigGlobe")
-    output_dir = os.path.join("OutPut", "DecisionTreeImages")
+# if __name__ == "__main__":
+#     base_dir = os.path.join("Imports", "BigGlobe")
+#     output_dir = os.path.join("OutPut", "DecisionTreeImages")
+#
+#     if not os.path.exists(output_dir) or not os.path.isdir(output_dir):
+#         os.makedirs(output_dir)
+#
+#     # Clean and create output directory
+#     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
+#
+#     # Process all trees
+#     visualizer.batch_visualize(output_dir=output_dir, split=True, max_depth=8192)
+#
 
+if __name__ == "__main__":
+    import argparse
+
+    # Set up command line argument parser
+    parser = argparse.ArgumentParser(description="BigGlobe Decision Tree Visualizer")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--main", action="store_true", help="Use Output/DataPack as input directory")
+    group.add_argument("--debug", action="store_true", help="Use Output/DataPackDebug as input directory")
+    group.add_argument("--root", action="store_true", help="Use Imports/BigGlobe as input directory (default)")
+
+    args = parser.parse_args()
+
+    # Determine base directory based on arguments
+    if args.main:
+        base_dir = os.path.join("Output", "DataPack")
+        output_dir = os.path.join("OutPut", "DecisionTreeImages.Main")
+    elif args.debug:
+        base_dir = os.path.join("Output", "DataPackDebug")
+        output_dir = os.path.join("OutPut", "DecisionTreeImages.Debug")
+    else:  # default is --root or no argument
+        base_dir = os.path.join("Imports", "BigGlobe")
+        output_dir = os.path.join("OutPut", "DecisionTreeImages")
+
+    # Create output directory if it doesn't exist
     if not os.path.exists(output_dir) or not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
-    # Clean and create output directory
+    # Initialize visualizer
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
 
     # Process all trees
     visualizer.batch_visualize(output_dir=output_dir, split=True, max_depth=8192)
-

@@ -987,11 +987,50 @@ class BigGlobeDecisionTreeVisualizer:
 
 
 
+# if __name__ == "__main__":
+#     base_dir = os.path.join("Imports", "BigGlobe")
+#     output_json = os.path.join("OutPut", "DecisionTreeJson")
+#     output_html = os.path.join("OutPut", "DecisionTreeHtml")
+#     output_markdown = os.path.join("OutPut", "DecisionTreeMarkdown")
+#
+#     os.makedirs(output_json, exist_ok=True)
+#     os.makedirs(output_html, exist_ok=True)
+#     os.makedirs(output_markdown, exist_ok=True)
+#
+#     # Create visualizer with option to show full scripts instead of truncating them
+#     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
+#
+#     visualizer.batch_export_trees(output_dir=output_json, format="json")
+#     visualizer.batch_export_trees(output_dir=output_html, format="html")
+#     visualizer.batch_export_trees(output_dir=output_markdown, format="markdown")
+
 if __name__ == "__main__":
-    base_dir = os.path.join("Imports", "BigGlobe")
-    output_json = os.path.join("OutPut", "DecisionTreeJson")
-    output_html = os.path.join("OutPut", "DecisionTreeHtml")
-    output_markdown = os.path.join("OutPut", "DecisionTreeMarkdown")
+    import argparse
+
+    # Set up command line argument parser
+    parser = argparse.ArgumentParser(description="BigGlobe Decision Tree Text Exporter")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--main", action="store_true", help="Use Output/DataPack as input directory")
+    group.add_argument("--debug", action="store_true", help="Use Output/DataPackDebug as input directory")
+    group.add_argument("--root", action="store_true", help="Use Imports/BigGlobe as input directory (default)")
+
+    args = parser.parse_args()
+
+    # Determine base directory based on arguments
+    if args.main:
+        base_dir = os.path.join("Output", "DataPack")
+        suffix = ".Main"
+    elif args.debug:
+        base_dir = os.path.join("Output", "DataPackDebug")
+        suffix = ".Debug"
+    else:  # default is --root or no argument
+        base_dir = os.path.join("Imports", "BigGlobe")
+        suffix = ""
+
+    # Create output directories
+    output_json = os.path.join("OutPut", f"DecisionTreeJson{suffix}")
+    output_html = os.path.join("OutPut", f"DecisionTreeHtml{suffix}")
+    output_markdown = os.path.join("OutPut", f"DecisionTreeMarkdown{suffix}")
 
     os.makedirs(output_json, exist_ok=True)
     os.makedirs(output_html, exist_ok=True)

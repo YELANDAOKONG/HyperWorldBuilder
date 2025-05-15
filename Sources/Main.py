@@ -448,72 +448,17 @@ def build_debug(args: List[str]) -> int:
     overworld_tree = builder.map_decision_tree(sources_decision_tree_dir, "bigglobe:overworld/biome/test_cave")
     islands_tree = builder.map_decision_tree(sources_decision_tree_dir, "bigglobe:islands/biome/test_cave")
 
-    # 创建薰衣草平原结果节点
     lavender_field_node = {
         "result": {
             "type": "constant",
             "value": "biomesoplenty:lavender_field"
         }
     }
-    overworld_tree["bigglobe:overworld/biome/lavender_field"] = lavender_field_node
-    islands_tree["bigglobe:islands/biome/lavender_field"] = lavender_field_node
 
-    # 创建魔法值条件节点
-    test_lavender_field_node = {
-        "condition": {
-            "type": "world_trait_threshold",
-            "trait": "bigglobe:magicalness",
-            "min": 0.2,
-            "max": 0.4,
-            "smooth_min": True,
-            "smooth_max": True
-        },
-        "if_true": "bigglobe:overworld/biome/lavender_field",
-        "if_false": "bigglobe:overworld/biome/temperate_plains"
-    }
-    overworld_tree["bigglobe:overworld/biome/test_lavender_field"] = test_lavender_field_node
+    # TODO...
+    # 后续迁移模块到 Sources.MainFiles包中
 
-    # 修改主世界温带平原的引用
-    # 找到 temperate_test_wasteland 节点并修改其 if_false 分支
-    if "bigglobe:overworld/biome/temperate_test_wasteland" in overworld_tree:
-        wasteland_node = overworld_tree["bigglobe:overworld/biome/temperate_test_wasteland"]
-        if isinstance(wasteland_node, dict) and "if_false" in wasteland_node:
-            # 只替换指向 temperate_plains 的引用
-            if wasteland_node["if_false"] == "bigglobe:overworld/biome/temperate_plains":
-                wasteland_node["if_false"] = "bigglobe:overworld/biome/test_lavender_field"
-
-    # 为浮岛创建相同的魔法值条件节点，注意路径要使用islands命名空间
-    islands_test_lavender_field_node = {
-        "condition": {
-            "type": "world_trait_threshold",
-            "trait": "bigglobe:magicalness",
-            "min": 0.2,
-            "max": 0.4,
-            "smooth_min": True,
-            "smooth_max": True
-        },
-        "if_true": "bigglobe:islands/biome/lavender_field",
-        "if_false": "bigglobe:islands/biome/temperate_plains"  # 修正：使用islands路径
-    }
-    islands_tree["bigglobe:islands/biome/test_lavender_field"] = islands_test_lavender_field_node
-
-    # 修改群岛温带平原的引用
-    # 找到 temperate_test_wasteland 节点并修改其 if_false 分支
-    if "bigglobe:islands/biome/temperate_test_wasteland" in islands_tree:
-        islands_wasteland_node = islands_tree["bigglobe:islands/biome/temperate_test_wasteland"]
-        if isinstance(islands_wasteland_node, dict) and "if_false" in islands_wasteland_node:
-            # 只替换指向 temperate_plains 的引用，使用正确的islands路径
-            if islands_wasteland_node["if_false"] == "bigglobe:islands/biome/temperate_plains":  # 修正：检查islands路径
-                islands_wasteland_node["if_false"] = "bigglobe:islands/biome/test_lavender_field"
-
-    # 写回决策树
-    builder.write_decision_tree(overworld_tree, all_decision_tree_dir)
-    builder.write_decision_tree(islands_tree, all_decision_tree_dir)
-
-    # 验证
-    builder.verify_decision_tree(overworld_tree, all_decision_tree_dir)
-    builder.verify_decision_tree(islands_tree, all_decision_tree_dir)
-
+    ### --------- &END 决策树区域 ---------
 
 
     builder.pack_zip(output_file, delete_exists=True)

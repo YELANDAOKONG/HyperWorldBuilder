@@ -39,6 +39,9 @@ def build_debug(args: List[str]) -> int:
     tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree", "overworld")
     column_value_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_column_value", "overworld")
     configured_feature = path.join(output_path, "data", "bigglobe", "worldgen", "configured_feature")
+    tags = path.join(output_path, "data", "bigglobe", "tags")
+    worldgen_tags = path.join(output_path, "data", "bigglobe", "tags", "worldgen")
+    configured_feature_tags = path.join(output_path, "data", "bigglobe", "tags", "worldgen", "configured_feature")
     os.makedirs(tree_dir, exist_ok=True)
     os.makedirs(path.join(tree_dir, "biome"), exist_ok=True)
     os.makedirs(path.join(tree_dir, "surface_state"), exist_ok=True)
@@ -65,7 +68,7 @@ def build_debug(args: List[str]) -> int:
         "if_false": "bigglobe:overworld/biome/lavender_field"
     }
     builder.write_raw(path.join(tree_dir, "biome", "lavender_field.json"), lavender_field)
-    #builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
+    builder.write_raw(path.join(tree_dir, "biome", "test_warm.json"), test_warm)
 
 
     test_hot = {
@@ -319,7 +322,116 @@ def build_debug(args: List[str]) -> int:
             ]
         }
     }
-    builder.write_raw(path.join(configured_feature, "overworld", "flowers", "flowers.json"), flowers, delete_exists=True)
+    #builder.write_raw(path.join(configured_feature, "overworld", "flowers", "flowers.json"), flowers, delete_exists=True)
+
+    lavender_field_flowers = {
+        "type": "bigglobe:flower",
+        "config": {
+            "seed": "lavender_field_flowers",
+            "distance": 16, # 24 / 16   # 减少距离使花朵生成点更靠近
+            "variation": 16, # 24 / 16   # 较小的变化值使分布更均匀
+            "spawn_chance": 1.0, # 1.0 / 1.0   # 确保每个可能的点都生成花朵
+            "randomize_chance": 0.15, # 0.125 / 0.15    # 保持一定的随机性
+            "randomize_radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+            "noise": {
+                "type": "abs",
+                "grid": {
+                    "type": "sum",
+                    "layers": [
+                        {"type": "smooth", "scale": 32, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 16, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 8, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 4, "amplitude": 0.25}
+                    ]
+                }
+            },
+            "entries": [
+                {
+                    "weight": 100.0,
+                    "restrictions": {
+                        "type": "and",
+                        "restrictions": [
+                            {
+                                "type": "range",
+                                "property": "bigglobe:overworld/foliage",
+                                "min": -0.5,
+                                "mid": 0.0,
+                                "max": 0.5
+                            },
+                            {
+                                "type": "range",
+                                "property": "bigglobe:overworld/temperature",
+                                "min": -0.5,
+                                "mid": 0.0,
+                                "max": 0.5
+                            }
+                        ]
+                    },
+                    "radius": {"type": "uniform", "min": 64.0, "max": 128.0},
+                    "state": "biomesoplenty:tall_lavender[half=lower]"
+                },
+                {
+                    "defaults": {
+                        "restrictions": {
+                            "type": "and",
+                            "restrictions": [
+                                {
+                                    "type": "threshold",
+                                    "property": "bigglobe:overworld/foliage",
+                                    "min": -0.5,
+                                    "max": 0.0
+                                },
+                                {
+                                    "type": "range",
+                                    "property": "bigglobe:overworld/temperature",
+                                    "min": -0.5,
+                                    "mid": 0.0,
+                                    "max": 0.5
+                                }
+                            ]
+                        }
+                    },
+                    "variations": [
+                        {
+                            "weight": 120.0,
+                            "radius": {
+                                "type": "uniform",
+                                "min": 64.0,
+                                "max": 128.0
+                            },
+                            "state": "biomesoplenty:lavender"
+                        },
+                        {
+                            "weight": 3.0, "radius": {
+                                "type": "uniform",
+                                "min": 8.0,
+                                "max": 16.0
+                            },
+                            "state": "minecraft:azure_bluet"
+                        },
+                        {
+                            "weight": 2.0, "radius": {
+                                "type": "uniform",
+                                "min": 8.0,
+                                "max": 16.0
+                            },
+                            "state": "minecraft:oxeye_daisy"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+    builder.write_raw(path.join(configured_feature, "overworld", "flowers", "lavender_field_flowers.json"), lavender_field_flowers, delete_exists=True)
+
+    surface_flowers = {
+        "replace": False,
+        "values": [
+            "bigglobe:overworld/flowers/lavender_field_flowers"
+        ]
+    }
+    builder.write_raw(path.join(configured_feature_tags, "overworld", "surface_flowers.json"), surface_flowers, delete_exists=True)
 
 
     builder.pack_zip(output_file, delete_exists=True)

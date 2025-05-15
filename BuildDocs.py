@@ -64,11 +64,10 @@ class DocumentationBuilder:
                 self.visualizers[name] = BigGlobeDecisionTreeVisualizer(dir_path, truncate_scripts=False)
 
     def clean_output_directory(self):
-        """Clean the output files directory by removing all its contents"""
-        # Clean files directory
-        if self.files_dir.exists():
-            self.logger.info(f"Cleaning files directory: {self.files_dir}")
-            shutil.rmtree(self.files_dir)
+        """Clean the entire output directory by removing all its contents"""
+        if self.output_dir.exists():
+            self.logger.info(f"Cleaning output directory: {self.output_dir}")
+            shutil.rmtree(self.output_dir)
 
         # Create output and files directories
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -94,17 +93,24 @@ class DocumentationBuilder:
             self.logger.info(f"Generating HTML visualizations for {name}...")
             visualizer.batch_export_trees(output_dir=temp_dir, format="html")
 
-            # Copy files to docs directory and build indexes
+            # Copy files to docs directory and build directory structure
             target_dir = self.files_dir / name
             self.logger.info(f"Copying files to {target_dir}...")
-            self._copy_and_index_files(temp_dir, target_dir, name)
+
+            # First copy all files
+            self._copy_files(temp_dir, target_dir)
 
             # Clean up temporary directory
             shutil.rmtree(temp_dir)
-            self.logger.info(f"Documentation for {name} successfully built")
+            self.logger.info(f"Files for {name} successfully copied")
 
             # Mark this build as successful
             build_statuses[name] = True
+
+        # Create directory indexes for all build types
+        for name in self.visualizers:
+            if build_statuses[name]:
+                self._create_directory_indexes(self.files_dir / name, name)
 
         # Generate main index page
         self.logger.info("Generating main index page...")
@@ -112,28 +118,23 @@ class DocumentationBuilder:
 
         self.logger.info(f"All documentation successfully built in {self.output_dir}")
 
-    def _copy_and_index_files(self, source_dir, target_dir, build_type):
+    def _copy_files(self, source_dir, target_dir):
         """
-        Copy files from the source directory to the target directory
-        and create index files for each directory.
+        Copy files from the source directory to the target directory.
 
         Args:
             source_dir: Source directory containing the visualizations
             target_dir: Target directory to copy files to
-            build_type: The type of build (root, main, or debug)
         """
         # Create target directory
         target_dir.mkdir(parents=True, exist_ok=True)
 
-        # Create a dictionary to track directory structure
-        dir_structure = {}
-
-        # Collect all files
-        for root, _, files in os.walk(source_dir):
+        # Collect and copy all files
+        for root, dirs, files in os.walk(source_dir):
             root_path = Path(root)
 
             # Skip empty directories
-            if not files:
+            if not files and not dirs:
                 continue
 
             # Get relative path from the source directory
@@ -142,53 +143,39 @@ class DocumentationBuilder:
                 current_target_dir = target_dir / rel_path
             except ValueError:
                 # This is the source directory itself
-                rel_path = Path()
                 current_target_dir = target_dir
 
             # Create the target directory
             current_target_dir.mkdir(parents=True, exist_ok=True)
 
-            # Add to directory structure
-            if str(rel_path) not in dir_structure:
-                dir_structure[str(rel_path)] = []
-
-            # Copy files and add to directory structure
-            html_files = []
+            # Copy files
             for file in files:
                 if file.endswith(".html") and file != "index.html":
                     source_file = root_path / file
                     target_file = current_target_dir / file
                     shutil.copy2(source_file, target_file)
-                    html_files.append(file)
 
-            dir_structure[str(rel_path)] = html_files
-
-        # Create index files for each directory
-        self._create_directory_indexes(dir_structure, target_dir, build_type)
-
-    def _create_directory_indexes(self, dir_structure, base_target_dir, build_type):
+    def _create_directory_indexes(self, base_dir, build_type):
         """
-        Create index.html files for each directory.
+        Create index.html files for the directory structure.
 
         Args:
-            dir_structure: Dictionary mapping directory paths to lists of HTML files
-            base_target_dir: Base target directory
+            base_dir: Base directory to start from
             build_type: The type of build (root, main, or debug)
         """
-        # Get all directories sorted by depth
-        dirs = sorted(dir_structure.keys(), key=lambda x: len(Path(x).parts))
+        # Create a dictionary to store the directory structure
+        dir_structure = self._scan_directory_structure(base_dir)
 
-        # Process each directory
-        for dir_path in dirs:
-            dir_files = dir_structure[dir_path]
-            target_dir = base_target_dir / dir_path
+        # Create index files for each directory
+        for dir_path, (subdirs, files) in dir_structure.items():
+            target_dir = base_dir / dir_path if dir_path else base_dir
 
             # Create the index file content
-            index_content = self._generate_directory_index(
+            index_content = self._generate_tree_view_index(
                 dir_path,
-                dir_files,
-                dirs,
-                base_target_dir,
+                subdirs,
+                files,
+                base_dir,
                 build_type
             )
 
@@ -197,17 +184,51 @@ class DocumentationBuilder:
             with open(index_file, 'w', encoding='utf-8') as f:
                 f.write(index_content)
 
-            self.logger.info(f"Created index file for {build_type}/{dir_path or 'root directory'}")
+            self.logger.info(f"Created tree view index for {build_type}/{dir_path or 'root directory'}")
 
-    def _generate_directory_index(self, current_dir, html_files, all_dirs, base_target_dir, build_type):
+    def _scan_directory_structure(self, base_dir):
         """
-        Generate HTML content for a directory index file.
+        Scan a directory to create a structure map.
 
         Args:
-            current_dir: Current directory path
+            base_dir: Base directory to scan
+
+        Returns:
+            Dictionary mapping relative paths to tuples of (subdirectories, files)
+        """
+        dir_structure = {}
+
+        for root, dirs, files in os.walk(base_dir):
+            root_path = Path(root)
+
+            # Get relative path from the base directory
+            try:
+                rel_path = root_path.relative_to(base_dir)
+                rel_path_str = str(rel_path) if rel_path.parts else ""
+            except ValueError:
+                # This is the base directory itself
+                rel_path_str = ""
+
+            # Filter out index.html files
+            html_files = [f for f in files if f.endswith(".html") and f != "index.html"]
+
+            # Collect subdirectories (excluding hidden directories)
+            subdirs = [d for d in dirs if not d.startswith('.')]
+
+            # Add to structure
+            dir_structure[rel_path_str] = (subdirs, html_files)
+
+        return dir_structure
+
+    def _generate_tree_view_index(self, current_dir, subdirs, html_files, base_dir, build_type):
+        """
+        Generate HTML content for a tree view index file.
+
+        Args:
+            current_dir: Current directory path (relative to base_dir)
+            subdirs: List of subdirectories in this directory
             html_files: List of HTML files in this directory
-            all_dirs: List of all directories
-            base_target_dir: Base target directory
+            base_dir: Base directory path
             build_type: The type of build (root, main, or debug)
 
         Returns:
@@ -222,24 +243,8 @@ class DocumentationBuilder:
             title = f"BigGlobe Decision Trees - {build_type.capitalize()}"
             heading = f"BigGlobe Decision Trees - {build_type.capitalize()}"
 
-        # Find subdirectories of the current directory
-        current_path = Path(current_dir)
-        subdirs = []
-        for dir_path in all_dirs:
-            path = Path(dir_path)
-            if path != current_path and len(path.parts) == len(current_path.parts) + 1:
-                if str(path).startswith(str(current_path) + os.sep) or (not current_path.parts and path.parts):
-                    subdirs.append(path)
-
-        # Create breadcrumb navigation
-        breadcrumbs = []
-        # Add link to main index
-        relative_path = "../" * (len(current_path.parts) + 1)
-        breadcrumbs.append(f'<a href="{relative_path}index.html">Main Index</a>')
-
-        # Add link to build type index
-        if current_path.parts:
-            breadcrumbs.append(f'<a href="../index.html">Back to {build_type.capitalize()} Root</a>')
+        # Generate paths for navigation
+        current_path = Path(current_dir) if current_dir else Path()
 
         # Generate HTML
         html = f"""<!DOCTYPE html>
@@ -248,6 +253,7 @@ class DocumentationBuilder:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {{
             --primary-color: #4a6da7;
@@ -259,6 +265,10 @@ class DocumentationBuilder:
             --info-color: #17a2b8;
             --warning-color: #ffc107;
             --danger-color: #dc3545;
+            --folder-color: #ffd700;
+            --folder-hover: #f0c800;
+            --file-color: #4caf50;
+            --file-hover: #388e3c;
             --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }}
 
@@ -338,55 +348,93 @@ class DocumentationBuilder:
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
         }}
 
-        .card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        /* Tree View Styling */
+        .tree {{
+            margin: 1rem 0;
         }}
 
-        .directory-list, .file-list {{
+        .tree-item {{
             list-style-type: none;
-            padding-left: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
+            margin-bottom: 0.5rem;
         }}
 
-        .directory-list li, .file-list li {{
-            padding: 0;
-            border-radius: 8px;
-            overflow: hidden;
-        }}
-
-        .directory-list a, .file-list a {{
+        .tree-folder, .tree-file {{
             display: block;
-            padding: 1rem;
-            color: var(--dark-color);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            color: white;
             text-decoration: none;
             font-weight: 500;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }}
 
-        .directory-list a {{
-            background-color: var(--info-color);
-            color: white;
+        .tree-folder {{
+            background-color: var(--folder-color);
+            cursor: pointer;
         }}
 
-        .file-list a {{
-            background-color: var(--success-color);
-            color: white;
+        .tree-folder:hover {{
+            background-color: var(--folder-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }}
 
-        .directory-list a:hover, .file-list a:hover {{
-            filter: brightness(1.1);
-            text-decoration: none;
+        .tree-file {{
+            background-color: var(--file-color);
         }}
 
-        .directory-icon, .file-icon {{
-            margin-right: 10px;
-            font-size: 1.2em;
+        .tree-file:hover {{
+            background-color: var(--file-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }}
+
+        .tree-icon {{
+            margin-right: 0.5rem;
+        }}
+
+        .tree-toggle {{
+            float: right;
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }}
+
+        .tree-children {{
+            display: none;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+            border-left: 2px solid #eee;
+        }}
+
+        .tree-children.open {{
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }}
+
+        /* Depth colors */
+        .tree-folder.depth-0 {{ background-color: #5d93e1; }}
+        .tree-folder.depth-0:hover {{ background-color: #4a7ec3; }}
+
+        .tree-folder.depth-1 {{ background-color: #7e57c2; }}
+        .tree-folder.depth-1:hover {{ background-color: #6944a8; }}
+
+        .tree-folder.depth-2 {{ background-color: #ec407a; }}
+        .tree-folder.depth-2:hover {{ background-color: #d63467; }}
+
+        .tree-folder.depth-3 {{ background-color: #ff7043; }}
+        .tree-folder.depth-3:hover {{ background-color: #e56238; }}
+
+        .tree-folder.depth-4 {{ background-color: #ffca28; }}
+        .tree-folder.depth-4:hover {{ background-color: #e6b623; }}
+
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(-10px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
         }}
 
         footer {{
@@ -399,12 +447,6 @@ class DocumentationBuilder:
             border-radius: 8px;
             box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
         }}
-
-        @media (max-width: 768px) {{
-            .directory-list, .file-list {{
-                grid-template-columns: 1fr;
-            }}
-        }}
     </style>
 </head>
 <body>
@@ -414,57 +456,142 @@ class DocumentationBuilder:
         </header>
 
         <main>
-"""
-        # Add breadcrumb navigation if available
-        if breadcrumbs:
-            html += f"""
             <div class="breadcrumb">
-                {' '.join(breadcrumbs)}
+                <a href="{('../' * len(current_path.parts))}../../index.html">Main Index</a>
+                {f'<a href="{("../" * len(current_path.parts))}index.html">{build_type.capitalize()} Root</a>' if current_dir else ""}
+                {self._generate_breadcrumb_path(current_path)}
             </div>
-"""
 
-        # Add subdirectories section if available
-        if subdirs:
-            html += f"""
             <div class="card">
-                <h2>Subdirectories</h2>
-                <ul class="directory-list">
-"""
-            for subdir in sorted(subdirs, key=lambda x: str(x)):
-                subdir_name = subdir.name
-                html += f'                    <li><a href="{subdir_name}/index.html"><span class="directory-icon">📁</span>{subdir_name}</a></li>\n'
-            html += """
-                </ul>
-            </div>
+                <h2>Directory Structure</h2>
+                <div class="tree">
 """
 
-        # Add files section if available
-        if html_files:
-            html += f"""
-            <div class="card">
-                <h2>Decision Tree Files</h2>
-                <ul class="file-list">
-"""
-            for file in sorted(html_files):
-                if file != "index.html":
-                    file_name = file.replace('.html', '')
-                    html += f'                    <li><a href="{file}"><span class="file-icon">🌲</span>{file_name}</a></li>\n'
-            html += """
-                </ul>
-            </div>
-"""
+        # Generate the tree view
+        if subdirs or html_files:
+            html += self._generate_tree_content(subdirs, html_files, current_path, 0)
+        else:
+            html += "                    <p>No files found in this directory.</p>"
 
-        # Close container and add footer
-        html += f"""
+        html += """
+                </div>
+            </div>
         </main>
 
         <footer>
-            <p>Generated by BigGlobe Decision Tree Documentation Builder on {datetime.now().strftime("%Y-%m-%d %H:%M")}</p>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on """ + datetime.now().strftime(
+            "%Y-%m-%d %H:%M") + """</p>
         </footer>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to all folder items
+            document.querySelectorAll('.tree-folder').forEach(folder => {
+                folder.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Toggle the next sibling (tree-children container)
+                    const children = this.nextElementSibling;
+                    if (children && children.classList.contains('tree-children')) {
+                        children.classList.toggle('open');
+
+                        // Toggle the icon
+                        const toggleIcon = this.querySelector('.tree-toggle');
+                        if (toggleIcon) {
+                            if (children.classList.contains('open')) {
+                                toggleIcon.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                            } else {
+                                toggleIcon.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Automatically open the current path
+            const pathParts = window.location.pathname.split('/');
+            const currentDir = pathParts[pathParts.length - 2] || '';
+
+            if (currentDir) {
+                document.querySelectorAll(`.tree-folder[data-path="${currentDir}"]`).forEach(folder => {
+                    folder.click();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 """
+        return html
+
+    def _generate_breadcrumb_path(self, current_path):
+        """Generate breadcrumb navigation for the current path"""
+        if not current_path.parts:
+            return ""
+
+        breadcrumbs = []
+        current_parts = []
+
+        for part in current_path.parts:
+            current_parts.append(part)
+            path_to_here = '/'.join(current_parts)
+            back_steps = len(current_path.parts) - len(current_parts)
+
+            breadcrumbs.append(f'<a href="{("../" * back_steps)}index.html">{part}</a>')
+
+        return ' / '.join(breadcrumbs)
+
+    def _generate_tree_content(self, subdirs, files, current_path, depth=0):
+        """
+        Recursively generate HTML for the tree view.
+
+        Args:
+            subdirs: List of subdirectories
+            files: List of files
+            current_path: Current path object
+            depth: Current depth in the tree
+
+        Returns:
+            HTML string for this level of the tree
+        """
+        html = ""
+
+        # Add folders first
+        for subdir in sorted(subdirs):
+            subdir_path = current_path / subdir if current_path.parts else Path(subdir)
+
+            html += f"""
+                <div class="tree-item">
+                    <div class="tree-folder depth-{min(depth, 4)}" data-path="{subdir}">
+                        <i class="fas fa-folder tree-icon"></i>
+                        {subdir}
+                        <span class="tree-toggle"><i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <div class="tree-children">
+                        <div class="tree-item">
+                            <a href="{subdir}/index.html" class="tree-file">
+                                <i class="fas fa-compass tree-icon"></i>
+                                Navigate to {subdir}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+"""
+
+        # Add files
+        for file in sorted(files):
+            file_name = file.replace('.html', '')
+
+            html += f"""
+                <div class="tree-item">
+                    <a href="{file}" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        {file_name}
+                    </a>
+                </div>
+"""
+
         return html
 
     def _get_version_info(self):
@@ -500,6 +627,7 @@ class DocumentationBuilder:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BigGlobe Decision Trees Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {{
             --primary-color: #4a6da7;
@@ -547,12 +675,14 @@ class DocumentationBuilder:
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
         }}
 
         header h1 {{
             margin: 0;
             font-size: 2.5rem;
             color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
         }}
 
         .version-info {{
@@ -561,6 +691,7 @@ class DocumentationBuilder:
             background-color: rgba(255, 255, 255, 0.2);
             padding: 0.5rem 1rem;
             border-radius: 4px;
+            backdrop-filter: blur(4px);
         }}
 
         h1, h2, h3 {{
@@ -579,22 +710,24 @@ class DocumentationBuilder:
             background-color: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }}
 
         .build-card:hover {{
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }}
 
         .build-header {{
             background-color: var(--primary-color);
             color: white;
-            padding: 1rem;
-            font-size: 1.2rem;
+            padding: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             text-align: center;
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
         }}
 
         .build-content {{
@@ -602,7 +735,8 @@ class DocumentationBuilder:
         }}
 
         .build-description {{
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            color: #555;
         }}
 
         .build-button {{
@@ -611,22 +745,27 @@ class DocumentationBuilder:
             background-color: var(--success-color);
             color: white;
             text-align: center;
-            padding: 0.8rem;
+            padding: 1rem;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-weight: bold;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
 
         .build-button:hover {{
             background-color: #218838;
             text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }}
 
         .build-button.disabled {{
             background-color: var(--disabled-color);
             cursor: not-allowed;
             pointer-events: none;
+            opacity: 0.7;
         }}
 
         .documentation-info {{
@@ -634,7 +773,19 @@ class DocumentationBuilder:
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }}
+
+        .documentation-info::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background-color: var(--primary-color);
         }}
 
         footer {{
@@ -647,6 +798,25 @@ class DocumentationBuilder:
             border-radius: 8px;
             box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
         }}
+
+        /* Badges */
+        .badge {{
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 30px;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }}
+
+        .badge-mc {{
+            background-color: var(--info-color);
+        }}
+
+        .badge-mod {{
+            background-color: var(--success-color);
+        }}
     </style>
 </head>
 <body>
@@ -654,13 +824,14 @@ class DocumentationBuilder:
         <header>
             <h1>BigGlobe Decision Trees Documentation</h1>
             <div class="version-info">
-                Minecraft: {version_info['minecraft']} | BigGlobe: {version_info['mod']}
+                <span class="badge badge-mc">Minecraft {version_info['minecraft']}</span>
+                <span class="badge badge-mod">BigGlobe {version_info['mod']}</span>
             </div>
         </header>
 
         <main>
             <div class="documentation-info">
-                <h2>Documentation Overview</h2>
+                <h2><i class="fas fa-info-circle"></i> Documentation Overview</h2>
                 <p>This documentation provides a visual representation of BigGlobe's decision trees used in world generation. 
                    Decision trees define how various features and biomes are generated throughout the world.</p>
                 <p>Select one of the build options below to explore the decision trees.</p>
@@ -673,15 +844,18 @@ class DocumentationBuilder:
         build_types = {
             'root': {
                 'title': 'Root Build',
-                'description': 'Base BigGlobe mod decision trees'
+                'description': 'Base BigGlobe mod decision trees from the original mod files.',
+                'icon': 'fa-seedling'
             },
             'main': {
                 'title': 'Main Build',
-                'description': 'Decision trees from the main data pack'
+                'description': 'Decision trees from the main data pack, includes any customizations.',
+                'icon': 'fa-cube'
             },
             'debug': {
                 'title': 'Debug Build',
-                'description': 'Decision trees from the debug data pack'
+                'description': 'Decision trees from the debug data pack, includes development configurations.',
+                'icon': 'fa-bug'
             }
         }
 
@@ -691,13 +865,15 @@ class DocumentationBuilder:
 
             html += f"""
                 <div class="build-card">
-                    <div class="build-header">{info['title']}</div>
+                    <div class="build-header">
+                        <i class="fas {info['icon']} mr-2"></i> {info['title']}
+                    </div>
                     <div class="build-content">
                         <div class="build-description">
                             <p>{info['description']}</p>
                         </div>
                         <a href="{'files/' + build_type + '/index.html' if is_enabled else '#'}" class="{button_class}">
-                            {'View Documentation' if is_enabled else 'Not Available'}
+                            {('<i class="fas fa-folder-open mr-2"></i> View Documentation') if is_enabled else ('<i class="fas fa-ban mr-2"></i> Not Available')}
                         </a>
                     </div>
                 </div>

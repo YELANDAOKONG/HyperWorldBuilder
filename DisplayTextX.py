@@ -927,6 +927,7 @@ class BigGlobeDecisionTreeVisualizer:
             padding: 0;
         }}
 
+        /*
         body {{
             font-family: var(--font-main);
             line-height: 1.6;
@@ -940,7 +941,24 @@ class BigGlobeDecisionTreeVisualizer:
             margin: 0 auto;
             width: 100%;
         }}
+        */
+        
+        body {{
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+        }}
+        
+        .container {{
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }}
 
+        /*
         header {{
             background-color: var(--primary-color);
             color: white;
@@ -950,8 +968,20 @@ class BigGlobeDecisionTreeVisualizer:
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
         }}
+        */
+        
+        header {{
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            border-radius: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }}
+        
 
-                header h1 {{
+        header h1 {{
             margin: 0;
             font-size: 2rem;
             color: white;
@@ -968,12 +998,22 @@ class BigGlobeDecisionTreeVisualizer:
             backdrop-filter: blur(4px);
         }}
         
+        /*
         .tree-container {{
             background-color: white;
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }}
+        */
+        
+        .tree-container {{
+            background-color: white;
+            border-radius: 0;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: none;
         }}
         
         .tree-node {{
@@ -1138,6 +1178,7 @@ class BigGlobeDecisionTreeVisualizer:
         }}
         
         /* Responsive adjustments */
+        /*
         @media (max-width: 768px) {{
             .container {{
                 padding: 10px;
@@ -1155,6 +1196,15 @@ class BigGlobeDecisionTreeVisualizer:
                 margin-left: 1rem;
                 padding-left: 0.5rem;
             }}
+        }}
+        */
+        
+        .tree-container {{
+            background-color: white;
+            border-radius: 0;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: none;
         }}
     </style>
 </head>

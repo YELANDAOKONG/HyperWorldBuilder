@@ -91,7 +91,8 @@ class DocumentationBuilder:
 
             # Generate HTML visualizations
             self.logger.info(f"Generating HTML visualizations for {name}...")
-            visualizer.batch_export_trees(output_dir=temp_dir, format="html")
+            # visualizer.batch_export_trees(output_dir=temp_dir, format="html")
+            visualizer.batch_export_trees(output_dir=temp_dir, format="beautified_html")
 
             # Copy files to docs directory and build directory structure
             target_dir = self.files_dir / name

@@ -6,6 +6,7 @@ import logging
 import colorlog
 import shutil
 from pathlib import Path
+from datetime import datetime
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -664,6 +665,7 @@ class BigGlobeDecisionTreeVisualizer:
     def export_tree_as_html(self, root_tree_id, output_file=None):
         """
         Export a decision tree as an HTML file with collapsible tree structure.
+        This is the original HTML export format for compatibility.
 
         Args:
             root_tree_id: ID of the root decision tree
@@ -803,6 +805,7 @@ class BigGlobeDecisionTreeVisualizer:
     def _node_to_html(self, node_id):
         """
         Recursively convert a node and its children to HTML.
+        This is the original HTML conversion for compatibility.
 
         Args:
             node_id: ID of the node to convert
@@ -852,6 +855,477 @@ class BigGlobeDecisionTreeVisualizer:
                 html += self._node_to_html(child)
 
             html += '</div>\n'
+
+        html += '</div>\n'
+
+        return html
+
+    def export_tree_as_beautified_html(self, root_tree_id, output_file=None):
+        """
+        Export a decision tree as a beautified HTML file with modern styling and improved interactivity.
+        This is the new HTML5/CSS3 format with enhanced visuals.
+
+        Args:
+            root_tree_id: ID of the root decision tree
+            output_file: Path to save the HTML file (optional)
+
+        Returns:
+            HTML content as string
+        """
+        self.G = nx.DiGraph()
+        self.node_labels = {}
+        self.node_colors = {}
+        self.node_paths = {}
+        self.node_counter = 0
+        self.resolved_trees = {}
+
+        # Process the tree
+        self.logger.info(f"Processing tree for beautified HTML export: {root_tree_id}")
+        self.process_tree(root_tree_id)
+
+        # Find root nodes
+        root_nodes = [n for n in self.G.nodes() if self.G.in_degree(n) == 0]
+
+        if not root_nodes:
+            self.logger.warning("No root nodes found in the tree")
+            return "<p>No root nodes found in the tree.</p>"
+
+        # Generate HTML
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Tree: {root_tree_id}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {{
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --disabled-color: #6c757d;
+            --result-bg: #e3fcef;
+            --result-border: #8fd3b6;
+            --condition-bg: #e1f5fe;
+            --condition-border: #81d4fa;
+            --missing-bg: #ffebee;
+            --missing-border: #ef9a9a;
+            --unknown-bg: #fff3e0;
+            --unknown-border: #ffe0b2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }}
+
+        * {{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }}
+
+        body {{
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 20px;
+        }}
+
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }}
+
+        header {{
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }}
+
+                header h1 {{
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }}
+        
+        .tree-path {{
+            font-family: monospace;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }}
+        
+        .tree-container {{
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }}
+        
+        .tree-node {{
+            margin: 1rem 0;
+            animation: fadeIn 0.5s ease;
+        }}
+        
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(-10px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        
+        .node-content {{
+            padding: 1rem;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }}
+        
+        .node-content:hover {{
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }}
+        
+        .result-node {{
+            background-color: var(--result-bg);
+            border-left: 5px solid var(--result-border);
+        }}
+        
+        .condition-node {{
+            background-color: var(--condition-bg);
+            border-left: 5px solid var(--condition-border);
+        }}
+        
+        .missing-node {{
+            background-color: var(--missing-bg);
+            border-left: 5px solid var(--missing-border);
+        }}
+        
+        .unknown-node {{
+            background-color: var(--unknown-bg);
+            border-left: 5px solid var(--unknown-border);
+        }}
+        
+        .root-node {{
+            position: relative;
+            border-width: 2px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }}
+        
+        .root-node::before {{
+            content: "ROOT";
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }}
+        
+        .edge-label {{
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.3rem 0.7rem;
+            margin: 0.5rem 0;
+            display: inline-block;
+            border-radius: 4px;
+            font-weight: 500;
+        }}
+        
+        .children {{
+            margin-left: 2rem;
+            padding-left: 1rem;
+            border-left: 2px dashed #ddd;
+            padding-top: 0.5rem;
+        }}
+        
+        .collapsible {{
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            outline: none;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }}
+        
+        .collapsible::after {{
+            content: "⮟";
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }}
+        
+        .collapsed::after {{
+            transform: rotate(-90deg);
+        }}
+        
+        .content {{
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }}
+        
+        .node-path {{
+            color: var(--secondary-color);
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            word-break: break-all;
+        }}
+        
+        .node-type {{
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }}
+        
+        .node-label {{
+            white-space: pre-wrap;
+            word-break: break-word;
+        }}
+        
+        .node-badge {{
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            color: white;
+        }}
+        
+        .badge-result {{
+            background-color: var(--success-color);
+        }}
+        
+        .badge-condition {{
+            background-color: var(--info-color);
+        }}
+        
+        .badge-missing {{
+            background-color: var(--danger-color);
+        }}
+        
+        .badge-unknown {{
+            background-color: var(--warning-color);
+        }}
+        
+        footer {{
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }}
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {{
+            .container {{
+                padding: 10px;
+            }}
+            
+            header {{
+                padding: 1rem;
+            }}
+            
+            .tree-container {{
+                padding: 1rem;
+            }}
+            
+            .children {{
+                margin-left: 1rem;
+                padding-left: 0.5rem;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Decision Tree: {root_tree_id}</h1>
+            <div class="tree-path">Path: {root_tree_id}</div>
+        </header>
+        
+        <div class="tree-container">
+"""
+
+        for root in root_nodes:
+            html += self._node_to_beautified_html(root)
+
+        html += """
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Visualizer on """ + datetime.now().strftime("%Y-%m-%d %H:%M") + """</p>
+        </footer>
+    </div>
+    
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup all collapsible elements
+            var collapsibles = document.querySelectorAll('.collapsible');
+            
+            collapsibles.forEach(function(collapsible) {
+                collapsible.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent event bubbling to parent collapsibles
+                    
+                    this.classList.toggle('collapsed');
+                    var content = this.nextElementSibling;
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        // Calculate proper height including nested content
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        
+                        // Adjust parent containers if this is a nested collapsible
+                        let parent = content.parentElement.closest('.content');
+                        while (parent) {
+                            parent.style.maxHeight = parseInt(parent.style.maxHeight || 0) + content.scrollHeight + "px";
+                            parent = parent.parentElement.closest('.content');
+                        }
+                    }
+                });
+                
+                // Open all root nodes by default
+                if (collapsible.closest('.root-node')) {
+                    setTimeout(function() {
+                        collapsible.click();
+                    }, 100);
+                }
+            });
+            
+            // Expand all nodes function
+            window.expandAll = function() {
+                collapsibles.forEach(function(collapsible) {
+                    if (!collapsible.classList.contains('active')) {
+                        collapsible.click();
+                    }
+                });
+            };
+            
+            // Collapse all nodes function
+            window.collapseAll = function() {
+                collapsibles.forEach(function(collapsible) {
+                    if (collapsible.classList.contains('active')) {
+                        collapsible.click();
+                    }
+                });
+            };
+        });
+    </script>
+</body>
+</html>
+"""
+
+        if output_file:
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(html)
+            self.logger.info(f"Beautified HTML tree saved to {output_file}")
+
+        return html
+
+    def _node_to_beautified_html(self, node_id):
+        """
+        Recursively convert a node and its children to beautified HTML.
+        This is the new HTML5/CSS3 conversion with enhanced visuals.
+
+        Args:
+            node_id: ID of the node to convert
+
+        Returns:
+            HTML representation of the node and its children
+        """
+        label = self.node_labels.get(node_id, "Unknown Node")
+        node_color = self.node_colors.get(node_id, "gray")
+        path = self.node_paths.get(node_id, "")
+
+        # Split label into type and value parts
+        label_parts = label.split('\n', 1)
+        node_type = label_parts[0]
+        node_value = label_parts[1] if len(label_parts) > 1 else ""
+
+        # Determine node badge and class based on node type
+        badge_class = "badge-unknown"
+        node_class = "unknown-node"
+
+        if "Result:" in node_type:
+            badge_class = "badge-result"
+            node_class = "result-node"
+        elif "Condition:" in node_type:
+            badge_class = "badge-condition"
+            node_class = "condition-node"
+        elif "Missing:" in node_type:
+            badge_class = "badge-missing"
+            node_class = "missing-node"
+
+        # Add root-node class for root nodes
+        is_root = self.G.in_degree(node_id) == 0
+        if is_root:
+            node_class += " root-node"
+
+        # Start node HTML
+        html = f'<div class="tree-node">\n'
+
+        # Create type badge
+        badge_text = node_type.split(":")[0]
+        badge = f'<span class="node-badge {badge_class}">{badge_text}</span>'
+
+        children = list(self.G.successors(node_id))
+
+        # Node content (collapsible if it has children)
+        if children:
+            html += f'<div class="node-content {node_class}">\n'
+            html += f'  <button class="collapsible">\n'
+            html += f'    <div>\n'
+            html += f'      <span class="node-path">Path: {path}</span>\n'
+            html += f'      <div class="node-type">{node_type} {badge}</div>\n'
+            html += f'      <div class="node-label">{node_value}</div>\n'
+            html += f'    </div>\n'
+            html += f'  </button>\n'
+            html += f'  <div class="content children">\n'
+
+            # Add child nodes
+            for child_id in children:
+                # Get edge label
+                edge_data = self.G.get_edge_data(node_id, child_id)
+                edge_label = edge_data.get("label", "") if edge_data else ""
+
+                # Add edge label if present
+                if edge_label:
+                    html += f'    <div class="edge-label">{edge_label}</div>\n'
+
+                # Add child node
+                html += self._node_to_beautified_html(child_id)
+
+            html += f'  </div>\n'
+            html += f'</div>\n'
+        else:
+            # Leaf node without collapsible content
+            html += f'<div class="node-content {node_class}">\n'
+            html += f'  <span class="node-path">Path: {path}</span>\n'
+            html += f'  <div class="node-type">{node_type} {badge}</div>\n'
+            html += f'  <div class="node-label">{node_value}</div>\n'
+            html += f'</div>\n'
 
         html += '</div>\n'
 
@@ -932,12 +1406,12 @@ class BigGlobeDecisionTreeVisualizer:
 
     def batch_export_trees(self, start_dir=None, output_dir="tree_exports", format="html"):
         """
-        Export all decision trees in a directory as HTML, Markdown, or JSON files.
+        Export all decision trees in a directory as HTML, Markdown, JSON, or beautified HTML files.
 
         Args:
             start_dir: Starting directory (defaults to decision_tree_dir)
             output_dir: Directory to save exported files
-            format: Export format, either "html", "markdown", or "json"
+            format: Export format, either "html", "markdown", "json", or "beautified_html"
         """
         if start_dir is None:
             start_dir = self.decision_tree_dir
@@ -970,6 +1444,10 @@ class BigGlobeDecisionTreeVisualizer:
                             output_file = tree_output_dir / f"{file.replace('.json', '.html')}"
                             self.logger.info(f"Exporting tree as HTML: {tree_id}")
                             self.export_tree_as_html(tree_id, output_file)
+                        elif format.lower() == "beautified_html":
+                            output_file = tree_output_dir / f"{file.replace('.json', '.html')}"
+                            self.logger.info(f"Exporting tree as beautified HTML: {tree_id}")
+                            self.export_tree_as_beautified_html(tree_id, output_file)
                         elif format.lower() == "json":
                             output_file = tree_output_dir / f"{file.replace('.json', '_tree.json')}"
                             self.logger.info(f"Exporting tree as JSON: {tree_id}")
@@ -1004,6 +1482,43 @@ class BigGlobeDecisionTreeVisualizer:
 #     visualizer.batch_export_trees(output_dir=output_html, format="html")
 #     visualizer.batch_export_trees(output_dir=output_markdown, format="markdown")
 
+# if __name__ == "__main__":
+#     import argparse
+#
+#     # Set up command line argument parser
+#     parser = argparse.ArgumentParser(description="BigGlobe Decision Tree Text Exporter")
+#     group = parser.add_mutually_exclusive_group()
+#     group.add_argument("--main", action="store_true", help="Use Output/DataPack as input directory")
+#     group.add_argument("--debug", action="store_true", help="Use Output/DataPackDebug as input directory")
+#     group.add_argument("--root", action="store_true", help="Use Imports/BigGlobe as input directory (default)")
+#     parser.add_argument("--format", choices=["html", "markdown", "json", "beautified_html"],
+#                        default="html", help="Export format (default: html)")
+#
+#     args = parser.parse_args()
+#
+#     # Determine base directory based on arguments
+#     if args.main:
+#         base_dir = os.path.join("Output", "DataPack")
+#         suffix = ".Main"
+#     elif args.debug:
+#         base_dir = os.path.join("Output", "DataPackDebug")
+#         suffix = ".Debug"
+#     else:  # default is --root or no argument
+#         base_dir = os.path.join("Imports", "BigGlobe")
+#         suffix = ""
+#
+#     # Create output directory
+#     format_name = "DecisionTree" + (args.format.capitalize() if args.format != "beautified_html" else "BeautifiedHtml")
+#     output_dir = os.path.join("OutPut", f"{format_name}{suffix}")
+#     os.makedirs(output_dir, exist_ok=True)
+#
+#     # Create visualizer with option to show full scripts instead of truncating them
+#     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
+#
+#     # Export trees in the selected format
+#     visualizer.batch_export_trees(output_dir=output_dir, format=args.format)
+#
+
 if __name__ == "__main__":
     import argparse
 
@@ -1013,6 +1528,8 @@ if __name__ == "__main__":
     group.add_argument("--main", action="store_true", help="Use Output/DataPack as input directory")
     group.add_argument("--debug", action="store_true", help="Use Output/DataPackDebug as input directory")
     group.add_argument("--root", action="store_true", help="Use Imports/BigGlobe as input directory (default)")
+    parser.add_argument("--format", choices=["html", "markdown", "json", "beautified_html", "all"],
+                        default="all", help="Export format (default: all formats)")
 
     args = parser.parse_args()
 
@@ -1027,18 +1544,33 @@ if __name__ == "__main__":
         base_dir = os.path.join("Imports", "BigGlobe")
         suffix = ""
 
-    # Create output directories
-    output_json = os.path.join("OutPut", f"DecisionTreeJson{suffix}")
-    output_html = os.path.join("OutPut", f"DecisionTreeHtml{suffix}")
-    output_markdown = os.path.join("OutPut", f"DecisionTreeMarkdown{suffix}")
-
-    os.makedirs(output_json, exist_ok=True)
-    os.makedirs(output_html, exist_ok=True)
-    os.makedirs(output_markdown, exist_ok=True)
-
     # Create visualizer with option to show full scripts instead of truncating them
     visualizer = BigGlobeDecisionTreeVisualizer(base_dir, truncate_scripts=False)
 
-    visualizer.batch_export_trees(output_dir=output_json, format="json")
-    visualizer.batch_export_trees(output_dir=output_html, format="html")
-    visualizer.batch_export_trees(output_dir=output_markdown, format="markdown")
+    # Export trees in the selected format(s)
+    if args.format == "all":
+        # Create output directories
+        output_json = os.path.join("OutPut", f"DecisionTreeJson{suffix}")
+        output_html = os.path.join("OutPut", f"DecisionTreeHtml{suffix}")
+        output_beautified = os.path.join("OutPut", f"DecisionTreeBeautifiedHtml{suffix}")
+        output_markdown = os.path.join("OutPut", f"DecisionTreeMarkdown{suffix}")
+
+        os.makedirs(output_json, exist_ok=True)
+        os.makedirs(output_html, exist_ok=True)
+        os.makedirs(output_beautified, exist_ok=True)
+        os.makedirs(output_markdown, exist_ok=True)
+
+        # Generate all formats
+        visualizer.batch_export_trees(output_dir=output_json, format="json")
+        visualizer.batch_export_trees(output_dir=output_html, format="html")
+        visualizer.batch_export_trees(output_dir=output_beautified, format="beautified_html")
+        visualizer.batch_export_trees(output_dir=output_markdown, format="markdown")
+    else:
+        # Create output directory
+        format_name = "DecisionTree" + (
+            args.format.capitalize() if args.format != "beautified_html" else "BeautifiedHtml")
+        output_dir = os.path.join("OutPut", f"{format_name}{suffix}")
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Generate single format
+        visualizer.batch_export_trees(output_dir=output_dir, format=args.format)

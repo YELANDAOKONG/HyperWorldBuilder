@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigGlobe Decision Trees - Root - surface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ffd700;
+            --folder-hover: #f0c800;
+            --file-color: #4caf50;
+            --file-hover: #388e3c;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: none;
+        }
+
+        /* Tree View Styling */
+        .tree {
+            margin: 1rem 0;
+        }
+
+        .tree-item {
+            list-style-type: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .tree-folder, .tree-file {
+            display: block;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tree-folder {
+            background-color: var(--folder-color);
+            cursor: pointer;
+        }
+
+        .tree-folder:hover {
+            background-color: var(--folder-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .tree-file {
+            background-color: var(--file-color);
+        }
+
+        .tree-file:hover {
+            background-color: var(--file-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .tree-icon {
+            margin-right: 0.5rem;
+        }
+
+        .tree-toggle {
+            float: right;
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .tree-children {
+            display: none;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+            border-left: 2px solid #eee;
+        }
+
+        .tree-children.open {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Depth colors */
+        .tree-folder.depth-0 { background-color: #5d93e1; }
+        .tree-folder.depth-0:hover { background-color: #4a7ec3; }
+
+        .tree-folder.depth-1 { background-color: #7e57c2; }
+        .tree-folder.depth-1:hover { background-color: #6944a8; }
+
+        .tree-folder.depth-2 { background-color: #ec407a; }
+        .tree-folder.depth-2:hover { background-color: #d63467; }
+
+        .tree-folder.depth-3 { background-color: #ff7043; }
+        .tree-folder.depth-3:hover { background-color: #e56238; }
+
+        .tree-folder.depth-4 { background-color: #ffca28; }
+        .tree-folder.depth-4:hover { background-color: #e6b623; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            margin-top: 0;
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Decision Trees in surface</h1>
+        </header>
+
+        <main>
+            <div class="breadcrumb">
+                <a href="../../../../index.html">Main Index</a>
+                <a href="../../index.html">Root Root</a>
+                <a href="../index.html">end</a> / <a href="index.html">surface</a>
+            </div>
+
+            <div class="card">
+                <h2>Directory Structure</h2>
+                <div class="tree">
+
+                <div class="tree-item">
+                    <a href="chorus.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        chorus
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="mountain.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        mountain
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="overgrown.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        overgrown
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="plains.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        plains
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="test_chorus.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        test_chorus
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="test_mountain.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        test_mountain
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="test_overgrown.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        test_overgrown
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="test_terrain.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        test_terrain
+                    </a>
+                </div>
+
+                <div class="tree-item">
+                    <a href="the_void.html" class="tree-file">
+                        <i class="fas fa-file-alt tree-icon"></i>
+                        the_void
+                    </a>
+                </div>
+
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to all folder items
+            document.querySelectorAll('.tree-folder').forEach(folder => {
+                folder.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Toggle the next sibling (tree-children container)
+                    const children = this.nextElementSibling;
+                    if (children && children.classList.contains('tree-children')) {
+                        children.classList.toggle('open');
+
+                        // Toggle the icon
+                        const toggleIcon = this.querySelector('.tree-toggle');
+                        if (toggleIcon) {
+                            if (children.classList.contains('open')) {
+                                toggleIcon.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                            } else {
+                                toggleIcon.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Automatically open the current path
+            const pathParts = window.location.pathname.split('/');
+            const currentDir = pathParts[pathParts.length - 2] || '';
+
+            if (currentDir) {
+                document.querySelectorAll(`.tree-folder[data-path="${currentDir}"]`).forEach(folder => {
+                    folder.click();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

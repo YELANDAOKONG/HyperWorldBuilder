@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - small_house.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> small_house.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\worldgen\bigglobe_script_structure_placement</a> <span>small_house.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;placement&quot;: [
+    &quot;void placeFlower(int x, int y, int z:&quot;,
+    &quot;setBlockState(x, y, z, &#39;minecraft:grass_block[snowy=false]&#39;)&quot;,
+    &quot;placeBlockState(x, y + 1, z, BlockTag(&#39;#bigglobe:small_house_structure_flowers&#39;).random().getRandomState())&quot;,
+    &quot;)&quot;,
+    &quot;WoodPalette palette = WoodPalette(data.palette.asString())&quot;,
+    &quot;;main building.&quot;,
+    &quot;for (int offsetY in range[0, 5):&quot;,
+    &quot;for (int offsetZ in range[-2, 2]:&quot;,
+    &quot;for (int offsetX in range[-2, 2]:&quot;,
+    &quot;setBlockState(midX + offsetX, minY + offsetY, midZ + offsetZ,&quot;,
+    &quot;if (abs(offsetX) == 2 &amp;&amp; abs(offsetZ) == 2:&quot;,
+    &quot;palette.logState(axis: &#39;y&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;else if (abs(offsetX) == 2 || abs(offsetZ) == 2:&quot;,
+    &quot;if (offsetY == 4:&quot;,
+    &quot;palette.logState(axis: abs(offsetX) &gt; abs(offsetZ) ? &#39;z&#39; : &#39;x&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;&#39;minecraft:cobblestone&#39;&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;offsetY == 0 ? palette.planksState() : &#39;minecraft:air&#39;&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;top level of main building.&quot;,
+    &quot;for (int offsetZ in range[-2, 2]:&quot;,
+    &quot;BlockState state = abs(offsetZ) == 2 ? &#39;minecraft:cobblestone&#39; : palette.planksState()&quot;,
+    &quot;for (int offsetX in range[-1, 1]:&quot;,
+    &quot;setBlockState(midX + offsetX, minY + 5, midZ + offsetZ, state)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;roof.&quot;,
+    &quot;for (int offsetX in range[-3, 3]:&quot;,
+    &quot;int y = minY + 7 - abs(offsetX)&quot;,
+    &quot;BlockState state = compare (offsetX:&quot;,
+    &quot;case (&lt;: palette.stairsState(facing: &#39;east&#39;))&quot;,
+    &quot;case (&gt;: palette.stairsState(facing: &#39;west&#39;))&quot;,
+    &quot;case (=: palette.slabState())&quot;,
+    &quot;)&quot;,
+    &quot;for (int offsetZ in range[-3, 3]:&quot;,
+    &quot;setBlockState(midX + offsetX, y, midZ + offsetZ, state)&quot;,
+    &quot;)&quot;,
+    &quot;if (abs(offsetX) != 3:&quot;,
+    &quot;--y&quot;,
+    &quot;state = compare (offsetX:&quot;,
+    &quot;case (&lt;: palette.stairsState(facing: &#39;west&#39;, half: &#39;top&#39;))&quot;,
+    &quot;case (&gt;: palette.stairsState(facing: &#39;east&#39;, half: &#39;top&#39;))&quot;,
+    &quot;case (=: palette.planksState())&quot;,
+    &quot;)&quot;,
+    &quot;for (int offsetZ in range[-3, 3] % (offsetX == 0 ? 1 : 6):&quot;,
+    &quot;setBlockState(midX + offsetX, y, midZ + offsetZ, state)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;door.&quot;,
+    &quot;String hinge = random.if (&#39;left&#39;) else (&#39;right&#39;)&quot;,
+    &quot;setBlockState(midX, minY + 1, midZ - 2, palette.doorState(facing: &#39;south&#39;, half: &#39;lower&#39;, hinge: hinge, open: false, powered: false))&quot;,
+    &quot;setBlockState(midX, minY + 2, midZ - 2, palette.doorState(facing: &#39;south&#39;, half: &#39;upper&#39;, hinge: hinge, open: false, powered: false))&quot;,
+    &quot;;stairs leading up to door.&quot;,
+    &quot;setBlockState(midX, minY, midZ - 3, &#39;minecraft:cobblestone_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]&#39;)&quot;,
+    &quot;setBlockState(midX - 1, minY, midZ - 3, &#39;minecraft:cobblestone_stairs[facing=east,half=bottom,shape=outer_right,waterlogged=false]&#39;)&quot;,
+    &quot;setBlockState(midX + 1, minY, midZ - 3, &#39;minecraft:cobblestone_stairs[facing=west,half=bottom,shape=outer_left,waterlogged=false]&#39;)&quot;,
+    &quot;;windows.&quot;,
+    &quot;setBlockState(midX - 2, minY + 2, midZ, &#39;minecraft:glass_pane[north=true,south=true,east=false,west=false,waterlogged=false]&#39;)&quot;,
+    &quot;setBlockState(midX + 2, minY + 2, midZ, &#39;minecraft:glass_pane[north=true,south=true,east=false,west=false,waterlogged=false]&#39;)&quot;,
+    &quot;setBlockState(midX, minY + 2, midZ + 2, &#39;minecraft:glass_pane[north=false,south=false,east=true,west=true,waterlogged=false]&#39;)&quot;,
+    &quot;;flower beds&quot;,
+    &quot;for (int offsetZ in range[-1, 1]:&quot;,
+    &quot;placeFlower(midX - 3, minY, midZ + offsetZ)&quot;,
+    &quot;placeFlower(midX + 3, minY, midZ + offsetZ)&quot;,
+    &quot;setBlockState(midX - 4, minY, midZ + offsetZ, palette.trapdoorState(facing: &#39;west&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;setBlockState(midX + 4, minY, midZ + offsetZ, palette.trapdoorState(facing: &#39;east&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;)&quot;,
+    &quot;setBlockState(midX - 3, minY, midZ - 2, palette.trapdoorState(facing: &#39;north&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;setBlockState(midX + 3, minY, midZ - 2, palette.trapdoorState(facing: &#39;north&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;setBlockState(midX - 3, minY, midZ + 2, palette.trapdoorState(facing: &#39;south&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;setBlockState(midX + 3, minY, midZ + 2, palette.trapdoorState(facing: &#39;south&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;for (int offsetX in range[-1, 1]:&quot;,
+    &quot;placeFlower(midX + offsetX, minY, midZ + 3)&quot;,
+    &quot;setBlockState(midX + offsetX, minY, midZ + 4, palette.trapdoorState(facing: &#39;south&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;)&quot;,
+    &quot;setBlockState(midX - 2, minY, midZ + 3, palette.trapdoorState(facing: &#39;west&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;setBlockState(midX + 2, minY, midZ + 3, palette.trapdoorState(facing: &#39;east&#39;, half: &#39;top&#39;, open: true, powered: false, waterlogged: false))&quot;,
+    &quot;;interior.&quot;,
+    &quot;int flip = random.if (1) else (-1)&quot;,
+    &quot;Block bed = random.switch (&quot;,
+    &quot;&#39;minecraft:white_bed&#39;,      &#39;minecraft:orange_bed&#39;, &#39;minecraft:magenta_bed&#39;, &#39;minecraft:light_blue_bed&#39;,&quot;,
+    &quot;&#39;minecraft:yellow_bed&#39;,     &#39;minecraft:lime_bed&#39;,   &#39;minecraft:pink_bed&#39;,    &#39;minecraft:gray_bed&#39;,&quot;,
+    &quot;&#39;minecraft:light_gray_bed&#39;, &#39;minecraft:cyan_bed&#39;,   &#39;minecraft:purple_bed&#39;,  &#39;minecraft:blue_bed&#39;,&quot;,
+    &quot;&#39;minecraft:brown_bed&#39;,      &#39;minecraft:green_bed&#39;,  &#39;minecraft:red_bed&#39;,     &#39;minecraft:black_bed&#39;&quot;,
+    &quot;)&quot;,
+    &quot;setBlockState(midX + flip, minY + 1, midZ, BlockState(bed, facing: &#39;south&#39;, part: &#39;foot&#39;, occupied: false))&quot;,
+    &quot;setBlockState(midX + flip, minY + 1, midZ + 1, BlockState(bed, facing: &#39;south&#39;, part: &#39;head&#39;, occupied: false))&quot;,
+    &quot;setBlockState(midX - flip, minY + 1, midZ + 1, &#39;minecraft:crafting_table&#39;)&quot;,
+    &quot;setBlockState(midX, minY + 3, midZ - 1, &#39;minecraft:wall_torch[facing=south]&#39;)&quot;,
+    &quot;;summon villager&quot;,
+    &quot;summon(midX + 0.5L, minY + 1.0L, midZ + 0.5L, &#39;minecraft:villager&#39;)&quot;
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

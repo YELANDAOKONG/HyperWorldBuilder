@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - sculk_patch_feature.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> sculk_patch_feature.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\bigglobe_script_templates</a> <span>sculk_patch_feature.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;script&quot;: [
+    &quot;class SpreadingPos(int*(x, y, z), byte direction)&quot;,
+    &quot;&quot;,
+    &quot;int directionX(int index: index == 0 ? -1 : index == 1 ? 1 : 0)&quot;,
+    &quot;int directionY(int index: index == 2 ? -1 : index == 3 ? 1 : 0)&quot;,
+    &quot;int directionZ(int index: index == 4 ? -1 : index == 5 ? 1 : 0)&quot;,
+    &quot;&quot;,
+    &quot;unless (getBlockState(originX, originY, originZ).isReplaceable(): return(false))&quot;,
+    &quot;ArrayList spreadingPositions = null&quot;,
+    &quot;HashSet sculkPosAdjacents = null&quot;,
+    &quot;&quot;,
+    &quot;SpreadingPos nextSpreadingPos(:&quot;,
+    &quot;int count = spreadingPositions.size()&quot;,
+    &quot;if (count == 0: return(null))&quot;,
+    &quot;int index = random.nextInt(count)&quot;,
+    &quot;--count&quot;,
+    &quot;SpreadingPos result = (&quot;,
+    &quot;index == count&quot;,
+    &quot;? spreadingPositions.removeIndex(index)&quot;,
+    &quot;: spreadingPositions.set(index, spreadingPositions.removeIndex(count))&quot;,
+    &quot;)&quot;,
+    &quot;sculkPosAdjacents.add(result)&quot;,
+    &quot;return(result)&quot;,
+    &quot;)&quot;,
+    &quot;&quot;,
+    &quot;void addSpreadingPos(SpreadingPos pos:&quot;,
+    &quot;if (sculkPosAdjacents.add(pos): spreadingPositions.add(pos))&quot;,
+    &quot;)&quot;,
+    &quot;&quot;,
+    &quot;for (int direction in range[0, 6):&quot;,
+    &quot;if (&quot;,
+    &quot;getBlockState(&quot;,
+    &quot;originX + directionX(direction),&quot;,
+    &quot;originY + directionY(direction),&quot;,
+    &quot;originZ + directionZ(direction)&quot;,
+    &quot;)&quot;,
+    &quot;.blocksLight()&quot;,
+    &quot;:&quot;,
+    &quot;(spreadingPositions ?: (spreadingPositions := new()))&quot;,
+    &quot;.add(SpreadingPos.new(originX, originY, originZ, direction.as(byte)))&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (spreadingPositions == null: return(false))&quot;,
+    &quot;sculkPosAdjacents = new()&quot;,
+    &quot;&quot;,
+    &quot;;compute blocks to place.&quot;,
+    &quot;repeat (spreads:&quot;,
+    &quot;SpreadingPos from = nextSpreadingPos()&quot;,
+    &quot;if (from == null: break())&quot;,
+    &quot;for (int direction in range[0, 6):&quot;,
+    &quot;;if (dot(primary, secondary) != 0: continue())&quot;,
+    &quot;if (direction &amp; ~1 == from.direction &amp; ~1: continue())&quot;,
+    &quot;int*(&quot;,
+    &quot;primaryX = directionX(direction)&quot;,
+    &quot;primaryY = directionY(direction)&quot;,
+    &quot;primaryZ = directionZ(direction)&quot;,
+    &quot;secondaryX = directionX(from.direction)&quot;,
+    &quot;secondaryY = directionY(from.direction)&quot;,
+    &quot;secondaryZ = directionZ(from.direction)&quot;,
+    &quot;)&quot;,
+    &quot;BlockState adjacentState = getBlockState(&quot;,
+    &quot;from.x + primaryX,&quot;,
+    &quot;from.y + primaryY,&quot;,
+    &quot;from.z + primaryZ&quot;,
+    &quot;)&quot;,
+    &quot;if (adjacentState.isReplaceable():&quot;,
+    &quot;BlockState adjacenterState = getBlockState(&quot;,
+    &quot;from.x + primaryX + secondaryX,&quot;,
+    &quot;from.y + primaryY + secondaryY,&quot;,
+    &quot;from.z + primaryZ + secondaryZ&quot;,
+    &quot;)&quot;,
+    &quot;if (adjacenterState.blocksLight():&quot;,
+    &quot;addSpreadingPos(&quot;,
+    &quot;SpreadingPos.new(&quot;,
+    &quot;from.x + primaryX,&quot;,
+    &quot;from.y + primaryY,&quot;,
+    &quot;from.z + primaryZ,&quot;,
+    &quot;from.direction&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else if (adjacenterState.isReplaceable():&quot;,
+    &quot;addSpreadingPos(&quot;,
+    &quot;SpreadingPos.new(&quot;,
+    &quot;from.x + primaryX + secondaryX,&quot;,
+    &quot;from.y + primaryY + secondaryY,&quot;,
+    &quot;from.z + primaryZ + secondaryZ,&quot;,
+    &quot;byte(direction # 1)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else if (adjacentState.blocksLight():&quot;,
+    &quot;addSpreadingPos(&quot;,
+    &quot;SpreadingPos.new(&quot;,
+    &quot;from.x,&quot;,
+    &quot;from.y,&quot;,
+    &quot;from.z,&quot;,
+    &quot;direction.as(byte)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;&quot;,
+    &quot;;place blocks.&quot;,
+    &quot;&quot;,
+    &quot;void placeVeinsAround(SpreadingPos pos, int primary:&quot;,
+    &quot;int*(&quot;,
+    &quot;primaryX = pos.x + directionX(primary)&quot;,
+    &quot;primaryY = pos.y + directionY(primary)&quot;,
+    &quot;primaryZ = pos.z + directionZ(primary)&quot;,
+    &quot;)&quot;,
+    &quot;BlockState adjacentState = getBlockState(&quot;,
+    &quot;primaryX + directionX(pos.direction),&quot;,
+    &quot;primaryY + directionY(pos.direction),&quot;,
+    &quot;primaryZ + directionZ(pos.direction)&quot;,
+    &quot;)&quot;,
+    &quot;if (adjacentState.blocksLight() &amp;&amp; adjacentState !==. &#39;minecraft:sculk&#39;:&quot;,
+    &quot;BlockState old = getBlockState(primaryX, primaryY, primaryZ)&quot;,
+    &quot;if (old.getBlock() ===. &#39;minecraft:sculk_vein&#39;:&quot;,
+    &quot;BlockState new = old.with(&quot;,
+    &quot;switch (pos.direction:&quot;,
+    &quot;case (0: &#39;west&#39; )&quot;,
+    &quot;case (1: &#39;east&#39; )&quot;,
+    &quot;case (2: &#39;down&#39; )&quot;,
+    &quot;case (3: &#39;up&#39;   )&quot;,
+    &quot;case (4: &#39;north&#39;)&quot;,
+    &quot;case (5: &#39;south&#39;)&quot;,
+    &quot;default (&#39;???&#39;  )&quot;,
+    &quot;),&quot;,
+    &quot;true&quot;,
+    &quot;)&quot;,
+    &quot;if (old !== new:&quot;,
+    &quot;setBlockState(primaryX, primaryY, primaryZ, new)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else if (old.isReplaceable():&quot;,
+    &quot;setBlockState(&quot;,
+    &quot;primaryX,&quot;,
+    &quot;primaryY,&quot;,
+    &quot;primaryZ,&quot;,
+    &quot;BlockState(&quot;,
+    &quot;&#39;minecraft:sculk_vein&#39;,&quot;,
+    &quot;west:  pos.direction == 0,&quot;,
+    &quot;east:  pos.direction == 1,&quot;,
+    &quot;down:  pos.direction == 2,&quot;,
+    &quot;up:    pos.direction == 3,&quot;,
+    &quot;north: pos.direction == 4,&quot;,
+    &quot;south: pos.direction == 5,&quot;,
+    &quot;waterlogged: old.hasWater()&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;&quot;,
+    &quot;void removeVeinsAround(int*(x, y, z):&quot;,
+    &quot;for (int checkDir in range[0, 6):&quot;,
+    &quot;int*(&quot;,
+    &quot;checkX = x + directionX(checkDir),&quot;,
+    &quot;checkY = y + directionY(checkDir),&quot;,
+    &quot;checkZ = z + directionZ(checkDir)&quot;,
+    &quot;)&quot;,
+    &quot;BlockState old = getBlockState(checkX, checkY, checkZ)&quot;,
+    &quot;if (old.getBlock() ===. &#39;minecraft:sculk_vein&#39;:&quot;,
+    &quot;BlockState new = old.with(&quot;,
+    &quot;switch (checkDir # 1:&quot;,
+    &quot;case (0: &#39;west&#39; )&quot;,
+    &quot;case (1: &#39;east&#39; )&quot;,
+    &quot;case (2: &#39;down&#39; )&quot;,
+    &quot;case (3: &#39;up&#39;   )&quot;,
+    &quot;case (4: &#39;north&#39;)&quot;,
+    &quot;case (5: &#39;south&#39;)&quot;,
+    &quot;default (&#39;???&#39;  )&quot;,
+    &quot;),&quot;,
+    &quot;false&quot;,
+    &quot;)&quot;,
+    &quot;if (new !== old:&quot;,
+    &quot;if (new ===. &#39;minecraft:sculk_vein[north=false,south=false,east=false,west=false,up=false,down=false,waterlogged=false]&#39;:&quot;,
+    &quot;new = &#39;minecraft:air&#39;&quot;,
+    &quot;)&quot;,
+    &quot;else if (new ===. &#39;minecraft:sculk_vein[north=false,south=false,east=false,west=false,up=false,down=false,waterlogged=true]&#39;:&quot;,
+    &quot;new = &#39;minecraft:water[level=0]&#39;&quot;,
+    &quot;)&quot;,
+    &quot;setBlockState(checkX, checkY, checkZ, new)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;&quot;,
+    &quot;for (SpreadingPos pos in sculkPosAdjacents:&quot;,
+    &quot;for (int direction in range[0, 6):&quot;,
+    &quot;if (direction == pos.direction # 1:&quot;,
+    &quot;continue()&quot;,
+    &quot;)&quot;,
+    &quot;else if (direction == pos.direction:&quot;,
+    &quot;int*(&quot;,
+    &quot;adjacentX = pos.x + directionX(direction)&quot;,
+    &quot;adjacentY = pos.y + directionY(direction)&quot;,
+    &quot;adjacentZ = pos.z + directionZ(direction)&quot;,
+    &quot;)&quot;,
+    &quot;if (getBlockState(adjacentX, adjacentY, adjacentZ).isIn(&#39;#bigglobe:sculk_replaceable&#39;):&quot;,
+    &quot;setBlockState(adjacentX, adjacentY, adjacentZ, &#39;minecraft:sculk&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;removeVeinsAround(adjacentX, adjacentY, adjacentZ)&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;placeVeinsAround(pos, direction)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (&quot;,
+    &quot;random.nextInt(64) == 0 &amp;&amp;&quot;,
+    &quot;BlockState*(centered := getBlockState(pos.x, pos.y, pos.z)).isReplaceable() &amp;&amp;&quot;,
+    &quot;getBlockState(pos.x, pos.y - 1, pos.z).blocksLight()&quot;,
+    &quot;:&quot;,
+    &quot;setBlockState(pos.x, pos.y, pos.z,&quot;,
+    &quot;random.if (BlockState(&#39;minecraft:sculk_sensor&#39;, power: 0, sculk_sensor_phase: &#39;inactive&#39;, waterlogged: centered.hasWater()))&quot;,
+    &quot;else random.if (&#39;minecraft:sculk_catalyst[bloom=false]&#39;)&quot;,
+    &quot;else (BlockState(&#39;minecraft:sculk_shrieker&#39;, can_summon: true, shrieking: false, waterlogged: centered.hasWater()))&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;return(true)&quot;
+  ],
+  &quot;inputs&quot;: [
+    {
+      &quot;name&quot;: &quot;spreads&quot;,
+      &quot;type&quot;: &quot;int&quot;
+    }
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - dungeon_feature.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> dungeon_feature.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\bigglobe_script_templates</a> <span>dungeon_feature.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;script&quot;: [
+    &quot;int*(&quot;,
+    &quot;floorY  = originY - 1&quot;,
+    &quot;radiusX = random.nextInt(4, 8)&quot;,
+    &quot;height  = random.nextInt(3, 6)&quot;,
+    &quot;radiusZ = random.nextInt(4, 8)&quot;,
+    &quot;)&quot;,
+    &quot;;check area.&quot;,
+    &quot;for (&quot;,
+    &quot;int checkX in range[-radiusX, radiusX],&quot;,
+    &quot;int checkZ in range[-radiusZ, radiusZ]&quot;,
+    &quot;:&quot;,
+    &quot;unless (getBlockState(originX + checkX, floorY - 1, originZ + checkZ).blocksLight(): return(false))&quot;,
+    &quot;)&quot;,
+    &quot;;fill main area.&quot;,
+    &quot;for (&quot;,
+    &quot;int offsetX in range[-radiusX, radiusX],&quot;,
+    &quot;int offsetZ in range[-radiusZ, radiusZ]&quot;,
+    &quot;:&quot;,
+    &quot;if (offsetX == -radiusX || offsetX == radiusX || offsetZ == -radiusZ || offsetZ == radiusZ:&quot;,
+    &quot;;wall&quot;,
+    &quot;setBlockState(originX + offsetX, floorY, originZ + offsetZ, `$STATE`)&quot;,
+    &quot;boolean inWall = true&quot;,
+    &quot;for (int offsetY in range[0, height):&quot;,
+    &quot;inWall &amp;&amp;= random.nextBoolean()&quot;,
+    &quot;setBlockState(originX + offsetX, originY + offsetY, originZ + offsetZ,&quot;,
+    &quot;inWall || getBlockState(originX + offsetX, originY + offsetY, originZ + offsetZ).blocksLight()&quot;,
+    &quot;? `$STATE`&quot;,
+    &quot;: &#39;air&#39;&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;;not wall&quot;,
+    &quot;setBlockState(originX + offsetX, floorY, originZ + offsetZ,&quot;,
+    &quot;random.if (0.25: &#39;air&#39;)&quot;,
+    &quot;else (`$STATE`)&quot;,
+    &quot;)&quot;,
+    &quot;for (int offsetY in range[0, height):&quot;,
+    &quot;setBlockState(originX + offsetX, originY + offsetY, originZ + offsetZ, &#39;air&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;place chests.&quot;,
+    &quot;repeat (random.nextInt(0, 4):&quot;,
+    &quot;int*(x = 0, z = 0)&quot;,
+    &quot;String direction = null&quot;,
+    &quot;random.switch (&quot;,
+    &quot;(direction = &#39;south&#39;,, z = 1 - radiusZ,, x = random.nextInt(1 - radiusX, radiusX)),&quot;,
+    &quot;(direction = &#39;north&#39;,, z = radiusZ - 1,, x = random.nextInt(1 - radiusX, radiusX)),&quot;,
+    &quot;(direction = &#39;east&#39;,,  x = 1 - radiusX,, z = random.nextInt(1 - radiusZ, radiusZ)),&quot;,
+    &quot;(direction = &#39;west&#39;,,  x = radiusX - 1,, z = random.nextInt(1 - radiusZ, radiusZ))&quot;,
+    &quot;)&quot;,
+    &quot;if (&quot;,
+    &quot;getBlockState(originX + x, originY, originZ + z).isAir() &amp;&amp;&quot;,
+    &quot;getBlockState(originX + x, floorY,  originZ + z).hasFullCubeCollision()&quot;,
+    &quot;:&quot;,
+    &quot;setBlockState (originX + x, originY, originZ + z, BlockState(&#39;chest&#39;, facing: direction, type: &#39;single&#39;, waterlogged: false))&quot;,
+    &quot;mergeBlockData(originX + x, originY, originZ + z, nbtCompound(&quot;,
+    &quot;LootTable: &#39;minecraft:chests/simple_dungeon&#39;,&quot;,
+    &quot;LootTableSeed: random.nextLong()&quot;,
+    &quot;))&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;place spawner&quot;,
+    &quot;setBlockState(originX, originY, originZ, &#39;minecraft:spawner&#39;)&quot;,
+    &quot;mergeBlockData(originX, originY, originZ, nbtCompound(&quot;,
+    &quot;SpawnData: nbtCompound(&quot;,
+    &quot;entity: nbtCompound(&quot;,
+    &quot;id: ENTITY_TYPE&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;))&quot;,
+    &quot;return(true)&quot;
+  ],
+  &quot;inputs&quot;: [
+    {
+      &quot;name&quot;: &quot;STATE&quot;,
+      &quot;type&quot;: &quot;BlockState&quot;
+    },
+    {
+      &quot;name&quot;: &quot;ENTITY_TYPE&quot;,
+      &quot;type&quot;: &quot;String&quot;
+    }
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

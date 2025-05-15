@@ -1,0 +1,17 @@
+{
+	"type": "bigglobe:voronoi",
+	"params": {
+		"type": {
+			"type": "bigglobe:voronoi",
+			"name": "OverworldGlacierCell"
+		},
+		"is_3d": false
+	},
+	"diagram": {
+		"distance": 32,
+		"variation": 24
+	},
+	"valid": {
+		"where": "glacier_crack_threshold > 0.0L"
+	}
+}

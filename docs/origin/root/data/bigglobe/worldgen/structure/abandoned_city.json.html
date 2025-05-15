@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - abandoned_city.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> abandoned_city.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\worldgen\structure</a> <span>abandoned_city.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;type&quot;: &quot;bigglobe:script&quot;,
+  &quot;biomes&quot;: &quot;#bigglobe:has_structure/abandoned_city&quot;,
+  &quot;spawn_overrides&quot;: {},
+  &quot;step&quot;: &quot;surface_structures&quot;,
+  &quot;layout&quot;: [
+    &quot;String palette = (&quot;,
+    &quot;world_traits.`bigglobe:wood_palette`(&quot;,
+    &quot;originX,&quot;,
+    &quot;world_traits.`bigglobe:y_level_on_surface`(originX, originZ),&quot;,
+    &quot;originZ&quot;,
+    &quot;)&quot;,
+    &quot;.?id&quot;,
+    &quot;?: return()&quot;,
+    &quot;)&quot;,
+    &quot;int*(&quot;,
+    &quot;BASE_SIZE    = random.nextInt(16)&quot;,
+    &quot;MAX_RADIUS   = BASE_SIZE + 8&quot;,
+    &quot;MAX_DIAMETER = MAX_RADIUS * 2 + 1&quot;,
+    &quot;MAX_AREA     = MAX_DIAMETER ^ 2&quot;,
+    &quot;originY      = 16x7FFF_FFFFU&quot;,
+    &quot;highestY     = 16x8000_0000U&quot;,
+    &quot;)&quot;,
+    &quot;int realX(int rawX: rawX * 4 + originX)&quot;,
+    &quot;int realY(int rawY: rawY * 5 + originY)&quot;,
+    &quot;int realZ(int rawZ: rawZ * 4 + originZ)&quot;,
+    &quot;for (int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;int*(&quot;,
+    &quot;x = realX(rawX)&quot;,
+    &quot;z = realZ(rawZ)&quot;,
+    &quot;y = world_traits.`bigglobe:y_level_in_surface`(x, z)&quot;,
+    &quot;)&quot;,
+    &quot;if (world_traits.`bigglobe:biome`(x, y, z).isIn(&#39;#bigglobe:has_structure/abandoned_city&#39;):&quot;,
+    &quot;originY = min(originY, y)&quot;,
+    &quot;highestY = max(highestY, y)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (originY == 16x7FFF_FFFF: return())&quot;,
+    &quot;if (highestY - originY &gt; MAX_RADIUS * (4.0L * sqrt(2.0L)): return())&quot;,
+    &quot;int*(&quot;,
+    &quot;MAX_LAYERS = (highestY - originY) / 5 + 12&quot;,
+    &quot;MAX_VOLUME = MAX_AREA * MAX_LAYERS&quot;,
+    &quot;)&quot;,
+    &quot;NumberArray positions = newBooleanArray(MAX_VOLUME)&quot;,
+    &quot;int encodeIndex(int*(x, y, z):&quot;,
+    &quot;y * MAX_AREA + (z + MAX_RADIUS) * MAX_DIAMETER + (x + MAX_RADIUS)&quot;,
+    &quot;)&quot;,
+    &quot;boolean hasAt(int*(x, y, z):&quot;,
+    &quot;x.isBetween[-MAX_RADIUS, MAX_RADIUS] &amp;&amp;&quot;,
+    &quot;z.isBetween[-MAX_RADIUS, MAX_RADIUS] &amp;&amp;&quot;,
+    &quot;(y &lt; 0 || (y &lt; MAX_LAYERS &amp;&amp; positions.(encodeIndex(x, y, z))))&quot;,
+    &quot;)&quot;,
+    &quot;boolean hasAtIncludingTerrain(int*(x, y, z):&quot;,
+    &quot;x.isBetween[-MAX_RADIUS, MAX_RADIUS] &amp;&amp;&quot;,
+    &quot;z.isBetween[-MAX_RADIUS, MAX_RADIUS] &amp;&amp;&quot;,
+    &quot;(&quot;,
+    &quot;y &lt; 0 || ;shouldn&#39;t be necessary, but for some reason still is???&quot;,
+    &quot;realY(y) + 4 &lt;= world_traits.`bigglobe:y_level_on_surface`(realX(x), realZ(z)) ||&quot;,
+    &quot;(y &lt; MAX_LAYERS &amp;&amp; positions.(encodeIndex(x, y, z)))&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;int countAdjacents(int*(rawX, rawY, rawZ):&quot;,
+    &quot;int adj = 0&quot;,
+    &quot;int shift = 0&quot;,
+    &quot;for (int offsetY in range[0, 1], int*(offsetZ, offsetX) in range[-1, 1]:&quot;,
+    &quot;adj |= int(hasAt(rawX + offsetX, rawY + offsetY, rawZ + offsetZ)) &lt;&lt; ++:shift&quot;,
+    &quot;)&quot;,
+    &quot;adj&quot;,
+    &quot;)&quot;,
+    &quot;boolean isStaircaseColumn(int*(rawX, rawZ):&quot;,
+    &quot;int position = (worldSeed # 16xB878B31F02EC6F15UL).newSeed(rawX &gt;&gt; 3, rawZ &gt;&gt; 3).nextInt()&quot;,
+    &quot;return(position &amp; 2x11 == rawX &amp; 2x111 &amp;&amp; (position &gt;&gt;&gt; 1) &amp; 2x11 == rawZ &amp; 2x111)&quot;,
+    &quot;)&quot;,
+    &quot;boolean isStaircaseAt(int*(rawX, rawY, rawZ, adjacents):&quot;,
+    &quot;return(&quot;,
+    &quot;isStaircaseColumn(rawX, rawZ) &amp;&amp;&quot;,
+    &quot;adjacents == 2x111_111_111___111_111_111&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;for (int layer in range[0, MAX_LAYERS):&quot;,
+    &quot;boolean canPlace(int*(rawX, rawZ):&quot;,
+    &quot;unless (hasAtIncludingTerrain(rawX, layer - 1, rawZ): return(false))&quot;,
+    &quot;if (hasAt(rawX, layer, rawZ): return(false))&quot;,
+    &quot;return(true)&quot;,
+    &quot;)&quot;,
+    &quot;boolean canFill(int*(minX, minZ, maxX, maxZ):&quot;,
+    &quot;for (int z in range[minZ, maxZ], int x in range[minX, maxX]:&quot;,
+    &quot;unless (canPlace(x, z): return(false))&quot;,
+    &quot;)&quot;,
+    &quot;return(true)&quot;,
+    &quot;)&quot;,
+    &quot;for (int placementAttempt in range[0, layer * MAX_RADIUS + MAX_RADIUS):&quot;,
+    &quot;int*(&quot;,
+    &quot;centerX = random.nextInt(-MAX_RADIUS, MAX_RADIUS + 1)&quot;,
+    &quot;centerZ = random.nextInt(-MAX_RADIUS, MAX_RADIUS + 1)&quot;,
+    &quot;minX = centerX&quot;,
+    &quot;maxX = centerX&quot;,
+    &quot;minZ = centerZ&quot;,
+    &quot;maxZ = centerZ&quot;,
+    &quot;)&quot;,
+    &quot;if (canPlace(centerX, centerZ):&quot;,
+    &quot;for (int directions = 2x1111, directions != 0, noop:&quot;,
+    &quot;random.switch (&quot;,
+    &quot;if (directions &amp; 2x1000 != 0: canFill(minX - 1, minZ, minX - 1, maxZ) ? --minX : directions &amp;= 2x0111),&quot;,
+    &quot;if (directions &amp; 2x0100 != 0: canFill(maxX + 1, minZ, maxX + 1, maxZ) ? ++maxX : directions &amp;= 2x1011),&quot;,
+    &quot;if (directions &amp; 2x0010 != 0: canFill(minX, minZ - 1, maxX, maxZ - 1) ? --minZ : directions &amp;= 2x1101),&quot;,
+    &quot;if (directions &amp; 2x0001 != 0: canFill(minX, maxZ + 1, maxX, maxZ + 1) ? ++maxZ : directions &amp;= 2x1110)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (minX == maxX || minZ == maxZ: continue())&quot;,
+    &quot;int*(&quot;,
+    &quot;sizeX = max(random.nextInt(maxX - minX + 1), random.nextInt(maxX - minX + 1))&quot;,
+    &quot;sizeZ = max(random.nextInt(maxZ - minZ + 1), random.nextInt(maxZ - minZ + 1))&quot;,
+    &quot;)&quot;,
+    &quot;random.if (&quot;,
+    &quot;random.if (maxX = minX + sizeX) else (minX = maxX - sizeX)&quot;,
+    &quot;minZ = random.nextInt(minZ, maxZ + 1 - sizeZ)&quot;,
+    &quot;maxZ = minZ + sizeZ&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;random.if (maxZ = minZ + sizeZ) else (minZ = maxZ - sizeZ)&quot;,
+    &quot;minX = random.nextInt(minX, maxX + 1 - sizeX)&quot;,
+    &quot;maxX = minX + sizeX&quot;,
+    &quot;)&quot;,
+    &quot;for (int z in range[minZ, maxZ]:&quot;,
+    &quot;int from = encodeIndex(minX, layer, z)&quot;,
+    &quot;int to = encodeIndex(maxX, layer, z)&quot;,
+    &quot;positions.fillBoolean(from, to + 1, true)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;for (int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;int surfaceY = world_traits.`bigglobe:y_level_on_surface`(realX(rawX), realZ(rawZ))&quot;,
+    &quot;boolean biomeIncorrect = !world_traits.`bigglobe:biome`(realX(rawX), surfaceY, realZ(rawZ)).isIn(&#39;#bigglobe:has_structure/abandoned_city&#39;)&quot;,
+    &quot;for (int layer = 0, layer &lt; MAX_LAYERS &amp;&amp; (surfaceY &gt; realY(layer) + 4 || biomeIncorrect), ++layer:&quot;,
+    &quot;positions.(encodeIndex(rawX, layer, rawZ)) = false&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;void fillGaps(int*(rawX, layer, rawZ), boolean filling:&quot;,
+    &quot;boolean hasAtMaybeTerrain(int*(x, y, z):&quot;,
+    &quot;filling ? hasAt(x, y, z) : hasAtIncludingTerrain(x, y, z)&quot;,
+    &quot;)&quot;,
+    &quot;if (&quot;,
+    &quot;hasAt(rawX, layer, rawZ) != filling &amp;&amp; (&quot;,
+    &quot;(&quot;,
+    &quot;hasAtMaybeTerrain(rawX - 1, layer, rawZ) == filling &amp;&amp;&quot;,
+    &quot;hasAtMaybeTerrain(rawX + 1, layer, rawZ) == filling&quot;,
+    &quot;)&quot;,
+    &quot;|| (&quot;,
+    &quot;hasAtMaybeTerrain(rawX, layer, rawZ - 1) == filling &amp;&amp;&quot;,
+    &quot;hasAtMaybeTerrain(rawX, layer, rawZ + 1) == filling&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;:&quot;,
+    &quot;positions.(encodeIndex(rawX, layer, rawZ)) = filling&quot;,
+    &quot;fillGaps(rawX - 1, layer, rawZ, filling)&quot;,
+    &quot;fillGaps(rawX, layer, rawZ - 1, filling)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;for (int layer in range[0, MAX_LAYERS), int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;fillGaps(rawX, layer, rawZ, true)&quot;,
+    &quot;)&quot;,
+    &quot;for (int layer in -range[0, MAX_LAYERS), int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;fillGaps(rawX, layer, rawZ, false)&quot;,
+    &quot;)&quot;,
+    &quot;NumberArray outdoorStaircases = newBooleanArray(MAX_VOLUME)&quot;,
+    &quot;for (int rawY in range[0, MAX_LAYERS), int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;int*(x = realX(rawX), y = realY(rawY), z = realZ(rawZ))&quot;,
+    &quot;if (hasAt(rawX, rawY, rawZ):&quot;,
+    &quot;int adj = countAdjacents(rawX, rawY, rawZ)&quot;,
+    &quot;pieces.add(&quot;,
+    &quot;isStaircaseAt(rawX, rawY, rawZ, adj)&quot;,
+    &quot;? (&quot;,
+    &quot;long seed = (worldSeed # 16x534C2016F8A7E2B3UL).newSeed(rawX, rawZ)&quot;,
+    &quot;boolean spiral = (seed := seed.newSeed()).nextBoolean()&quot;,
+    &quot;ScriptStructurePiece piece = ScriptStructurePiece.new(&quot;,
+    &quot;-2, 0, -2, 2, 5, 2,&quot;,
+    &quot;spiral&quot;,
+    &quot;? &#39;bigglobe:abandoned_city/indoor_staircase_spiral&#39;&quot;,
+    &quot;: &#39;bigglobe:abandoned_city/indoor_staircase_straight&#39;,&quot;,
+    &quot;nbtCompound(&quot;,
+    &quot;palette: palette,&quot;,
+    &quot;up: countAdjacents(rawX, rawY + 1, rawZ) == 2x111_111_111___111_111_111&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (spiral: piece.withRotation(((seed := seed.newSeed()).nextInt(4) + rawY) * 90))&quot;,
+    &quot;else (piece.rotateRandomly(seed := seed.newSeed()))&quot;,
+    &quot;(seed := seed.newSeed()).if (piece.symmetrifyAround(0, 0, &#39;FLIP_0&#39;))&quot;,
+    &quot;piece.offset(x, y, z)&quot;,
+    &quot;)&quot;,
+    &quot;: ScriptStructurePiece.new(&quot;,
+    &quot;-3, 0, -3, 3, 5, 3,&quot;,
+    &quot;&#39;bigglobe:abandoned_city/building&#39;,&quot;,
+    &quot;nbtCompound(&quot;,
+    &quot;adj: adj,&quot;,
+    &quot;deco: if (adj &amp; 2x111_111_111 == 2x111_111_111:&quot;,
+    &quot;if (isStaircaseColumn(rawX, rawZ) &amp;&amp; countAdjacents(rawX, rawY - 1, rawZ) == 2x111_111_111___111_111_111: 0Y)&quot;,
+    &quot;else if (rawX | rawZ &amp; 1 == 0: 1Y)&quot;,
+    &quot;else if (rawX &amp; rawZ &amp; 1 == 1: 2Y)&quot;,
+    &quot;else (0Y)&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;random.nextBoolean() ? 3Y : 0Y&quot;,
+    &quot;),&quot;,
+    &quot;palette: palette&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;.offset(x, y, z)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else if (rawX # rawZ &amp; 1 == 0 &amp;&amp; hasAt(rawX, rawY - 1, rawZ):&quot;,
+    &quot;int*(dx = 0, dz = 0, rotation = 0)&quot;,
+    &quot;random.switch (&quot;,
+    &quot;dz =  1 rotation =   0,&quot;,
+    &quot;dx = -1 rotation =  90,&quot;,
+    &quot;dz = -1 rotation = 180,&quot;,
+    &quot;dx =  1 rotation = 270&quot;,
+    &quot;)&quot;,
+    &quot;if (&quot;,
+    &quot; hasAt(rawX + dx, rawY,     rawZ + dz) &amp;&amp;&quot;,
+    &quot;!hasAt(rawX + dx, rawY + 1, rawZ + dz) &amp;&amp;&quot;,
+    &quot; hasAt(rawX - dx, rawY - 1, rawZ - dz) &amp;&amp;&quot;,
+    &quot;!hasAt(rawX - dx, rawY,     rawZ - dz)&quot;,
+    &quot;:&quot;,
+    &quot;pieces.add(&quot;,
+    &quot;ScriptStructurePiece.new(&quot;,
+    &quot;-2, 0, -2, 2, 5, 2,&quot;,
+    &quot;&#39;bigglobe:abandoned_city/outdoor_staircase&#39;,&quot;,
+    &quot;nbtCompound(&quot;,
+    &quot;l: hasAt(rawX + dz, rawY, rawZ - dx),&quot;,
+    &quot;r: hasAt(rawX - dz, rawY, rawZ + dx)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;.withRotation(rotation)&quot;,
+    &quot;.offset(x, y, z)&quot;,
+    &quot;)&quot;,
+    &quot;outdoorStaircases.(encodeIndex(rawX, rawY, rawZ)) = true&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;boolean hasOrStaircase(int*(x, y, z):&quot;,
+    &quot;x.isBetween[-MAX_RADIUS, MAX_RADIUS] &amp;&amp;&quot;,
+    &quot;z.isBetween[-MAX_RADIUS, MAX_RADIUS] &amp;&amp;&quot;,
+    &quot;(&quot;,
+    &quot;y &lt; 0 || (&quot;,
+    &quot;y &lt; MAX_LAYERS &amp;&amp; (&quot;,
+    &quot;int index = encodeIndex(x, y, z),,&quot;,
+    &quot;positions.(index) || outdoorStaircases.(index)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;NumberArray roofPositions = newBooleanArray(MAX_VOLUME)&quot;,
+    &quot;boolean hasRoofAt(int*(x, y, z):&quot;,
+    &quot;roofPositions.(encodeIndex(x, y, z))&quot;,
+    &quot;)&quot;,
+    &quot;for outer (int rawY in range[0, MAX_LAYERS), int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;for (int*(offsetX, offsetZ) in range[-1, 1]:&quot;,
+    &quot;unless (hasAt(rawX + offsetX, rawY, rawZ + offsetZ): continue(outer))&quot;,
+    &quot;if (hasOrStaircase(rawX + offsetX, rawY + 1, rawZ + offsetZ): continue(outer))&quot;,
+    &quot;)&quot;,
+    &quot;roofPositions.(encodeIndex(rawX, rawY, rawZ)) = true&quot;,
+    &quot;)&quot;,
+    &quot;for (int rawY in range[0, MAX_LAYERS), int*(rawZ, rawX) in range[-MAX_RADIUS, MAX_RADIUS]:&quot;,
+    &quot;int*(x = realX(rawX), y = realY(rawY), z = realZ(rawZ))&quot;,
+    &quot;if (hasAt(rawX, rawY, rawZ):&quot;,
+    &quot;int*(dx = 0, dz = 0, rotation = 0)&quot;,
+    &quot;random.switch (&quot;,
+    &quot;dz =  1 rotation =   0,&quot;,
+    &quot;dx = -1 rotation =  90,&quot;,
+    &quot;dz = -1 rotation = 180,&quot;,
+    &quot;dx =  1 rotation = 270&quot;,
+    &quot;)&quot;,
+    &quot;unless (hasOrStaircase(rawX - dx, rawY, rawZ - dz):&quot;,
+    &quot;pieces.add(&quot;,
+    &quot;hasAt(rawX - dx, rawY - 1, rawZ - dz)&quot;,
+    &quot;? ScriptStructurePiece.new(&quot;,
+    &quot;-2, 0, -2, 2, 2, 2,&quot;,
+    &quot;&#39;bigglobe:abandoned_city/door&#39;,&quot;,
+    &quot;nbtCompound()&quot;,
+    &quot;)&quot;,
+    &quot;.withRotation(rotation)&quot;,
+    &quot;.offset(x, y, z)&quot;,
+    &quot;: ScriptStructurePiece.new(&quot;,
+    &quot;0, 0, 0, 0, 3, 0,&quot;,
+    &quot;&#39;bigglobe:abandoned_city/interior_wall&#39;,&quot;,
+    &quot;nbtCompound()&quot;,
+    &quot;)&quot;,
+    &quot;.offset(x, y, z)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (hasRoofAt(rawX, rawY, rawZ):&quot;,
+    &quot;pieces.add(&quot;,
+    &quot;ScriptStructurePiece.new(&quot;,
+    &quot;-2, 0, -2, 2, 1, 2,&quot;,
+    &quot;&#39;bigglobe:abandoned_city/roof&#39;,&quot;,
+    &quot;nbtCompound(&quot;,
+    &quot;adj: (&quot;,
+    &quot;int adj = 0&quot;,
+    &quot;int shift = 0&quot;,
+    &quot;for (int*(offsetZ, offsetX) in range[-1, 1]:&quot;,
+    &quot;adj |= int(hasRoofAt(rawX + offsetX, rawY, rawZ + offsetZ)) &lt;&lt; ++:shift&quot;,
+    &quot;)&quot;,
+    &quot;adj&quot;,
+    &quot;),&quot;,
+    &quot;palette: palette&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;.offset(x, y + 5, z)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

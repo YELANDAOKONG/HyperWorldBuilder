@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Files - Root - blocks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+                        font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+        
+        header {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-item:hover {
+            background-color: var(--file-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .folder-item {
+            background-color: var(--folder-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .folder-item:hover {
+            background-color: var(--folder-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .file-icon, .folder-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            margin-top: 0;
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-message {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            font-style: italic;
+            color: #6c757d;
+            text-align: center;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JSON Files in blocks</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <span>data\bigglobe\loot_tables\blocks</span>
+        </div>
+        
+        <div class="card">
+
+            <h2><i class="fas fa-file-code"></i> JSON Files</h2>
+            <div class="file-grid">
+
+                <a href="ancient_automata.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ancient_automata.json
+                </a>
+
+                <a href="ashen_netherrack.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ashen_netherrack.json
+                </a>
+
+                <a href="automata.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    automata.json
+                </a>
+
+                <a href="blazing_blossom.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    blazing_blossom.json
+                </a>
+
+                <a href="blue_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    blue_aura_infused_cloud.json
+                </a>
+
+                <a href="blue_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    blue_aura_infused_void_cloud.json
+                </a>
+
+                <a href="budding_quartz.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    budding_quartz.json
+                </a>
+
+                <a href="charred_button.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_button.json
+                </a>
+
+                <a href="charred_door.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_door.json
+                </a>
+
+                <a href="charred_fence.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_fence.json
+                </a>
+
+                <a href="charred_fence_gate.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_fence_gate.json
+                </a>
+
+                <a href="charred_grass.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_grass.json
+                </a>
+
+                <a href="charred_hanging_sign.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_hanging_sign.json
+                </a>
+
+                <a href="charred_leaves.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_leaves.json
+                </a>
+
+                <a href="charred_log.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_log.json
+                </a>
+
+                <a href="charred_planks.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_planks.json
+                </a>
+
+                <a href="charred_pressure_plate.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_pressure_plate.json
+                </a>
+
+                <a href="charred_sapling.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_sapling.json
+                </a>
+
+                <a href="charred_sign.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_sign.json
+                </a>
+
+                <a href="charred_slab.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_slab.json
+                </a>
+
+                <a href="charred_stairs.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_stairs.json
+                </a>
+
+                <a href="charred_trapdoor.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_trapdoor.json
+                </a>
+
+                <a href="charred_wood.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    charred_wood.json
+                </a>
+
+                <a href="chorus_nylium.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    chorus_nylium.json
+                </a>
+
+                <a href="cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud.json
+                </a>
+
+                <a href="crystalline_prismarine.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    crystalline_prismarine.json
+                </a>
+
+                <a href="cyan_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cyan_aura_infused_cloud.json
+                </a>
+
+                <a href="cyan_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cyan_aura_infused_void_cloud.json
+                </a>
+
+                <a href="cyan_blue_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cyan_blue_aura_infused_cloud.json
+                </a>
+
+                <a href="cyan_blue_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cyan_blue_aura_infused_void_cloud.json
+                </a>
+
+                <a href="cyan_green_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cyan_green_aura_infused_cloud.json
+                </a>
+
+                <a href="cyan_green_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cyan_green_aura_infused_void_cloud.json
+                </a>
+
+                <a href="flint.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    flint.json
+                </a>
+
+                <a href="glowing_goldenrod.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    glowing_goldenrod.json
+                </a>
+
+                <a href="green_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    green_aura_infused_cloud.json
+                </a>
+
+                <a href="green_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    green_aura_infused_void_cloud.json
+                </a>
+
+                <a href="large_quartz_bud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    large_quartz_bud.json
+                </a>
+
+                <a href="magenta_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    magenta_aura_infused_cloud.json
+                </a>
+
+                <a href="magenta_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    magenta_aura_infused_void_cloud.json
+                </a>
+
+                <a href="magenta_red_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    magenta_red_aura_infused_cloud.json
+                </a>
+
+                <a href="magenta_red_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    magenta_red_aura_infused_void_cloud.json
+                </a>
+
+                <a href="medium_chorus_spores.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    medium_chorus_spores.json
+                </a>
+
+                <a href="medium_quartz_bud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    medium_quartz_bud.json
+                </a>
+
+                <a href="molten_rock_1.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_1.json
+                </a>
+
+                <a href="molten_rock_2.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_2.json
+                </a>
+
+                <a href="molten_rock_3.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_3.json
+                </a>
+
+                <a href="molten_rock_4.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_4.json
+                </a>
+
+                <a href="molten_rock_5.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_5.json
+                </a>
+
+                <a href="molten_rock_6.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_6.json
+                </a>
+
+                <a href="molten_rock_7.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_7.json
+                </a>
+
+                <a href="molten_rock_8.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_rock_8.json
+                </a>
+
+                <a href="mushroom_spores.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    mushroom_spores.json
+                </a>
+
+                <a href="omni_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    omni_aura_infused_cloud.json
+                </a>
+
+                <a href="omni_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    omni_aura_infused_void_cloud.json
+                </a>
+
+                <a href="orange_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    orange_aura_infused_cloud.json
+                </a>
+
+                <a href="orange_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    orange_aura_infused_void_cloud.json
+                </a>
+
+                <a href="overgrown_end_stone.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    overgrown_end_stone.json
+                </a>
+
+                <a href="overgrown_podzol.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    overgrown_podzol.json
+                </a>
+
+                <a href="overgrown_sand.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    overgrown_sand.json
+                </a>
+
+                <a href="potted_blazing_blossom.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    potted_blazing_blossom.json
+                </a>
+
+                <a href="potted_charred_sapling.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    potted_charred_sapling.json
+                </a>
+
+                <a href="potted_glowing_goldenrod.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    potted_glowing_goldenrod.json
+                </a>
+
+                <a href="potted_rose.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    potted_rose.json
+                </a>
+
+                <a href="purple_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    purple_aura_infused_cloud.json
+                </a>
+
+                <a href="purple_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    purple_aura_infused_void_cloud.json
+                </a>
+
+                <a href="quartz_cluster.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    quartz_cluster.json
+                </a>
+
+                <a href="red_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    red_aura_infused_cloud.json
+                </a>
+
+                <a href="red_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    red_aura_infused_void_cloud.json
+                </a>
+
+                <a href="rock.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    rock.json
+                </a>
+
+                <a href="rope_anchor.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    rope_anchor.json
+                </a>
+
+                <a href="rose.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    rose.json
+                </a>
+
+                <a href="rough_quartz.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    rough_quartz.json
+                </a>
+
+                <a href="short_chorus_spores.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    short_chorus_spores.json
+                </a>
+
+                <a href="short_grass.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    short_grass.json
+                </a>
+
+                <a href="slated_prismarine.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    slated_prismarine.json
+                </a>
+
+                <a href="slated_prismarine_slab.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    slated_prismarine_slab.json
+                </a>
+
+                <a href="slated_prismarine_stairs.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    slated_prismarine_stairs.json
+                </a>
+
+                <a href="small_quartz_bud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    small_quartz_bud.json
+                </a>
+
+                <a href="soul_cauldron.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    soul_cauldron.json
+                </a>
+
+                <a href="soul_magma.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    soul_magma.json
+                </a>
+
+                <a href="soul_silverpetal.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    soul_silverpetal.json
+                </a>
+
+                <a href="spelunking_rope.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    spelunking_rope.json
+                </a>
+
+                <a href="stick.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    stick.json
+                </a>
+
+                <a href="stripped_charred_log.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    stripped_charred_log.json
+                </a>
+
+                <a href="stripped_charred_wood.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    stripped_charred_wood.json
+                </a>
+
+                <a href="sulfur_block.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    sulfur_block.json
+                </a>
+
+                <a href="sulfur_ore.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    sulfur_ore.json
+                </a>
+
+                <a href="tall_chorus_spores.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    tall_chorus_spores.json
+                </a>
+
+                <a href="void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    void_cloud.json
+                </a>
+
+                <a href="wart_weed.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    wart_weed.json
+                </a>
+
+                <a href="yellow_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    yellow_aura_infused_cloud.json
+                </a>
+
+                <a href="yellow_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    yellow_aura_infused_void_cloud.json
+                </a>
+
+                <a href="yellow_green_aura_infused_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    yellow_green_aura_infused_cloud.json
+                </a>
+
+                <a href="yellow_green_aura_infused_void_cloud.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    yellow_green_aura_infused_void_cloud.json
+                </a>
+
+            </div>
+
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+</body>
+</html>

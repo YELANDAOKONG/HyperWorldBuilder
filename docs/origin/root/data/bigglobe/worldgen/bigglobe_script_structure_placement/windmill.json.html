@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - windmill.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> windmill.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\worldgen\bigglobe_script_structure_placement</a> <span>windmill.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;placement&quot;: [
+    &quot;;main floor and walls&quot;,
+    &quot;BlockState mainBlock = random.if (&#39;minecraft:white_terracotta&#39;) else (&#39;minecraft:light_gray_terracotta&#39;)&quot;,
+    &quot;for (int y in range[-1, 16]:&quot;,
+    &quot;double radius = mixLinear(3.5L, 1.0L, max(y, 0) * 0.0625L)&quot;,
+    &quot;double radius2 = radius ^ 2&quot;,
+    &quot;int floorRadius = int(radius)&quot;,
+    &quot;for (int z in range[-floorRadius, floorRadius]:&quot;,
+    &quot;for (int x in range[-floorRadius, floorRadius]:&quot;,
+    &quot;if (&quot;,
+    &quot;x ^ 2 + z ^ 2 &lt;= radius2 &amp;&amp; (&quot;,
+    &quot;y &lt; 0 ||&quot;,
+    &quot;(x + sign(x)) ^ 2 + z ^ 2 &gt; radius2 ||&quot;,
+    &quot;x ^ 2 + (z + sign(z)) ^ 2 &gt; radius2&quot;,
+    &quot;)&quot;,
+    &quot;:&quot;,
+    &quot;setBlockState(x, y, z, compare (y:&quot;,
+    &quot;case (&lt;: &#39;minecraft:smooth_stone&#39;)&quot;,
+    &quot;case (=: &#39;minecraft:cobblestone&#39;)&quot;,
+    &quot;case (&gt;: mainBlock)&quot;,
+    &quot;))&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;windmill (wool)&quot;,
+    &quot;double*(&quot;,
+    &quot;angle = random.nextDouble(-pi / 4.0L, +pi / 4.0L)&quot;,
+    &quot;cosAngle = fastCos(angle)&quot;,
+    &quot;sinAngle = fastSin(angle)&quot;,
+    &quot;)&quot;,
+    &quot;for (int y in range[-8, +8]:&quot;,
+    &quot;for (int z in range[-8, +8]:&quot;,
+    &quot;;[ cos, sin] [z]&quot;,
+    &quot;;[-sin, cos] [y]&quot;,
+    &quot;double rotatedZ =  cosAngle * z + sinAngle * y&quot;,
+    &quot;double rotatedY = -sinAngle * z + cosAngle * y&quot;,
+    &quot;if (&quot;,
+    &quot;rotatedZ.isBetween[-8.0L, +8.0L] &amp;&amp;&quot;,
+    &quot;rotatedY.isBetween[-8.0L, +8.0L] &amp;&amp; (&quot;,
+    &quot;(rotatedZ * -sign(rotatedY)).isBetween(0.0L, 3.0L] ||&quot;,
+    &quot;(rotatedY *  sign(rotatedZ)).isBetween(0.0L, 3.0L]&quot;,
+    &quot;)&quot;,
+    &quot;:&quot;,
+    &quot;setBlockState(5, y + 15, z, &#39;minecraft:white_wool&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;;windmill (logs)&quot;,
+    &quot;double step = 1.0L / max(abs(cosAngle), abs(sinAngle))&quot;,
+    &quot;for (double dist = step, dist &lt; 7.99, dist += step:&quot;,
+    &quot;setBlockState(5, roundInt( sinAngle * dist + 15.0L), roundInt( cosAngle * dist), &#39;minecraft:oak_log[axis=z]&#39;)&quot;,
+    &quot;setBlockState(5, roundInt( cosAngle * dist + 15.0L), roundInt(-sinAngle * dist), &#39;minecraft:oak_log[axis=y]&#39;)&quot;,
+    &quot;setBlockState(5, roundInt(-sinAngle * dist + 15.0L), roundInt(-cosAngle * dist), &#39;minecraft:oak_log[axis=z]&#39;)&quot;,
+    &quot;setBlockState(5, roundInt(-cosAngle * dist + 15.0L), roundInt( sinAngle * dist), &#39;minecraft:oak_log[axis=y]&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;;connect windmill to main structure&quot;,
+    &quot;fillBlockState(-2, 15, 0, 5, 15, 0, &#39;minecraft:oak_log[axis=x]&#39;)&quot;,
+    &quot;;vertical pillar of logs on interior&quot;,
+    &quot;fillBlockState(0, 0, 0, 0, 14, 0, &#39;minecraft:oak_log[axis=y]&#39;)&quot;,
+    &quot;;door&quot;,
+    &quot;setBlockState(3, 0, 0, &#39;minecraft:oak_door[facing=west,half=lower,hinge=left,open=false,powered=false]&#39;)&quot;,
+    &quot;setBlockState(3, 1, 0, &#39;minecraft:oak_door[facing=west,half=upper,hinge=left,open=false,powered=false]&#39;)&quot;,
+    &quot;;interior&quot;,
+    &quot;setBlockState(-2, 0,  1, &#39;minecraft:stonecutter[facing=north]&#39;)&quot;,
+    &quot;setBlockState(-2, 0, -1, &#39;minecraft:grindstone[face=floor,facing=west]&#39;)&quot;,
+    &quot;Coordinator.new().symmetrify(&#39;IDENTITY&#39;, &#39;ROTATE_90&#39;, &#39;ROTATE_270&#39;).setBlockState(-2, 1, 0, &#39;minecraft:wall_torch[facing=east]&#39;)&quot;,
+    &quot;;summon villager&quot;,
+    &quot;summon(1.5L, 0.0L, 0.5L, &#39;minecraft:villager&#39;)&quot;
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

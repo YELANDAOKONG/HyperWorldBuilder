@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Files - Root - vanilla</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+                        font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+        
+        header {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-item:hover {
+            background-color: var(--file-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .folder-item {
+            background-color: var(--folder-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .folder-item:hover {
+            background-color: var(--folder-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .file-icon, .folder-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            margin-top: 0;
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-message {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            font-style: italic;
+            color: #6c757d;
+            text-align: center;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JSON Files in vanilla</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <span>data\bigglobe\tags\worldgen\biome\has_structure\vanilla</span>
+        </div>
+        
+        <div class="card">
+
+            <h2><i class="fas fa-file-code"></i> JSON Files</h2>
+            <div class="file-grid">
+
+                <a href="ancient_city.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ancient_city.json
+                </a>
+
+                <a href="bastion_remnant.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    bastion_remnant.json
+                </a>
+
+                <a href="buried_treasure.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    buried_treasure.json
+                </a>
+
+                <a href="desert_pyramid.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    desert_pyramid.json
+                </a>
+
+                <a href="end_city.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    end_city.json
+                </a>
+
+                <a href="igloo.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    igloo.json
+                </a>
+
+                <a href="jungle_temple.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    jungle_temple.json
+                </a>
+
+                <a href="mineshaft.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    mineshaft.json
+                </a>
+
+                <a href="mineshaft_mesa.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    mineshaft_mesa.json
+                </a>
+
+                <a href="nether_fortress.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    nether_fortress.json
+                </a>
+
+                <a href="ocean_monument.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ocean_monument.json
+                </a>
+
+                <a href="ocean_ruin_cold.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ocean_ruin_cold.json
+                </a>
+
+                <a href="ocean_ruin_warm.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ocean_ruin_warm.json
+                </a>
+
+                <a href="pillager_outpost.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    pillager_outpost.json
+                </a>
+
+                <a href="shipwreck.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    shipwreck.json
+                </a>
+
+                <a href="shipwreck_beached.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    shipwreck_beached.json
+                </a>
+
+                <a href="stronghold.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    stronghold.json
+                </a>
+
+                <a href="swamp_hut.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    swamp_hut.json
+                </a>
+
+                <a href="trail_ruins.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    trail_ruins.json
+                </a>
+
+                <a href="village_desert.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    village_desert.json
+                </a>
+
+                <a href="village_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    village_plains.json
+                </a>
+
+                <a href="village_savanna.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    village_savanna.json
+                </a>
+
+                <a href="village_snowy.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    village_snowy.json
+                </a>
+
+                <a href="village_taiga.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    village_taiga.json
+                </a>
+
+                <a href="woodland_mansion.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    woodland_mansion.json
+                </a>
+
+            </div>
+
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+</body>
+</html>

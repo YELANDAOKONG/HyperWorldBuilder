@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Files - Root - islands</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+                        font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+        
+        header {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-item:hover {
+            background-color: var(--file-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .folder-item {
+            background-color: var(--folder-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .folder-item:hover {
+            background-color: var(--folder-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .file-icon, .folder-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            margin-top: 0;
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-message {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            font-style: italic;
+            color: #6c757d;
+            text-align: center;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JSON Files in islands</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <span>data\bigglobe\worldgen\bigglobe_column_value\islands</span>
+        </div>
+        
+        <div class="card">
+
+            <h2><i class="fas fa-file-code"></i> JSON Files</h2>
+            <div class="file-grid">
+
+                <a href="automatic_is_skyland.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    automatic_is_skyland.json
+                </a>
+
+                <a href="basic_surface_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    basic_surface_height.json
+                </a>
+
+                <a href="beach_cave_exclusion.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    beach_cave_exclusion.json
+                </a>
+
+                <a href="beachiness.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    beachiness.json
+                </a>
+
+                <a href="beachy_surface_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    beachy_surface_height.json
+                </a>
+
+                <a href="biome.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    biome.json
+                </a>
+
+                <a href="cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cave.json
+                </a>
+
+                <a href="cave_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cave_noise.json
+                </a>
+
+                <a href="cave_primary_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cave_primary_noise.json
+                </a>
+
+                <a href="cave_secondary_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cave_secondary_noise.json
+                </a>
+
+                <a href="cave_surface_depth.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cave_surface_depth.json
+                </a>
+
+                <a href="cloud_horizontal_bias.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_horizontal_bias.json
+                </a>
+
+                <a href="cloud_horizontal_center.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_horizontal_center.json
+                </a>
+
+                <a href="cloud_horizontal_extent.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_horizontal_extent.json
+                </a>
+
+                <a href="cloud_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_noise.json
+                </a>
+
+                <a href="cloud_sdf.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_sdf.json
+                </a>
+
+                <a href="cloud_vertical_bias.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_vertical_bias.json
+                </a>
+
+                <a href="cloud_vertical_center.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_vertical_center.json
+                </a>
+
+                <a href="cloud_vertical_limit.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cloud_vertical_limit.json
+                </a>
+
+                <a href="core_gradient_offset.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    core_gradient_offset.json
+                </a>
+
+                <a href="curved_island_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    curved_island_height.json
+                </a>
+
+                <a href="d_curved_island_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    d_curved_island_height.json
+                </a>
+
+                <a href="dx_height_offset.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dx_height_offset.json
+                </a>
+
+                <a href="dx_island_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dx_island_height.json
+                </a>
+
+                <a href="dx_skyland_height_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dx_skyland_height_noise.json
+                </a>
+
+                <a href="dz_height_offset.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dz_height_offset.json
+                </a>
+
+                <a href="dz_island_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dz_island_height.json
+                </a>
+
+                <a href="dz_skyland_height_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dz_skyland_height_noise.json
+                </a>
+
+                <a href="eroded_skyland_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    eroded_skyland_height.json
+                </a>
+
+                <a href="eroded_surface_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    eroded_surface_height.json
+                </a>
+
+                <a href="erosion.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    erosion.json
+                </a>
+
+                <a href="erosion_multiplier.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    erosion_multiplier.json
+                </a>
+
+                <a href="exp_skyland_height_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    exp_skyland_height_noise.json
+                </a>
+
+                <a href="foliage_feature.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    foliage_feature.json
+                </a>
+
+                <a href="has_skylands.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    has_skylands.json
+                </a>
+
+                <a href="height_adjusted_foliage.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    height_adjusted_foliage.json
+                </a>
+
+                <a href="height_adjusted_temperature.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    height_adjusted_temperature.json
+                </a>
+
+                <a href="height_offset.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    height_offset.json
+                </a>
+
+                <a href="is_floating.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    is_floating.json
+                </a>
+
+                <a href="is_volcano.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    is_volcano.json
+                </a>
+
+                <a href="island.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    island.json
+                </a>
+
+                <a href="island_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    island_height.json
+                </a>
+
+                <a href="magicalness.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    magicalness.json
+                </a>
+
+                <a href="mountainness.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    mountainness.json
+                </a>
+
+                <a href="raw_foliage.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    raw_foliage.json
+                </a>
+
+                <a href="raw_temperature.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    raw_temperature.json
+                </a>
+
+                <a href="sea_depth.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    sea_depth.json
+                </a>
+
+                <a href="skyland_bottom.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_bottom.json
+                </a>
+
+                <a href="skyland_bottom_approximate.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_bottom_approximate.json
+                </a>
+
+                <a href="skyland_bottom_point.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_bottom_point.json
+                </a>
+
+                <a href="skyland_erosion.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_erosion.json
+                </a>
+
+                <a href="skyland_foliage.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_foliage.json
+                </a>
+
+                <a href="skyland_foliage_feature.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_foliage_feature.json
+                </a>
+
+                <a href="skyland_height_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_height_noise.json
+                </a>
+
+                <a href="skyland_hilliness.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_hilliness.json
+                </a>
+
+                <a href="skyland_snow_chance.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_snow_chance.json
+                </a>
+
+                <a href="skyland_snow_y.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_snow_y.json
+                </a>
+
+                <a href="skyland_surface_states.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_surface_states.json
+                </a>
+
+                <a href="skyland_top.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_top.json
+                </a>
+
+                <a href="skyland_top_approximate.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_top_approximate.json
+                </a>
+
+                <a href="skyland_top_plain.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    skyland_top_plain.json
+                </a>
+
+                <a href="snow_height.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    snow_height.json
+                </a>
+
+                <a href="surface_foliage.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    surface_foliage.json
+                </a>
+
+                <a href="surface_states.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    surface_states.json
+                </a>
+
+                <a href="surface_temperature.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    surface_temperature.json
+                </a>
+
+                <a href="volcano_excluded_core.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    volcano_excluded_core.json
+                </a>
+
+                <a href="volcano_excluded_deep_dark.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    volcano_excluded_deep_dark.json
+                </a>
+
+                <a href="volcano_magma_noise.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    volcano_magma_noise.json
+                </a>
+
+                <a href="volcano_magma_sdf.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    volcano_magma_sdf.json
+                </a>
+
+                <a href="wood_palette.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    wood_palette.json
+                </a>
+
+            </div>
+
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+</body>
+</html>

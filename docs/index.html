@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigGlobe Decision Trees Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --disabled-color: #6c757d;
+            --json-color: #9c27b0;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            padding: 20px;
+            flex: 1;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .version-info {
+            margin-top: 1rem;
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .build-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .build-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .build-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .build-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.2rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }
+
+        .build-content {
+            padding: 1.5rem;
+        }
+
+        .build-description {
+            margin-bottom: 1.5rem;
+            color: #555;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .build-button {
+            display: inline-block;
+            width: 100%;
+            background-color: var(--success-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .build-button:hover {
+            background-color: #218838;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .build-button.disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .json-button {
+            display: inline-block;
+            width: 100%;
+            background-color: var(--json-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .json-button:hover {
+            background-color: #7b1fa2;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .json-button.disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .documentation-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .documentation-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+
+        footer {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 30px;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-mc {
+            background-color: var(--info-color);
+        }
+
+        .badge-mod {
+            background-color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BigGlobe Decision Trees Documentation</h1>
+            <div class="version-info">
+                <span class="badge badge-mc">Minecraft 1.20.1</span>
+                <span class="badge badge-mod">BigGlobe 5.0.1</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="documentation-info">
+                <h2><i class="fas fa-info-circle"></i> Documentation Overview</h2>
+                <p>This documentation provides two main features:</p>
+                <ul>
+                    <li><strong>Decision Tree Visualizations</strong> - Interactive visualizations of BigGlobe's decision trees used in world generation.</li>
+                    <li><strong>JSON File Browser</strong> - A way to browse and view the original JSON configuration files.</li>
+                </ul>
+                <p>Select one of the build options below to explore the documentation.</p>
+            </div>
+
+            <div class="build-options">
+
+                <div class="build-card">
+                    <div class="build-header">
+                        <i class="fas fa-seedling mr-2"></i> Root Build
+                    </div>
+                    <div class="build-content">
+                        <div class="build-description">
+                            <p>Base BigGlobe mod decision trees from the original mod files.</p>
+                        </div>
+                        <div class="button-container">
+                            <a href="files/root/index.html" class="build-button">
+                                <i class="fas fa-sitemap mr-2"></i> View Decision Trees
+                            </a>
+                            <a href="origin/root/index.html" class="json-button">
+                                <i class="fas fa-file-code mr-2"></i> View JSON Files
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="build-card">
+                    <div class="build-header">
+                        <i class="fas fa-cube mr-2"></i> Main Build
+                    </div>
+                    <div class="build-content">
+                        <div class="build-description">
+                            <p>Decision trees from the main data pack, includes any customizations.</p>
+                        </div>
+                        <div class="button-container">
+                            <a href="#" class="build-button disabled">
+                                <i class="fas fa-sitemap mr-2"></i> View Decision Trees
+                            </a>
+                            <a href="#" class="json-button disabled">
+                                <i class="fas fa-file-code mr-2"></i> View JSON Files
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="build-card">
+                    <div class="build-header">
+                        <i class="fas fa-bug mr-2"></i> Debug Build
+                    </div>
+                    <div class="build-content">
+                        <div class="build-description">
+                            <p>Decision trees from the debug data pack, includes development configurations.</p>
+                        </div>
+                        <div class="button-container">
+                            <a href="#" class="build-button disabled">
+                                <i class="fas fa-sitemap mr-2"></i> View Decision Trees
+                            </a>
+                            <a href="#" class="json-button disabled">
+                                <i class="fas fa-file-code mr-2"></i> View JSON Files
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+</body>
+</html>

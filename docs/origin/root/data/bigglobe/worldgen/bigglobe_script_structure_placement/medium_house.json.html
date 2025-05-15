@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - medium_house.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> medium_house.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\worldgen\bigglobe_script_structure_placement</a> <span>medium_house.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;placement&quot;: [
+    &quot;String randomColor(:&quot;,
+    &quot;random.switch(&quot;,
+    &quot;&#39;white&#39;,      &#39;orange&#39;, &#39;magenta&#39;, &#39;light_blue&#39;,&quot;,
+    &quot;&#39;yellow&#39;,     &#39;lime&#39;,   &#39;pink&#39;,    &#39;gray&#39;,&quot;,
+    &quot;&#39;light_gray&#39;, &#39;cyan&#39;,   &#39;purple&#39;,  &#39;blue&#39;,&quot;,
+    &quot;&#39;brown&#39;,      &#39;green&#39;,  &#39;red&#39;,     &#39;black&#39;&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;WoodPalette palette = WoodPalette(data.palette.asString())&quot;,
+    &quot;Coordinator*(&quot;,
+    &quot;root   = new()&quot;,
+    &quot;flipX  = root.flip2X()&quot;,
+    &quot;flipZ  = root.flip2Z()&quot;,
+    &quot;flipXZ = root.flip4XZ()&quot;,
+    &quot;)&quot;,
+    &quot;BlockState*(&quot;,
+    &quot;log = palette.logState(axis: &#39;y&#39;)&quot;,
+    &quot;planks = palette.planksState()&quot;,
+    &quot;slab = palette.slabState(type: &#39;bottom&#39;, waterlogged: false)&quot;,
+    &quot;northStairs = palette.stairsState(facing: &#39;north&#39;, half: &#39;bottom&#39;, shape: &#39;straight&#39;, waterlogged: false)&quot;,
+    &quot;southStairs = northStairs.with(&#39;facing&#39;, &#39;south&#39;)&quot;,
+    &quot; westStairs = northStairs.with(&#39;facing&#39;,  &#39;west&#39;)&quot;,
+    &quot; eastStairs = northStairs.with(&#39;facing&#39;,  &#39;east&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;;cobblestone outline&quot;,
+    &quot;flipXZ.setBlockStateLine(4, 0, 2, 0, 0, 1, 5, &#39;minecraft:cobblestone&#39;)&quot;,
+    &quot;flipZ.setBlockStateLine(-2, 0, 8, 1, 0, 0, 5, &#39;minecraft:cobblestone&#39;)&quot;,
+    &quot;flipX.setBlockStateLine(2, 0, -2, 0, 0, 1, 5, &#39;minecraft:cobblestone&#39;)&quot;,
+    &quot;flipXZ.translate(&quot;,
+    &quot;2, 0, 6,&quot;,
+    &quot;2, 0, 7,&quot;,
+    &quot;3, 0, 6,&quot;,
+    &quot;3, 0, 2&quot;,
+    &quot;)&quot;,
+    &quot;.setBlockState(0, 0, 0, &#39;minecraft:cobblestone&#39;)&quot;,
+    &quot;;wool floor&quot;,
+    &quot;fillBlockState(-1, 0, -7, 1, 0, 7, &#39;minecraft:white_wool&#39;)&quot;,
+    &quot;flipXZ.setBlockStateCuboid(2, 0, 3, 3, 0, 5, &#39;minecraft:white_wool&#39;)&quot;,
+    &quot;;walls&quot;,
+    &quot;root.stack(4, 0, 0, 2).stack(0, 0, 4, 4).setBlockStateLine(-2, 1, -6, 0, 1, 0, 4, log)&quot;,
+    &quot;ArrayList walls = new(6)&quot;,
+    &quot;walls&quot;,
+    &quot;.$add(root.translate(2, 0, 4))&quot;,
+    &quot;.$add(root.translate(2, 0, -4))&quot;,
+    &quot;.$add(root.translate(0, 0, 6).rotate1x(90))&quot;,
+    &quot;.$add(root.translate(0, 0, -6).rotate1x(270))&quot;,
+    &quot;.$add(root.translate(-2, 0, 4).rotate1x(180))&quot;,
+    &quot;.$add(root.translate(-2, 0, -4).rotate1x(180))&quot;,
+    &quot;Coordinator allWalls = Coordinator.allOf(walls.(0), walls.(1), walls.(2), walls.(3), walls.(4), walls.(5))&quot;,
+    &quot;allWalls.stack(0, 0, 4, 2).setBlockStateLine(2, 1, -2, 0, 1, 0, 4, log)&quot;,
+    &quot;allWalls.stack(0, 0, 4, 2).setBlockStateLine(1, 1, -2, 0, 1, 0, 4, planks)&quot;,
+    &quot;allWalls.setBlockStateCuboid(2, 1, -1, 2, 4, 1, planks)&quot;,
+    &quot;flipX.setBlockStateCuboid(2, 1, -1, 2, 4, 1, planks)&quot;,
+    &quot;;patio&quot;,
+    &quot;flipX.setBlockStateCuboid(3, 0, -1, 4, 0, 1, planks)&quot;,
+    &quot;flipX.setBlockState(4, 0,  0, northStairs.with(&#39;facing&#39;, &#39;west&#39;))&quot;,
+    &quot;flipX.setBlockState(4, 1, -1, palette.fenceState(north: true, south: false, east: false, west: false, waterlogged: false))&quot;,
+    &quot;flipX.setBlockState(4, 1,  1, palette.fenceState(north: false, south: true, east: false, west: false, waterlogged: false))&quot;,
+    &quot;;roof&quot;,
+    &quot;allWalls&quot;,
+    &quot;.flip2Z()&quot;,
+    &quot;.$setBlockStateLine(3, 4, 3, -1, 0,  0, 2, northStairs)&quot;,
+    &quot;.$setBlockStateLine(3, 5, 2, -1, 0,  0, 3, northStairs)&quot;,
+    &quot;.$setBlockStateLine(3, 6, 1, -1, 0,  0, 4, northStairs)&quot;,
+    &quot;.$setBlockStateLine(3, 4, 2,  0, 1, -1, 2, northStairs.with(&#39;facing&#39;, &#39;south&#39;).with(&#39;half&#39;, &#39;top&#39;))&quot;,
+    &quot;allWalls&quot;,
+    &quot;.$setBlockStateLine(3, 7, 0, -1, 0, 0, 5, slab)&quot;,
+    &quot;.$setBlockStateLine(3, 6, 0, -1, 0, 0, 5, planks)&quot;,
+    &quot;.$setBlockStateCuboid(0, 5, -1, 2, 5, 1, planks)&quot;,
+    &quot;flipZ.translate(0, 0, 4).rotate4x90().setBlockStateLine(3, 4, 3, -1, 1, -1, 3, northStairs.with(&#39;shape&#39;, &#39;inner_left&#39;))&quot;,
+    &quot;flipX&quot;,
+    &quot;.$setBlockState(3, 4, 0, westStairs)&quot;,
+    &quot;.$setBlockStateLine(2, 5, -1, 0, 0, 1, 3, westStairs)&quot;,
+    &quot;.$setBlockStateLine(1, 6, -2, 0, 0, 1, 5, westStairs)&quot;,
+    &quot;fillBlockState(0, 6, -4, 0, 6, 4, planks)&quot;,
+    &quot;fillBlockState(0, 7, -4, 0, 7, 4, slab)&quot;,
+    &quot;fillBlockState(-1, 5, -5, 1, 5, 5, planks)&quot;,
+    &quot;;interior upper trimming&quot;,
+    &quot;BlockState topEastStairs = eastStairs.with(&#39;half&#39;, &#39;top&#39;)&quot;,
+    &quot;allWalls&quot;,
+    &quot;.$setBlockState(1, 4, 0, topEastStairs)&quot;,
+    &quot;.$setBlockState(1, 4, -1, topEastStairs.with(&#39;shape&#39;, &#39;inner_left&#39;))&quot;,
+    &quot;.$setBlockState(1, 4, 1, topEastStairs.with(&#39;shape&#39;, &#39;inner_right&#39;))&quot;,
+    &quot;.$setBlockState(0, 4, -1, northStairs.with(&#39;half&#39;, &#39;top&#39;))&quot;,
+    &quot;.$setBlockState(0, 4, 1, southStairs.with(&#39;half&#39;, &#39;top&#39;))&quot;,
+    &quot;flipZ.translate(0, 0, 4).rotate4x90().setBlockState(1, 4, 1, topEastStairs.with(&#39;shape&#39;, &#39;outer_right&#39;))&quot;,
+    &quot;flipX.setBlockStateLine(1, 4, -2, 0, 0, 1, 5, topEastStairs)&quot;,
+    &quot;;decorations&quot;,
+    &quot;allWalls.setBlockState(2, 2, 0, &#39;minecraft:glass_pane[north=true,south=true,east=false,west=false,waterlogged=false]&#39;)&quot;,
+    &quot;BlockState door = palette.doorState(facing: &#39;west&#39;, half: &#39;lower&#39;, hinge: random.if (&#39;left&#39;) else (&#39;right&#39;), open: false, powered: false)&quot;,
+    &quot;setBlockState(2, 1, 0, door)&quot;,
+    &quot;setBlockState(2, 2, 0, door.with(&#39;half&#39;, &#39;upper&#39;))&quot;,
+    &quot;door = door.with(&#39;facing&#39;, &#39;east&#39;).with(&#39;hinge&#39;, random.if (&#39;left&#39;) else (&#39;right&#39;))&quot;,
+    &quot;setBlockState(-2, 1, 0, door)&quot;,
+    &quot;setBlockState(-2, 2, 0, door.with(&#39;half&#39;, &#39;upper&#39;))&quot;,
+    &quot;flipZ.setBlockState(0, 4, 4, &#39;minecraft:lantern[hanging=true,waterlogged=false]&#39;)&quot;,
+    &quot;fillBlockState(0, 1, -4, 0, 1, 4, BlockState(&#39;minecraft:$randomColor()_carpet&#39;))&quot;,
+    &quot;;interior&quot;,
+    &quot;walls.shuffle()&quot;,
+    &quot;Coordinator(walls.(0)).setBlockState(0, 1, 0, &#39;minecraft:cartography_table&#39;)&quot;,
+    &quot;Coordinator(walls.(1)).setBlockState(0, 1, 0, &#39;minecraft:loom[facing=west]&#39;)&quot;,
+    &quot;Coordinator(walls.(2)).setBlockState(0, 1, 0, &#39;minecraft:lectern[facing=west,has_book=false,powered=false]&#39;)&quot;,
+    &quot;Coordinator(walls.(3))&quot;,
+    &quot;.$setBlockState(1, 1, -1, northStairs)&quot;,
+    &quot;.$setBlockState(1, 1,  1, southStairs)&quot;,
+    &quot;.$setBlockState(1, 1,  0, palette.fenceState(north: false, south: false, east: false, west: false, waterlogged: false))&quot;,
+    &quot;.$setBlockState(1, 2,  0, palette.pressurePlateState(powered: false))&quot;,
+    &quot;Coordinator(walls.(4))&quot;,
+    &quot;.$setBlockStateLine(1, 1, -1, 0, 0, 1, 3, &#39;minecraft:bookshelf&#39;)&quot;,
+    &quot;.$setBlockState(1, 2, random.if (-1) else (1), BlockTag(&#39;#minecraft:flower_pots&#39;).random().getDefaultState())&quot;,
+    &quot;BlockState bed1 = BlockState(&#39;minecraft:$randomColor()_bed&#39;, facing: &#39;east&#39;, occupied: false, part: &#39;foot&#39;)&quot;,
+    &quot;BlockState bed2 = BlockState(&#39;minecraft:$randomColor()_bed&#39;, facing: &#39;east&#39;, occupied: false, part: &#39;foot&#39;)&quot;,
+    &quot;Coordinator(walls.(5))&quot;,
+    &quot;.$setBlockState(0, 1, -1, bed1)&quot;,
+    &quot;.$setBlockState(1, 1, -1, bed1.with(&#39;part&#39;, &#39;head&#39;))&quot;,
+    &quot;.$setBlockState(0, 1,  1, bed2)&quot;,
+    &quot;.$setBlockState(1, 1,  1, bed2.with(&#39;part&#39;, &#39;head&#39;))&quot;,
+    &quot;.$setBlockState(1, 1,  0, &#39;minecraft:crafting_table&#39;)&quot;,
+    &quot;;spawn villagers&quot;,
+    &quot;summon(0.5L, 1.0625L,  4.5L, &#39;minecraft:villager&#39;)&quot;,
+    &quot;summon(0.5L, 1.0625L, -3.5L, &#39;minecraft:villager&#39;)&quot;
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

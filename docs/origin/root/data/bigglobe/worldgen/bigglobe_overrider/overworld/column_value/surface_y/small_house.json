@@ -1,0 +1,30 @@
+{
+	"type": "column_value",
+	"script": {
+		"source": [
+			"for (StructureStart start in structures:",
+				"if (start.structure ==. 'bigglobe:small_house':",
+					"StructurePiece piece = start.pieces.(0)",
+					"double distance = distanceToCircle(piece, 4.0L)",
+					"if (distance < 16.0L:",
+						"double mixLevel = smooth(distance * 0.0625L)",
+						"setSurfaceY(piece.minY - 0.5L, mixLevel, setSnow)",
+						"setSurfaceFoliage(piece.minY, mixLevel)",
+					")",
+					"if (start.pieces.size > 1:",
+						"piece = start.pieces.(1)",
+						"distance = distanceToSquare(piece)",
+						"if (distance < 16.0L:",
+							"double mixLevel = smooth(distance * 0.0625L)",
+							"setSurfaceY(piece.minY + 0.5L, mixLevel, setSnow)",
+							"setSurfaceFoliage(piece.minY, mixLevel)",
+						")",
+					")",
+				")",
+			")"
+		],
+		"includes": [
+			"bigglobe:include/surface_manipulation"
+		]
+	}
+}

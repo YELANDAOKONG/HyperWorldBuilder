@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Tree: islands\biome\test_sky</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --disabled-color: #6c757d;
+            --result-bg: #e3fcef;
+            --result-border: #8fd3b6;
+            --condition-bg: #e1f5fe;
+            --condition-border: #81d4fa;
+            --missing-bg: #ffebee;
+            --missing-border: #ef9a9a;
+            --unknown-bg: #fff3e0;
+            --unknown-border: #ffe0b2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /*
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        */
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /*
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }
+        */
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            border-radius: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, #2a4073 100%);
+        }
+        
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .tree-path {
+            font-family: monospace;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }
+        
+        /*
+        .tree-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        */
+        
+        .tree-container {
+            background-color: white;
+            border-radius: 0;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: none;
+        }
+        
+        .tree-node {
+            margin: 1rem 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .node-content {
+            padding: 1rem;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .node-content:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .result-node {
+            background-color: var(--result-bg);
+            border-left: 5px solid var(--result-border);
+        }
+        
+        .condition-node {
+            background-color: var(--condition-bg);
+            border-left: 5px solid var(--condition-border);
+        }
+        
+        .missing-node {
+            background-color: var(--missing-bg);
+            border-left: 5px solid var(--missing-border);
+        }
+        
+        .unknown-node {
+            background-color: var(--unknown-bg);
+            border-left: 5px solid var(--unknown-border);
+        }
+        
+        .root-node {
+            position: relative;
+            border-width: 2px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .root-node::before {
+            content: "ROOT";
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .edge-label {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.3rem 0.7rem;
+            margin: 0.5rem 0;
+            display: inline-block;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .children {
+            margin-left: 2rem;
+            padding-left: 1rem;
+            border-left: 2px dashed #ddd;
+            padding-top: 0.5rem;
+        }
+        
+        .collapsible {
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            outline: none;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .collapsible::after {
+            content: "⮟";
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .node-path {
+            color: var(--secondary-color);
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            word-break: break-all;
+        }
+        
+        .node-type {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        
+        .node-label {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .node-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            color: white;
+        }
+        
+        .badge-result {
+            background-color: var(--success-color);
+        }
+        
+        .badge-condition {
+            background-color: var(--info-color);
+        }
+        
+        .badge-missing {
+            background-color: var(--danger-color);
+        }
+        
+        .badge-unknown {
+            background-color: var(--warning-color);
+        }
+        
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive adjustments */
+        /*
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 1rem;
+            }
+            
+            .tree-container {
+                padding: 1rem;
+            }
+            
+            .children {
+                margin-left: 1rem;
+                padding-left: 0.5rem;
+            }
+        }
+        */
+        
+        .tree-container {
+            background-color: white;
+            border-radius: 0;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Decision Tree: islands\biome\test_sky</h1>
+            <div class="tree-path">Path: islands\biome\test_sky</div>
+        </header>
+        
+        <div class="tree-container">
+<div class="tree-node">
+<div class="node-content condition-node root-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: islands\biome\test_sky</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: ['`bigglobe:islands/is_floating` &&', 'y >= max(', 'world_traits.`bigglobe:approximate_surface_y`,', 'world_traits.`bigglobe:sea_level`', ') + 128']</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_hot</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:temperature_at_surface: 0.25 to 0.75 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/hot_test_light_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/hot_test_dense_forest</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_dense_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_dense_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_light_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_light_forest</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/hot_test_wasteland</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: `bigglobe:overworld/is_mesa`</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_wasteland</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_wasteland</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_cold</span>
+      <div class="node-type">Condition: script_chance <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script_chance</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cold_test_light_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cold_test_dense_forest</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_dense_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_dense_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_light_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_light_forest</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cold_test_wasteland</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: -0.375 to -0.625 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_wasteland</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_wasteland</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_magical</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:magicalness: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cherry_test_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cherry_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cherry_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cherry_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cherry_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_light_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_dense_forest</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_dense_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_dense_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_light_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_light_forest</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_wasteland</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: -0.375 to -0.625 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_wasteland</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_wasteland</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_shallow_ocean</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:exact_surface_y` < world_traits.`bigglobe:sea_level`</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/shallow_ocean_test_ocean</span>
+      <div class="node-type">Condition: script_chance <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script_chance</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/ocean_test_deep_ocean</span>
+      <div class="node-type">Condition: script_chance <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script_chance</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/deep_ocean</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:deep_ocean</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/ocean</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:ocean</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/shallow_ocean</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:shallow_ocean</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_beach</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:exact_surface_y: 8.0 to 4.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/beach_test_overgrown</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:exact_surface_y: 2.0 to 8.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/overgrown_beach</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:overgrown_beach</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/beach</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:beach</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_volcano</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: `bigglobe:islands/is_volcano`</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:islands/biome/volcano</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:volcano</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_hot</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:temperature_at_surface: 0.25 to 0.75 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/hot_test_light_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/hot_test_dense_forest</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_dense_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_dense_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_light_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_light_forest</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/hot_test_wasteland</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: `bigglobe:overworld/is_mesa`</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_wasteland</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_wasteland</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/hot_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:hot_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:islands/biome/test_cold</span>
+      <div class="node-type">Condition: script_chance <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script_chance</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cold_test_light_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cold_test_dense_forest</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_dense_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_dense_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_light_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_light_forest</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cold_test_wasteland</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: -0.375 to -0.625 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_wasteland</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_wasteland</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cold_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cold_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_magical</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:magicalness: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/cherry_test_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cherry_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cherry_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/cherry_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:cherry_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_light_forest</span>
+      <div class="node-type">Condition: script <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">script: world_traits.`bigglobe:foliage_at_surface` > 0.0I</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_dense_forest</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: 0.5 to 1.0 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_dense_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_dense_forest</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_light_forest</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_light_forest</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content condition-node">
+  <button class="collapsible">
+    <div>
+      <span class="node-path">Path: bigglobe:overworld/biome/temperate_test_wasteland</span>
+      <div class="node-type">Condition: world_trait_threshold <span class="node-badge badge-condition">Condition</span></div>
+      <div class="node-label">bigglobe:foliage_at_surface: -0.375 to -0.625 (smooth/smooth)</div>
+    </div>
+  </button>
+  <div class="content children">
+    <div class="edge-label">True</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_wasteland</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_wasteland</div>
+</div>
+</div>
+    <div class="edge-label">False</div>
+<div class="tree-node">
+<div class="node-content result-node">
+  <span class="node-path">Path: bigglobe:overworld/biome/temperate_plains</span>
+  <div class="node-type">Result: constant <span class="node-badge badge-result">Result</span></div>
+  <div class="node-label">bigglobe:temperate_plains</div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
+</div>
+
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Visualizer on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+    
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup all collapsible elements
+            var collapsibles = document.querySelectorAll('.collapsible');
+            
+            collapsibles.forEach(function(collapsible) {
+                collapsible.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent event bubbling to parent collapsibles
+                    
+                    this.classList.toggle('collapsed');
+                    var content = this.nextElementSibling;
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        // Calculate proper height including nested content
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        
+                        // Adjust parent containers if this is a nested collapsible
+                        let parent = content.parentElement.closest('.content');
+                        while (parent) {
+                            parent.style.maxHeight = parseInt(parent.style.maxHeight || 0) + content.scrollHeight + "px";
+                            parent = parent.parentElement.closest('.content');
+                        }
+                    }
+                });
+                
+                // Open all root nodes by default
+                if (collapsible.closest('.root-node')) {
+                    setTimeout(function() {
+                        collapsible.click();
+                    }, 100);
+                }
+            });
+            
+            // Expand all nodes function
+            window.expandAll = function() {
+                collapsibles.forEach(function(collapsible) {
+                    if (!collapsible.classList.contains('active')) {
+                        collapsible.click();
+                    }
+                });
+            };
+            
+            // Collapse all nodes function
+            window.collapseAll = function() {
+                collapsibles.forEach(function(collapsible) {
+                    if (collapsible.classList.contains('active')) {
+                        collapsible.click();
+                    }
+                });
+            };
+        });
+    </script>
+</body>
+</html>

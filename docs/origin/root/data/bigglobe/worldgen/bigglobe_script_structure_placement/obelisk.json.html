@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer - obelisk.json</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --code-background: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1.5rem;
+            margin: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--file-color) 0%, var(--file-hover) 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        header h1 .file-icon {
+            margin-right: 0.8rem;
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .code-container {
+            background-color: var(--code-background);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            flex: 1;
+            position: relative;
+        }
+        
+        pre {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+        
+        code {
+            white-space: pre;
+            display: block;
+        }
+        
+        .actions {
+            position: sticky;
+            top: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button:hover {
+            background-color: #395885;
+        }
+        
+        .action-icon {
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code file-icon"></i> obelisk.json</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\worldgen\bigglobe_script_structure_placement</a> <span>obelisk.json</span>
+        </div>
+        
+        <div class="code-container">
+            <div class="actions">
+                <button onclick="copyToClipboard()" class="action-button">
+                    <i class="fas fa-copy action-icon"></i> Copy
+                </button>
+            </div>
+            <pre><code class="language-json">{
+  &quot;raw_placement&quot;: [
+    &quot;int*(&quot;,
+    &quot;startY   = data.startY&quot;,
+    &quot;mode     = data.mode&quot;,
+    &quot;iterMinX = max(minX,   chunkMinX)&quot;,
+    &quot;iterMinY = max(startY, chunkMinY)&quot;,
+    &quot;iterMinZ = max(minZ,   chunkMinZ)&quot;,
+    &quot;iterMaxX = min(maxX,   chunkMaxX)&quot;,
+    &quot;iterMaxY = min(maxY,   chunkMaxY)&quot;,
+    &quot;iterMaxZ = min(maxZ,   chunkMaxZ)&quot;,
+    &quot;)&quot;,
+    &quot;double structureRadius = maxX - midX&quot;,
+    &quot;BlockState filler = data.filler.asString().as(BlockState)&quot;,
+    &quot;BlockState accent = data.accent.asString().as(BlockState)&quot;,
+    &quot;NbtList sides = NbtList(data.sides)&quot;,
+    &quot;NumberArray noiseSamples = newFloatArray(iterMaxY - iterMinY + 1)&quot;,
+    &quot;long cloudSeed = worldSeed # 16x457CEC37ECB9EC5EUL&quot;,
+    &quot;int cloudColorOffset = cloudSeed.newSeed(0).nextInt(12)&quot;,
+    &quot;int cloudPositionOffset = cloudSeed.newSeed(1).nextInt()&quot;,
+    &quot;for positionLoop (&quot;,
+    &quot;int z in range[iterMinZ, iterMaxZ],&quot;,
+    &quot;int x in range[iterMinX, iterMaxX]&quot;,
+    &quot;:&quot;,
+    &quot;long xzSeed = cloudSeed.newSeed(x, z)&quot;,
+    &quot;double horizontalDistance = sqrt((x - midX) ^ 2 + (z - midZ) ^ 2)&quot;,
+    &quot;float horizontalFraction = 0.0I&quot;,
+    &quot;float relativeX = x - midX&quot;,
+    &quot;float relativeZ = z - midZ&quot;,
+    &quot;for (NbtCompound side in sides:&quot;,
+    &quot;float sideX = side.x&quot;,
+    &quot;float sideZ = side.z&quot;,
+    &quot;float dot = relativeX * sideX + relativeZ * sideZ&quot;,
+    &quot;float div = sideX ^ 2 + sideZ ^ 2&quot;,
+    &quot;dot /= div&quot;,
+    &quot;if (dot &gt; 1.015625I: continue(positionLoop))&quot;,
+    &quot;horizontalFraction = max(horizontalFraction, dot)&quot;,
+    &quot;)&quot;,
+    &quot;long columnSeed = (worldSeed # 16x4C0FAE6F7D5286A4UL).newSeed(x, z)&quot;,
+    &quot;Grid3D(&#39;bigglobe:obelisk_noise&#39;).getValuesY(worldSeed # 16x47585410AEDBABCAUL, x, iterMinY, z, noiseSamples)&quot;,
+    &quot;for (int y in range[iterMinY, iterMaxY]:&quot;,
+    &quot;float bottomFraction = float(unmixLinear(double(startY), double(startY + 16), double(y)))&quot;,
+    &quot;float verticalFraction = switch (mode:&quot;,
+    &quot;case (0:&quot;,
+    &quot;float topFraction = float(unmixLinear(double(maxY - 96), double(maxY), double(y)))&quot;,
+    &quot;max(horizontalFraction, topFraction * 1.015625I)&quot;,
+    &quot;)&quot;,
+    &quot;case (1:&quot;,
+    &quot;float topFraction = float(unmixLinear(double(startY + 16), double(maxY), double(y)))&quot;,
+    &quot;horizontalFraction + max(topFraction, 0.0I) ^ 2 * 1.015625I&quot;,
+    &quot;)&quot;,
+    &quot;case (2:&quot;,
+    &quot;float topFraction = float(unmixLinear(double(maxY - 128), double(maxY), double(y)))&quot;,
+    &quot;horizontalFraction + max(topFraction * 1.015625I, 0.0)&quot;,
+    &quot;)&quot;,
+    &quot;default (&quot;,
+    &quot;horizontalFraction&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;if (verticalFraction &lt; 0.875I &amp;&amp; y &gt;= startY + 32:&quot;,
+    &quot;double index = (y - (startY + 32)) / 8.0L&quot;,
+    &quot;int intIndex = int(index)&quot;,
+    &quot;if (intIndex &lt; 12:&quot;,
+    &quot;double torusRadius = ((reverseBits(cloudPositionOffset + intIndex) &gt;&gt;&gt; 16) / 524288.0L + 0.0625L) * structureRadius&quot;,
+    &quot;double torusDistance = 0.125L * (horizontalDistance - torusRadius) ^ 2 + 8.0L * (index - intIndex - 0.5L) ^ 2&quot;,
+    &quot;if (torusDistance &lt; 1.0L:&quot;,
+    &quot;setBlockState(x, y, z,&quot;,
+    &quot;xzSeed.newSeed(y).nextInt(32) != 0&quot;,
+    &quot;? &#39;bigglobe:cloud&#39;&quot;,
+    &quot;: switch ((intIndex + cloudColorOffset) % 12:&quot;,
+    &quot;case ( 0: &#39;bigglobe:red_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 1: &#39;bigglobe:orange_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 2: &#39;bigglobe:yellow_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 3: &#39;bigglobe:yellow_green_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 4: &#39;bigglobe:green_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 5: &#39;bigglobe:cyan_green_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 6: &#39;bigglobe:cyan_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 7: &#39;bigglobe:cyan_blue_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 8: &#39;bigglobe:blue_aura_infused_cloud&#39;)&quot;,
+    &quot;case ( 9: &#39;bigglobe:purple_aura_infused_cloud&#39;)&quot;,
+    &quot;case (10: &#39;bigglobe:magenta_aura_infused_cloud&#39;)&quot;,
+    &quot;case (11: &#39;bigglobe:magenta_red_aura_infused_cloud&#39;)&quot;,
+    &quot;default (&#39;bigglobe:cloud&#39;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;else (&quot;,
+    &quot;float noise = noiseSamples.(y - iterMinY).as(float) * smooth(bottomFraction - 1.0I) * 0.015625I&quot;,
+    &quot;if (verticalFraction - noise &lt; 1.0I &amp;&amp; columnSeed.newSeed(y).nextBoolean(smooth(bottomFraction)):&quot;,
+    &quot;setBlockState(x, y, z, filler)&quot;,
+    &quot;)&quot;,
+    &quot;else if (verticalFraction + noise + 0.0625I &lt; 1.0I &amp;&amp; bottomFraction &gt; 1.0I:&quot;,
+    &quot;setBlockState(x, y, z, accent)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;,
+    &quot;)&quot;
+  ],
+  &quot;placement&quot;: &quot;noop&quot;
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder</p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.querySelector('code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const button = document.querySelector('.action-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check action-icon"></i> Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

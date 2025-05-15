@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Files - Root - biome</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #8aa9d6;
+            --accent-color: #ffb200;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --folder-color: #ff9800;
+            --folder-hover: #f57c00;
+            --file-color: #9c27b0;
+            --file-hover: #7b1fa2;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+                        font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+        
+        header {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .breadcrumb {
+            background-color: white;
+            padding: 1rem;
+            margin-bottom: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .breadcrumb a {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            background-color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb span {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            background-color: var(--file-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-item:hover {
+            background-color: var(--file-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .folder-item {
+            background-color: var(--folder-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .folder-item:hover {
+            background-color: var(--folder-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .file-icon, .folder-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            margin-top: 0;
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-message {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            font-style: italic;
+            color: #6c757d;
+            text-align: center;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JSON Files in biome</h1>
+        </header>
+        
+        <div class="breadcrumb">
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <span>data\bigglobe\worldgen\biome</span>
+        </div>
+        
+        <div class="card">
+
+            <h2><i class="fas fa-file-code"></i> JSON Files</h2>
+            <div class="file-grid">
+
+                <a href="ashen_wastes.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ashen_wastes.json
+                </a>
+
+                <a href="beach.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    beach.json
+                </a>
+
+                <a href="cherry_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cherry_forest.json
+                </a>
+
+                <a href="cherry_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cherry_plains.json
+                </a>
+
+                <a href="chorus_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    chorus_forest.json
+                </a>
+
+                <a href="cold_dense_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cold_dense_forest.json
+                </a>
+
+                <a href="cold_light_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cold_light_forest.json
+                </a>
+
+                <a href="cold_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cold_plains.json
+                </a>
+
+                <a href="cold_wasteland.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    cold_wasteland.json
+                </a>
+
+                <a href="crimson_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    crimson_forest.json
+                </a>
+
+                <a href="deep_dark.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    deep_dark.json
+                </a>
+
+                <a href="deep_ocean.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    deep_ocean.json
+                </a>
+
+                <a href="dripping_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    dripping_cave.json
+                </a>
+
+                <a href="end_barrens.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    end_barrens.json
+                </a>
+
+                <a href="end_mountain.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    end_mountain.json
+                </a>
+
+                <a href="end_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    end_plains.json
+                </a>
+
+                <a href="frozen_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    frozen_cave.json
+                </a>
+
+                <a href="generic_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    generic_cave.json
+                </a>
+
+                <a href="glacier.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    glacier.json
+                </a>
+
+                <a href="hot_dense_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    hot_dense_forest.json
+                </a>
+
+                <a href="hot_light_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    hot_light_forest.json
+                </a>
+
+                <a href="hot_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    hot_plains.json
+                </a>
+
+                <a href="hot_wasteland.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    hot_wasteland.json
+                </a>
+
+                <a href="hyperspace.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    hyperspace.json
+                </a>
+
+                <a href="inferno.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    inferno.json
+                </a>
+
+                <a href="lush_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    lush_cave.json
+                </a>
+
+                <a href="molten_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    molten_cave.json
+                </a>
+
+                <a href="mushroom_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    mushroom_cave.json
+                </a>
+
+                <a href="nether_wastes.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    nether_wastes.json
+                </a>
+
+                <a href="ocean.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    ocean.json
+                </a>
+
+                <a href="overgrown_beach.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    overgrown_beach.json
+                </a>
+
+                <a href="overgrown_end.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    overgrown_end.json
+                </a>
+
+                <a href="river.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    river.json
+                </a>
+
+                <a href="sandy_cave.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    sandy_cave.json
+                </a>
+
+                <a href="shallow_ocean.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    shallow_ocean.json
+                </a>
+
+                <a href="swamp_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    swamp_forest.json
+                </a>
+
+                <a href="swamp_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    swamp_plains.json
+                </a>
+
+                <a href="swamp_wasteland.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    swamp_wasteland.json
+                </a>
+
+                <a href="temperate_dense_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    temperate_dense_forest.json
+                </a>
+
+                <a href="temperate_light_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    temperate_light_forest.json
+                </a>
+
+                <a href="temperate_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    temperate_plains.json
+                </a>
+
+                <a href="temperate_wasteland.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    temperate_wasteland.json
+                </a>
+
+                <a href="the_core.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    the_core.json
+                </a>
+
+                <a href="the_void.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    the_void.json
+                </a>
+
+                <a href="valley_of_souls.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    valley_of_souls.json
+                </a>
+
+                <a href="volcano.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    volcano.json
+                </a>
+
+                <a href="warm_dense_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    warm_dense_forest.json
+                </a>
+
+                <a href="warm_light_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    warm_light_forest.json
+                </a>
+
+                <a href="warm_plains.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    warm_plains.json
+                </a>
+
+                <a href="warm_wasteland.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    warm_wasteland.json
+                </a>
+
+                <a href="warped_forest.json.html" class="file-item">
+                    <i class="fas fa-file-code file-icon"></i>
+                    warped_forest.json
+                </a>
+
+            </div>
+
+        </div>
+        
+        <footer>
+            <p>Generated by BigGlobe Decision Tree Documentation Builder on 2025-05-16 06:34</p>
+        </footer>
+    </div>
+</body>
+</html>

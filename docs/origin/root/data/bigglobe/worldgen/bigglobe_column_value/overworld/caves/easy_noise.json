@@ -1,0 +1,42 @@
+{
+	"type": "bigglobe:script",
+	"params": {
+		"type": "float",
+		"is_3d": true
+	},
+	"script": [
+		"float curve(float*(valueSquared, width):",
+			"float curve = valueSquared / (valueSquared + width ^ 2)",
+			"float edgeExclusion = unmixLinear(",
+				"`bigglobe:overworld/cave_system_size` - width * 2.0I,",
+				"float(`bigglobe:overworld/cave_system_size`),",
+				"float(soft_distance) * float(`bigglobe:overworld/cave_system_size`)",
+			")",
+			"if (edgeExclusion > 0.0I: curve += edgeExclusion ^ 2)",
+			"float bottomExclusion = float(unmixLinear(",
+				"world_traits.`bigglobe:approximate_surface_y` - depth + width,",
+				"world_traits.`bigglobe:approximate_surface_y` - depth,",
+				"y",
+			"))",
+			"if (bottomExclusion > 0.0I: curve += bottomExclusion ^ 2)",
+			"if (`bigglobe:overworld/beach_cave_exclusion` > 0.0I:",
+				"float topExclusion = float(unmixLinear(",
+					"world_traits.`bigglobe:exact_surface_y` - width * 2.0L,",
+					"world_traits.`bigglobe:exact_surface_y`,",
+					"y",
+				"))",
+				"if (topExclusion > 0.0I: curve += topExclusion ^ 2 * `bigglobe:overworld/beach_cave_exclusion`)",
+			")",
+			"return(curve)",
+		")",
+		"return(",
+			"curve(biased_primary_noise, easy_width)",
+			"* curve(biased_secondary_noise, 8.0I)",
+			"+ ledge_noise",
+		")"
+	],
+	"valid": {
+		"min_y": "world_traits.`bigglobe:cave_min_y`",
+		"max_y": "world_traits.`bigglobe:cave_max_y`"
+	}
+}

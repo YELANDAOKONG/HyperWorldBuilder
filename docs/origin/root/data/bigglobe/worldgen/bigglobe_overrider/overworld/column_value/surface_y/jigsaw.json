@@ -1,0 +1,32 @@
+{
+	"type": "column_value",
+	"script": {
+		"source": [
+			"for (StructureStart start in structures:",
+				"if (start.structure.type ==. 'minecraft:jigsaw' && start.structure.generationStep == 'surface_structures' && start.structure.terrainAdaptation != 'none':",
+					"for (StructurePiece piece in start.pieces:",
+						"if (piece.hasPreferredTerrainHeight:",
+							"int diameter = max(piece.sizeX, piece.sizeZ)",
+							"double radius = diameter * 0.5L",
+							"double distance = distanceToCircle(piece, radius)",
+							"double mixLevel = smooth(distance / clamp(4.0L, 16.0L, radius))",
+							"double newY = piece.preferredTerrainHeight - 0.5L",
+							"setSurfaceY(newY, mixLevel, setSnow)",
+						")",
+						"else (",
+							"double distance = distanceToSquare(piece)",
+							"double mixLevel = smooth(distance * 0.125L)",
+							"setSnowY(world_traits.`bigglobe:automatic_exact_surface_y`(piece.minY) - 1.0L, mixLevel)",
+						")",
+						"if (double*(distance := distanceToSquare(piece)) < 16.0L:",
+							"setSurfaceFoliage(piece.minY, smooth(distance * 0.0625L))",
+						")",
+					")",
+				")",
+			")"
+		],
+		"includes": [
+			"bigglobe:include/surface_manipulation"
+		]
+	}
+}

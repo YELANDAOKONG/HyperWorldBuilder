@@ -40,6 +40,9 @@ def build_debug(args: List[str]) -> int:
     builder.delete_structure("obelisk")
     builder.delete_structure("abandonedcity")
 
+    add_crop_generation(builder, output_path)
+    add_berry_generation(builder, output_path)
+
     sources_decision_tree_dir = path.join(import_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree")
     all_decision_tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree")
     tree_dir = path.join(output_path, "data", "bigglobe", "worldgen", "bigglobe_decision_tree", "overworld")

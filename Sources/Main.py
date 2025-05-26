@@ -21,6 +21,8 @@ def build_main(args: List[str]) -> int:
     # data = builder.map_decision_tree(os.path.join(os.path.dirname(__file__), "..", "Imports", "BigGlobe", "data", "bigglobe", "worldgen", "bigglobe_decision_tree"),  "bigglobe:overworld/biome/test_cave")
     # print(json.dumps(data, indent=4))
 
+    add_crop_generation(builder, output_path)
+
     builder.pack_zip(output_file, delete_exists=True)
     return 0
 
@@ -479,7 +481,7 @@ def add_crop_generation(builder, output_path):
     tags_dir = os.path.join(output_path, "data", "bigglobe", "tags", "worldgen", "configured_feature", "overworld")
     os.makedirs(tags_dir, exist_ok=True)
 
-    # Extended crops configuration based on your existing crops.json pattern
+    # Extended crops configuration with adjusted weights
     extended_crops = {
         "type": "bigglobe:flower",
         "config": {
@@ -548,42 +550,51 @@ def add_crop_generation(builder, output_path):
                     }
                 },
                 "variations": [
-                    {"weight": 20.0, "state": "minecraft:wheat"},
-                    {"weight": 10.0, "state": "minecraft:carrots"},
-                    {"weight": 10.0, "state": "minecraft:potatoes"},
-                    {"weight": 5.0, "state": "minecraft:beetroots"},
-                    {"weight": 3.0, "state": "farmersdelight:cabbages"},
-                    {"weight": 3.0, "state": "farmersdelight:tomatoes"},
-                    {"weight": 2.0, "state": "farm_and_charm:tomato_crop_body"},
-                    {"weight": 2.0, "state": "farm_and_charm:lettuce_crop"},
-                    {"weight": 2.0, "state": "farm_and_charm:oat_crop"},
-                    {"weight": 2.0, "state": "farm_and_charm:barley_crop"},
-                    {"weight": 1.0, "state": "culturaldelights:cucumbers"},
-                    {"weight": 1.0, "state": "culturaldelights:eggplants"},
-                    {"weight": 1.0, "state": "culturaldelights:corn_upper"},
-                    {"weight": 1.0, "state": "culturaldelights:wild_cucumbers"},
-                    {"weight": 1.0, "state": "culturaldelights:wild_corn"},
-                    {"weight": 1.0, "state": "culturaldelights:wild_eggplants"},
-                    {"weight": 1.0, "state": "farm_and_charm:corn_crop"},
-                    {"weight": 1.0, "state": "farm_and_charm:wild_ribwort"},
-                    {"weight": 1.0, "state": "farm_and_charm:wild_nettle"},
-                    {"weight": 1.0, "state": "farm_and_charm:wild_emmer"},
-                    {"weight": 1.0, "state": "farm_and_charm:wild_corn[half=lower]"},
-                    {"weight": 1.0, "state": "expandeddelight:sweet_potatoes_crop"},
-                    {"weight": 1.0, "state": "expandeddelight:peanut_crop"},
-                    {"weight": 1.0, "state": "brewery:hops_crop"},
-                    {"weight": 1.0, "state": "supplementaries:flax"},
-                    {"weight": 1.0, "state": "snowyspirit:wild_ginger"},
-                    {"weight": 1.0, "state": "expandeddelight:asparagus_crop"},
-                    {"weight": 1.0, "state": "expandeddelight:chili_pepper_crop"},
-                    {"weight": 0.5, "state": "minecraft:pumpkin_stem"},
-                    {"weight": 0.5, "state": "minecraft:melon_stem"},
+                    # Common staple crops - higher weights
+                    {"weight": 25.0, "state": "minecraft:wheat"},
+                    {"weight": 15.0, "state": "minecraft:carrots"},
+                    {"weight": 15.0, "state": "minecraft:potatoes"},
+                    {"weight": 8.0, "state": "minecraft:beetroots"},
+
+                    # Moderate frequency crops
+                    {"weight": 6.0, "state": "farmersdelight:cabbages"},
+                    {"weight": 6.0, "state": "farmersdelight:tomatoes"},
+                    {"weight": 5.0, "state": "farm_and_charm:tomato_crop_body"},
+                    {"weight": 5.0, "state": "farm_and_charm:lettuce_crop"},
+                    {"weight": 5.0, "state": "farm_and_charm:oat_crop"},
+                    {"weight": 5.0, "state": "farm_and_charm:barley_crop"},
+                    {"weight": 4.0, "state": "farm_and_charm:corn_crop"},
+                    {"weight": 4.0, "state": "culturaldelights:corn_upper"},
+
+                    # Less common crops
+                    {"weight": 3.0, "state": "culturaldelights:cucumbers"},
+                    {"weight": 3.0, "state": "culturaldelights:eggplants"},
+                    {"weight": 3.0, "state": "expandeddelight:asparagus_crop"},
+                    {"weight": 3.0, "state": "expandeddelight:chili_pepper_crop"},
+                    {"weight": 3.0, "state": "expandeddelight:sweet_potatoes_crop"},
+                    {"weight": 3.0, "state": "expandeddelight:peanut_crop"},
+                    {"weight": 3.0, "state": "brewery:hops_crop"},
+                    {"weight": 3.0, "state": "supplementaries:flax"},
+
+                    # Rarer crops
+                    {"weight": 2.0, "state": "minecraft:pumpkin_stem"},
+                    {"weight": 2.0, "state": "minecraft:melon_stem"},
+
+                    # Wild variants - very rare in cultivated patches
+                    {"weight": 0.5, "state": "culturaldelights:wild_cucumbers"},
+                    {"weight": 0.5, "state": "culturaldelights:wild_corn"},
+                    {"weight": 0.5, "state": "culturaldelights:wild_eggplants"},
+                    {"weight": 0.5, "state": "farm_and_charm:wild_ribwort"},
+                    {"weight": 0.5, "state": "farm_and_charm:wild_nettle"},
+                    {"weight": 0.5, "state": "farm_and_charm:wild_emmer"},
+                    {"weight": 0.5, "state": "farm_and_charm:wild_corn[half=lower]"},
+                    {"weight": 0.5, "state": "snowyspirit:wild_ginger"}
                 ]
             }
         }
     }
 
-    # Wild crops configuration - simpler approach
+    # Wild crops with more realistic distribution
     wild_crops = {
         "type": "bigglobe:flower",
         "config": {
@@ -628,13 +639,102 @@ def add_crop_generation(builder, output_path):
                     }
                 },
                 "variations": [
-                    {"weight": 10.0, "state": "farmersdelight:wild_cabbages"},
-                    {"weight": 10.0, "state": "farmersdelight:wild_onions"},
-                    {"weight": 10.0, "state": "farmersdelight:wild_tomatoes"},
-                    {"weight": 10.0, "state": "farmersdelight:wild_carrots"},
-                    {"weight": 10.0, "state": "farmersdelight:wild_potatoes"},
-                    {"weight": 10.0, "state": "farmersdelight:wild_beetroots"},
-                    {"weight": 5.0, "state": "farmersdelight:wild_rice"}
+                    {"weight": 12.0, "state": "farmersdelight:wild_cabbages"},
+                    {"weight": 12.0, "state": "farmersdelight:wild_onions"},
+                    {"weight": 12.0, "state": "farmersdelight:wild_tomatoes"},
+                    {"weight": 12.0, "state": "farmersdelight:wild_carrots"},
+                    {"weight": 12.0, "state": "farmersdelight:wild_potatoes"},
+                    {"weight": 12.0, "state": "farmersdelight:wild_beetroots"},
+                    {"weight": 8.0, "state": "farmersdelight:wild_rice"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_corn"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_barley"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_oat"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_carrots"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_beetroots"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_potatoes"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_tomatoes"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_lettuce"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_onions"},
+                    {"weight": 8.0, "state": "farm_and_charm:wild_strawberries"},
+                    {"weight": 6.0, "state": "culturaldelights:wild_cucumbers"},
+                    {"weight": 6.0, "state": "culturaldelights:wild_corn"},
+                    {"weight": 6.0, "state": "culturaldelights:wild_eggplants"},
+                    {"weight": 6.0, "state": "expandeddelight:wild_asparagus"},
+                    {"weight": 6.0, "state": "expandeddelight:wild_sweet_potatoes"},
+                    {"weight": 6.0, "state": "expandeddelight:wild_chili_pepper"},
+                    {"weight": 6.0, "state": "expandeddelight:wild_peanuts"},
+                    {"weight": 4.0, "state": "farm_and_charm:wild_ribwort"},
+                    {"weight": 4.0, "state": "farm_and_charm:wild_nettle"},
+                    {"weight": 4.0, "state": "farm_and_charm:wild_emmer"},
+                    {"weight": 4.0, "state": "snowyspirit:wild_ginger"}
+                ]
+            }
+        }
+    }
+
+    # Special rice paddy feature (in shallow water)
+    rice_paddies = {
+        "type": "bigglobe:flower",
+        "config": {
+            "seed": "rice_paddies",
+            "distance": 96,
+            "variation": 64,
+            "spawn_chance": 0.08,
+            "randomize_chance": 0.1,
+            "randomize_radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+            "noise": {
+                "type": "abs",
+                "grid": {
+                    "type": "sum",
+                    "layers": [
+                        {"type": "smooth", "scale": 32, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 16, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 8, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 4, "amplitude": 0.25}
+                    ]
+                }
+            },
+            "entries": {
+                "defaults": {
+                    "radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+                    "restrictions": {
+                        "type": "and",
+                        "restrictions": [
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/foliage",
+                                "min": 0.2,
+                                "max": 0.6
+                            },
+                            {
+                                "type": "range",
+                                "property": "bigglobe:overworld/temperature",
+                                "min": 0.0,
+                                "mid": 0.3,
+                                "max": 0.6
+                            },
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/hilliness",
+                                "min": 0.0,
+                                "max": 0.3,
+                                "smooth_max": False
+                            }
+                        ]
+                    },
+                    "under": {
+                        "place": "minecraft:water",
+                        "replace": [
+                            "minecraft:dirt",
+                            "minecraft:coarse_dirt",
+                            "minecraft:grass_block",
+                            "minecraft:podzol",
+                            "bigglobe:overgrown_podzol"
+                        ]
+                    }
+                },
+                "variations": [
+                    {"weight": 100.0, "state": "farmersdelight:rice"}
                 ]
             }
         }
@@ -643,13 +743,15 @@ def add_crop_generation(builder, output_path):
     # Write the configurations
     builder.write_raw(os.path.join(crops_dir, "extended_crops.json"), extended_crops)
     builder.write_raw(os.path.join(crops_dir, "wild_crops.json"), wild_crops)
+    builder.write_raw(os.path.join(crops_dir, "rice_paddies.json"), rice_paddies)
 
-    # Update surface flowers tag conservatively
+    # Update surface flowers tag
     surface_flowers_tag = {
         "replace": False,
         "values": [
             "bigglobe:overworld/crops/extended_crops",
-            "bigglobe:overworld/crops/wild_crops"
+            "bigglobe:overworld/crops/wild_crops",
+            "bigglobe:overworld/crops/rice_paddies"
         ]
     }
 

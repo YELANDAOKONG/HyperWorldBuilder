@@ -22,6 +22,7 @@ def build_main(args: List[str]) -> int:
     # print(json.dumps(data, indent=4))
 
     add_crop_generation(builder, output_path)
+    add_berry_generation(builder, output_path)
 
     builder.pack_zip(output_file, delete_exists=True)
     return 0
@@ -767,6 +768,199 @@ def add_crop_generation(builder, output_path):
             pass
 
     builder.write_raw(tag_file_path, surface_flowers_tag)
+
+def add_berry_generation(builder, output_path):
+    # Create necessary directories
+    configured_feature = os.path.join(output_path, "data", "bigglobe", "worldgen", "configured_feature")
+    configured_feature_overworld = os.path.join(configured_feature, "overworld")
+    berries_dir = os.path.join(configured_feature_overworld, "berries")
+    os.makedirs(berries_dir, exist_ok=True)
+
+    tags_dir = os.path.join(output_path, "data", "bigglobe", "tags", "worldgen", "configured_feature", "overworld")
+    os.makedirs(tags_dir, exist_ok=True)
+
+    # Create berry bushes configuration with all moreberries variants
+    moreberries_bushes = {
+        "type": "bigglobe:flower",
+        "config": {
+            "seed": "moreberries_bushes",
+            "distance": 64,
+            "variation": 64,
+            "spawn_chance": 0.125,
+            "randomize_chance": 0.125,
+            "randomize_radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+            "noise": {
+                "type": "abs",
+                "grid": {
+                    "type": "sum",
+                    "layers": [
+                        {"type": "smooth", "scale": 32, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 16, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 8, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 4, "amplitude": 0.25}
+                    ]
+                }
+            },
+            "entries": {
+                "defaults": {
+                    "radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+                    "restrictions": {
+                        "type": "and",
+                        "restrictions": [
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/foliage",
+                                "min": 0.0,
+                                "max": 0.5
+                            },
+                            {
+                                "type": "range",
+                                "property": "bigglobe:overworld/temperature",
+                                "min": -0.5,
+                                "mid": 0.0,
+                                "max": 0.5
+                            }
+                        ]
+                    }
+                },
+                "variations": [
+                    {"weight": 10.0, "state": "minecraft:sweet_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:blue_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:yellow_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:orange_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:purple_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:green_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:black_berry_bush"}
+                ]
+            }
+        }
+    }
+
+    # Climate-specific berry variations
+    cold_berries = {
+        "type": "bigglobe:flower",
+        "config": {
+            "seed": "cold_berries",
+            "distance": 64,
+            "variation": 64,
+            "spawn_chance": 0.1,
+            "randomize_chance": 0.125,
+            "randomize_radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+            "noise": {
+                "type": "abs",
+                "grid": {
+                    "type": "sum",
+                    "layers": [
+                        {"type": "smooth", "scale": 32, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 16, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 8, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 4, "amplitude": 0.25}
+                    ]
+                }
+            },
+            "entries": {
+                "radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+                "restrictions": {
+                    "type": "and",
+                    "restrictions": [
+                        {
+                            "type": "threshold",
+                            "property": "bigglobe:overworld/foliage",
+                            "min": 0.0,
+                            "max": 0.5
+                        },
+                        {
+                            "type": "threshold",
+                            "property": "bigglobe:overworld/temperature",
+                            "min": -0.8,
+                            "max": -0.3
+                        }
+                    ]
+                },
+                "weight": 10.0,
+                "state": "moreberries:blue_berry_bush"
+            }
+        }
+    }
+
+    warm_berries = {
+        "type": "bigglobe:flower",
+        "config": {
+            "seed": "warm_berries",
+            "distance": 64,
+            "variation": 64,
+            "spawn_chance": 0.1,
+            "randomize_chance": 0.125,
+            "randomize_radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+            "noise": {
+                "type": "abs",
+                "grid": {
+                    "type": "sum",
+                    "layers": [
+                        {"type": "smooth", "scale": 32, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 16, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 8, "amplitude": 0.25},
+                        {"type": "smooth", "scale": 4, "amplitude": 0.25}
+                    ]
+                }
+            },
+            "entries": {
+                "defaults": {
+                    "radius": {"type": "uniform", "min": 16.0, "max": 32.0},
+                    "restrictions": {
+                        "type": "and",
+                        "restrictions": [
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/foliage",
+                                "min": 0.0,
+                                "max": 0.5
+                            },
+                            {
+                                "type": "threshold",
+                                "property": "bigglobe:overworld/temperature",
+                                "min": 0.3,
+                                "max": 0.8
+                            }
+                        ]
+                    }
+                },
+                "variations": [
+                    {"weight": 10.0, "state": "moreberries:orange_berry_bush"},
+                    {"weight": 8.0, "state": "moreberries:yellow_berry_bush"}
+                ]
+            }
+        }
+    }
+
+    # Write the configurations
+    builder.write_raw(os.path.join(berries_dir, "moreberries_bushes.json"), moreberries_bushes)
+    builder.write_raw(os.path.join(berries_dir, "cold_berries.json"), cold_berries)
+    builder.write_raw(os.path.join(berries_dir, "warm_berries.json"), warm_berries)
+
+    # Update surface flowers tag
+    surface_flowers_tag = {
+        "replace": False,
+        "values": [
+            "bigglobe:overworld/berries/moreberries_bushes",
+            "bigglobe:overworld/berries/cold_berries",
+            "bigglobe:overworld/berries/warm_berries"
+        ]
+    }
+
+    tag_file_path = os.path.join(tags_dir, "surface_flowers.json")
+    if os.path.exists(tag_file_path):
+        try:
+            with open(tag_file_path, 'r') as f:
+                existing_tag = json.load(f)
+                if "values" in existing_tag:
+                    existing_tag["values"].extend(surface_flowers_tag["values"])
+                    surface_flowers_tag = existing_tag
+        except:
+            pass
+
+    builder.write_raw(tag_file_path, surface_flowers_tag)
+
 
 # --------------------------- &END 辅助方法区域 ---------------------------
 

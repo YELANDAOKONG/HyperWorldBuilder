@@ -36,7 +36,8 @@ class Builder:
 
     version = "5.0.2"  # Big Globe Version
     version_pack_format = 15  # Minecraft Data Pack Format
-    version_pack_description = "&6Hyper World &aCompatibility &bPack"
+    # version_pack_description = "&6Hyper World &aCompatibility &bPack"
+    version_pack_description = "&6System &aCompatibility &bData Pack"
 
     def __init__(self, output_path):
         self.path = output_path

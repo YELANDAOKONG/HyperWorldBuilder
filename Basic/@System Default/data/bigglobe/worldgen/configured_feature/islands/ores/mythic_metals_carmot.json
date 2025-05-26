@@ -1,0 +1,25 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_carmot",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:carmot_ore",
+            "minecraft:cobblestone": "mythicmetals:carmot_ore",
+            "minecraft:andesite": "mythicmetals:carmot_ore",
+            "minecraft:polished_andesite": "mythicmetals:carmot_ore",
+            "minecraft:diorite": "mythicmetals:carmot_ore",
+            "minecraft:polished_diorite": "mythicmetals:carmot_ore",
+            "minecraft:granite": "mythicmetals:carmot_ore",
+            "minecraft:polished_granite": "mythicmetals:carmot_ore",
+            "minecraft:cobbled_deepslate": "mythicmetals:deepslate_carmot_ore",
+            "minecraft:deepslate": "mythicmetals:deepslate_carmot_ore"
+        },
+        "chance": " ((y > -500) && (y < -400)) || (y < -850) ? 0.35 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 2,
+            "average": 1.5
+        }
+    }
+}

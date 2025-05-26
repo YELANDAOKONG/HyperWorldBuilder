@@ -1,0 +1,24 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_prometheum",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:prometheum_ore",
+            "minecraft:cobblestone": "mythicmetals:prometheum_ore",
+            "minecraft:andesite": "mythicmetals:prometheum_ore",
+            "minecraft:polished_andesite": "mythicmetals:prometheum_ore",
+            "minecraft:diorite": "mythicmetals:prometheum_ore",
+            "minecraft:polished_diorite": "mythicmetals:prometheum_ore",
+            "minecraft:granite": "mythicmetals:prometheum_ore",
+            "minecraft:polished_granite": "mythicmetals:prometheum_ore",
+            "minecraft:deepslate": "mythicmetals:deepslate_prometheum_ore"
+        },
+        "chance": "`bigglobe:overworld/biome`.isIn('#bigglobe:overworld/prometheum_biomes') ? 0.2 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1.5,
+            "max": 6,
+            "average": 3
+        }
+    }
+}

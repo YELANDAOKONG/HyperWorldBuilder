@@ -1,0 +1,25 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_mythril",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:mythril_ore",
+            "minecraft:cobblestone": "mythicmetals:mythril_ore",
+            "minecraft:andesite": "mythicmetals:mythril_ore",
+            "minecraft:polished_andesite": "mythicmetals:mythril_ore",
+            "minecraft:diorite": "mythicmetals:mythril_ore",
+            "minecraft:polished_diorite": "mythicmetals:mythril_ore",
+            "minecraft:granite": "mythicmetals:mythril_ore",
+            "minecraft:polished_granite": "mythicmetals:mythril_ore",
+            "minecraft:cobbled_deepslate": "mythicmetals:deepslate_mythril_ore",
+            "minecraft:deepslate": "mythicmetals:deepslate_mythril_ore"
+        },
+        "chance": " ((y > -500) && (y < -400)) || (y < -850) ? 0.25 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 5,
+            "average": 3
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_manganese",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:manganese_ore",
+            "minecraft:cobblestone": "mythicmetals:manganese_ore",
+            "minecraft:andesite": "mythicmetals:manganese_ore",
+            "minecraft:polished_andesite": "mythicmetals:manganese_ore",
+            "minecraft:diorite": "mythicmetals:manganese_ore",
+            "minecraft:polished_diorite": "mythicmetals:manganese_ore",
+            "minecraft:granite": "mythicmetals:manganese_ore",
+            "minecraft:polished_granite": "mythicmetals:manganese_ore"
+        },
+        "chance": " (y > -500) && (y < -100) ? 0.2 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 6,
+            "average": 3
+        }
+    }
+}

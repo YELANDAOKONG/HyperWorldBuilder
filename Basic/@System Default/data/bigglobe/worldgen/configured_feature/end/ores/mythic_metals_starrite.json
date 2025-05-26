@@ -1,0 +1,16 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_starrite",
+        "blocks": {
+            "minecraft:end_stone": "mythicmetals:end_stone_starrite_ore"
+        },
+        "chance": "0.25L",
+        "radius": {
+            "type": "bigglobe:average",
+            "min": 2,
+            "max": 6,
+            "average": 3.5
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_aquarium",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:aquarium_ore",
+            "minecraft:cobblestone": "mythicmetals:aquarium_ore",
+            "minecraft:andesite": "mythicmetals:aquarium_ore",
+            "minecraft:polished_andesite": "mythicmetals:aquarium_ore",
+            "minecraft:diorite": "mythicmetals:aquarium_ore",
+            "minecraft:polished_diorite": "mythicmetals:aquarium_ore",
+            "minecraft:granite": "mythicmetals:aquarium_ore",
+            "minecraft:polished_granite": "mythicmetals:aquarium_ore"
+        },
+        "chance": "(`bigglobe:overworld/biome`.isIn('#bigglobe:ocean') || `bigglobe:overworld/biome`.isIn('bigglobe:dripping_cave'))  ? 0.25 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 2.5,
+            "max": 8,
+            "average": 3.5
+        }
+    }
+}

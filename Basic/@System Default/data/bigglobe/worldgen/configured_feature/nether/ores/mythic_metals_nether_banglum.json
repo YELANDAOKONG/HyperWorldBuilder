@@ -1,0 +1,16 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_nether_banglum",
+        "blocks": {
+            "minecraft:netherrack": "mythicmetals:nether_banglum_ore"
+        },
+        "chance": " y > 500 ? 0.35 : 0.0",
+        "radius": {
+            "type": "bigglobe:average",
+            "min": 4,
+            "max": 8,
+            "average": 6
+        }
+    }
+}

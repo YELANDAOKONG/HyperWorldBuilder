@@ -1,0 +1,34 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "copper",
+        "blocks": {
+            "minecraft:stone": "minecraft:copper_ore",
+            "minecraft:cobblestone": "minecraft:copper_ore",
+            "minecraft:andesite": "universal_ores:andesite_copper_ore",
+            "minecraft:polished_andesite": "universal_ores:andesite_copper_ore",
+            "minecraft:diorite": "universal_ores:diorite_copper_ore",
+            "minecraft:polished_diorite": "universal_ores:diorite_copper_ore",
+            "minecraft:granite": "universal_ores:granite_copper_ore",
+            "minecraft:polished_granite": "universal_ores:granite_copper_ore",
+            "minecraft:calcite": "universal_ores:calcite_copper_ore",
+            "minecraft:tuff": "universal_ores:tuff_copper_ore",
+            "minecraft:deepslate": "minecraft:deepslate_copper_ore",
+            "minecraft:cobbled_deepslate": "minecraft:deepslate_copper_ore"
+        },
+        "chance": {
+            "template": "bigglobe:ores/exponential",
+            "inputs": {
+                "delay": "512.0L",
+                "peak": "1.0L",
+                "limit": "0.0L"
+            }
+        },
+        "radius": {
+            "type": "average",
+            "min": 2.5,
+            "max": 8,
+            "average": 3.5
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_silver",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:silver_ore",
+            "minecraft:cobblestone": "mythicmetals:silver_ore",
+            "minecraft:andesite": "mythicmetals:silver_ore",
+            "minecraft:polished_andesite": "mythicmetals:silver_ore",
+            "minecraft:diorite": "mythicmetals:silver_ore",
+            "minecraft:polished_diorite": "mythicmetals:silver_ore",
+            "minecraft:granite": "mythicmetals:silver_ore",
+            "minecraft:polished_granite": "mythicmetals:silver_ore"
+        },
+        "chance": " ((y > -400) && (y < -30)) || (y < -850) ? 0.3 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 4,
+            "average": 2
+        }
+    }
+}

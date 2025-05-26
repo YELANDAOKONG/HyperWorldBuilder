@@ -1,0 +1,9 @@
+{
+    "replace": false,
+    "values": [
+        "bigglobe:nether/ores/mythic_metals_midas_gold",
+        "bigglobe:nether/ores/mythic_metals_nether_banglum",
+        "bigglobe:nether/ores/mythic_metals_palladium",
+        "bigglobe:nether/ores/mythic_metals_stormyx"
+    ]
+}

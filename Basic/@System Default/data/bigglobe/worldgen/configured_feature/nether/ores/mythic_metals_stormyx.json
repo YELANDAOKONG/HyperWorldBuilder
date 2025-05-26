@@ -1,0 +1,17 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_stormyx",
+        "blocks": {
+            "minecraft:netherrack": "mythicmetals:stormyx_ore",
+            "minecraft:blackstone": "mythicmetals:blackstone_stormyx_ore"
+        },
+        "chance": " y < 500 ? 0.3 : 0.0",
+        "radius": {
+            "type": "bigglobe:average",
+            "min": 1,
+            "max": 4,
+            "average": 2
+        }
+    }
+}

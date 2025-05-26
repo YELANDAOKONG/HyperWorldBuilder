@@ -1,0 +1,31 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "diamond",
+        "blocks": {
+            "minecraft:stone": "minecraft:diamond_ore",
+            "minecraft:cobblestone": "minecraft:diamond_ore",
+            "minecraft:andesite": "universal_ores:andesite_diamond_ore",
+            "minecraft:polished_andesite": "universal_ores:andesite_diamond_ore",
+            "minecraft:diorite": "universal_ores:diorite_diamond_ore",
+            "minecraft:polished_diorite": "universal_ores:diorite_diamond_ore",
+            "minecraft:granite": "universal_ores:granite_diamond_ore",
+            "minecraft:polished_granite": "universal_ores:granite_diamond_ore",
+            "minecraft:calcite": "universal_ores:calcite_diamond_ore",
+            "minecraft:tuff": "universal_ores:tuff_diamond_ore",
+            "minecraft:deepslate": "minecraft:deepslate_diamond_ore",
+            "minecraft:cobbled_deepslate": "minecraft:deepslate_diamond_ore"
+        },
+        "chance": [
+            "double line = unmixLinear(256.0L, 512.0L, `bigglobe:approximate_distance_below_surface`)",
+            "double curve = 1.0L - fastExp(-line)",
+            "return(curve * 0.5L)"
+        ],
+        "radius": {
+            "type": "average",
+            "min": 1.5,
+            "max": 4,
+            "average": 2.5
+        }
+    }
+}

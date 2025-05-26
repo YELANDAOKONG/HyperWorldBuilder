@@ -1,0 +1,27 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_orichalcum",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:orichalcum_ore",
+            "minecraft:cobblestone": "mythicmetals:orichalcum_ore",
+            "minecraft:andesite": "mythicmetals:orichalcum_ore",
+            "minecraft:polished_andesite": "mythicmetals:orichalcum_ore",
+            "minecraft:diorite": "mythicmetals:orichalcum_ore",
+            "minecraft:polished_diorite": "mythicmetals:orichalcum_ore",
+            "minecraft:granite": "mythicmetals:orichalcum_ore",
+            "minecraft:polished_granite": "mythicmetals:orichalcum_ore",
+            "minecraft:tuff": "mythicmetals:tuff_orichalcum_ore",
+            "minecraft:basalt": "mythicmetals:smooth_basalt_orichalcum_ore",
+            "minecraft:cobbled_deepslate": "mythicmetals:deepslate_orichalcum_ore",
+            "minecraft:deepslate": "mythicmetals:deepslate_orichalcum_ore"
+        },
+        "chance": " (y < -400) ? 0.15 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 3,
+            "average": 2
+        }
+    }
+}

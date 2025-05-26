@@ -1,0 +1,23 @@
+{
+    "replace": false,
+    "values": [
+        "bigglobe:overworld/ores/mythic_metals_tin",
+        "bigglobe:overworld/ores/mythic_metals_silver",
+        "bigglobe:overworld/ores/mythic_metals_unobtainium",
+        "bigglobe:overworld/ores/mythic_metals_kyber",
+        "bigglobe:overworld/ores/mythic_metals_adamantite",
+        "bigglobe:overworld/ores/mythic_metals_banglum",
+        "bigglobe:overworld/ores/mythic_metals_aquarium",
+        "bigglobe:overworld/ores/mythic_metals_platinum",
+        "bigglobe:overworld/ores/mythic_metals_quadrillum",
+        "bigglobe:overworld/ores/mythic_metals_manganese",
+        "bigglobe:overworld/ores/mythic_metals_morkite",
+        "bigglobe:overworld/ores/mythic_metals_carmot",
+        "bigglobe:overworld/ores/mythic_metals_mythril",
+        "bigglobe:overworld/ores/mythic_metals_orichalcum",
+        "bigglobe:overworld/ores/mythic_metals_osmium",
+        "bigglobe:overworld/ores/mythic_metals_runite",
+        "bigglobe:overworld/ores/mythic_metals_starrite",
+        "bigglobe:overworld/ores/mythic_metals_prometheum"
+    ]
+}

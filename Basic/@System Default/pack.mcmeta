@@ -1,0 +1,8 @@
+{
+    "pack": {
+        "name": "@System Default",
+        "id": "system",
+        "pack_format": 15,
+        "description": "System Default Data Pack"
+    }
+}

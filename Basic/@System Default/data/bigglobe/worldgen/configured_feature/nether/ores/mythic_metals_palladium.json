@@ -1,0 +1,16 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_palladium",
+        "blocks": {
+            "minecraft:netherrack": "mythicmetals:palladium_ore"
+        },
+        "chance": " (y < 64) || ((y < 128) && `bigglobe:nether/bubble`.biome.isIn('bigglobe:inferno')) ? 0.3 : 0.0",
+        "radius": {
+            "type": "bigglobe:average",
+            "min": 1,
+            "max": 4,
+            "average": 2
+        }
+    }
+}

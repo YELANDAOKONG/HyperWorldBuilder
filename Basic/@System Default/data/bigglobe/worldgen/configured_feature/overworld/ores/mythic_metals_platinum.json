@@ -1,0 +1,23 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_platinum",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:platinum_ore",
+            "minecraft:cobblestone": "mythicmetals:platinum_ore",
+            "minecraft:andesite": "mythicmetals:platinum_ore",
+            "minecraft:polished_andesite": "mythicmetals:platinum_ore",
+            "minecraft:diorite": "mythicmetals:platinum_ore",
+            "minecraft:polished_diorite": "mythicmetals:platinum_ore",
+            "minecraft:granite": "mythicmetals:platinum_ore",
+            "minecraft:polished_granite": "mythicmetals:platinum_ore"
+        },
+        "chance": " ((y > -500) && (y < -100))  || (y < -850) ? 0.2 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 6,
+            "average": 3
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_unobtainium",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:unobtainium_ore",
+            "minecraft:cobblestone": "mythicmetals:unobtainium_ore",
+            "minecraft:andesite": "mythicmetals:unobtainium_ore",
+            "minecraft:polished_andesite": "mythicmetals:unobtainium_ore",
+            "minecraft:diorite": "mythicmetals:unobtainium_ore",
+            "minecraft:polished_diorite": "mythicmetals:unobtainium_ore",
+            "minecraft:granite": "mythicmetals:unobtainium_ore",
+            "minecraft:polished_granite": "mythicmetals:unobtainium_ore",
+            "minecraft:cobbled_deepslate": "mythicmetals:deepslate_unobtainium_ore",
+            "minecraft:deepslate": "mythicmetals:deepslate_unobtainium_ore"
+        },
+        "chance": " (`bigglobe:islands/biome`.isIn('bigglobe:deep_dark')) || (y < -850) ? 0.1 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 2,
+            "average": 1.5
+        }
+    }
+}

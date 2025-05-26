@@ -1,0 +1,23 @@
+{
+    "replace": false,
+    "values": [
+        "bigglobe:islands/ores/mythic_metals_tin",
+        "bigglobe:islands/ores/mythic_metals_silver",
+        "bigglobe:islands/ores/mythic_metals_unobtainium",
+        "bigglobe:islands/ores/mythic_metals_kyber",
+        "bigglobe:islands/ores/mythic_metals_adamantite",
+        "bigglobe:islands/ores/mythic_metals_banglum",
+        "bigglobe:islands/ores/mythic_metals_aquarium",
+        "bigglobe:islands/ores/mythic_metals_platinum",
+        "bigglobe:islands/ores/mythic_metals_quadrillum",
+        "bigglobe:islands/ores/mythic_metals_manganese",
+        "bigglobe:islands/ores/mythic_metals_morkite",
+        "bigglobe:islands/ores/mythic_metals_carmot",
+        "bigglobe:islands/ores/mythic_metals_mythril",
+        "bigglobe:islands/ores/mythic_metals_orichalcum",
+        "bigglobe:islands/ores/mythic_metals_osmium",
+        "bigglobe:islands/ores/mythic_metals_runite",
+        "bigglobe:islands/ores/mythic_metals_starrite",
+        "bigglobe:islands/ores/mythic_metals_prometheum"
+    ]
+}

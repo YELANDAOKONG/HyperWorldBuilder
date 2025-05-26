@@ -1,0 +1,17 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_starrite",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:starrite_ore",
+            "minecraft:calcite": "mythicmetals:calcite_starrite_ore"
+        },
+        "chance": " (y > 150) && ((world_traits.`bigglobe:approximate_surface_y` - y) < 5) ? 0.15 : 0.0",
+        "radius": {
+            "type": "bigglobe:average",
+            "min": 0.5,
+            "max": 1,
+            "average": 0.75
+        }
+    }
+}

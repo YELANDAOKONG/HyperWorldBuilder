@@ -1,0 +1,23 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_tin",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:tin_ore",
+            "minecraft:cobblestone": "mythicmetals:tin_ore",
+            "minecraft:andesite": "mythicmetals:tin_ore",
+            "minecraft:polished_andesite": "mythicmetals:tin_ore",
+            "minecraft:diorite": "mythicmetals:tin_ore",
+            "minecraft:polished_diorite": "mythicmetals:tin_ore",
+            "minecraft:granite": "mythicmetals:tin_ore",
+            "minecraft:polished_granite": "mythicmetals:tin_ore"
+        },
+        "chance": " (y > -200) && (y < 50) ? 0.3 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 2.5,
+            "max": 8,
+            "average": 3.5
+        }
+    }
+}

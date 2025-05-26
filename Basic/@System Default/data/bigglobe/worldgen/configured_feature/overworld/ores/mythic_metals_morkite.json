@@ -1,0 +1,24 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_morkite",
+        "blocks": {
+            "minecraft:stone": "mythicmetals:morkite_ore",
+            "minecraft:cobblestone": "mythicmetals:morkite_ore",
+            "minecraft:andesite": "mythicmetals:morkite_ore",
+            "minecraft:polished_andesite": "mythicmetals:morkite_ore",
+            "minecraft:diorite": "mythicmetals:platinum_ore",
+            "minecraft:polished_diorite": "mythicmetals:morkite_ore",
+            "minecraft:granite": "mythicmetals:morkite_ore",
+            "minecraft:polished_granite": "mythicmetals:morkite_ore",
+            "minecraft:deepslate": "mythicmetals:deepslate_morkite_ore"
+        },
+        "chance": " (y > -600) && (y < -300) ? 0.2 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 1,
+            "max": 6,
+            "average": 3
+        }
+    }
+}

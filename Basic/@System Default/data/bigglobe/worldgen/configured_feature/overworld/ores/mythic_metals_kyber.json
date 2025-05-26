@@ -1,0 +1,16 @@
+{
+    "type": "bigglobe:ore",
+    "config": {
+        "seed": "mythic_metals_kyber",
+        "blocks": {
+            "minecraft:calcite": "mythicmetals:calcite_kyber_ore"
+        },
+        "chance": " (y < 0) ? 0.2 : 0.0",
+        "radius": {
+            "type": "average",
+            "min": 2.5,
+            "max": 8,
+            "average": 3.5
+        }
+    }
+}

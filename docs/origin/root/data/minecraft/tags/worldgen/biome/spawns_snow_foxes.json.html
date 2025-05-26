@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Viewer - bushes.json</title>
+    <title>JSON Viewer - spawns_snow_foxes.json</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
@@ -179,11 +179,11 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-file-code file-icon"></i> bushes.json</h1>
+            <h1><i class="fas fa-file-code file-icon"></i> spawns_snow_foxes.json</h1>
         </header>
         
         <div class="breadcrumb">
-            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\bigglobe\worldgen\configured_feature\overworld\flowers</a> <span>bushes.json</span>
+            <a href="../../../../index.html">Main Index</a> <a href="../index.html">Root Root</a> <a href="index.html">data\minecraft\tags\worldgen\biome</a> <span>spawns_snow_foxes.json</span>
         </div>
         
         <div class="code-container">
@@ -193,74 +193,10 @@
                 </button>
             </div>
             <pre><code class="language-json">{
-  &quot;type&quot;: &quot;bigglobe:flower&quot;,
-  &quot;config&quot;: {
-    &quot;seed&quot;: &quot;bushes&quot;,
-    &quot;distance&quot;: 64,
-    &quot;variation&quot;: 64,
-    &quot;spawn_chance&quot;: 0.125,
-    &quot;randomize_chance&quot;: 0.125,
-    &quot;randomize_radius&quot;: {
-      &quot;type&quot;: &quot;uniform&quot;,
-      &quot;min&quot;: 16.0,
-      &quot;max&quot;: 32.0
-    },
-    &quot;noise&quot;: {
-      &quot;type&quot;: &quot;abs&quot;,
-      &quot;grid&quot;: {
-        &quot;type&quot;: &quot;sum&quot;,
-        &quot;layers&quot;: [
-          {
-            &quot;type&quot;: &quot;smooth&quot;,
-            &quot;scale&quot;: 32,
-            &quot;amplitude&quot;: 0.25
-          },
-          {
-            &quot;type&quot;: &quot;smooth&quot;,
-            &quot;scale&quot;: 16,
-            &quot;amplitude&quot;: 0.25
-          },
-          {
-            &quot;type&quot;: &quot;smooth&quot;,
-            &quot;scale&quot;: 8,
-            &quot;amplitude&quot;: 0.25
-          },
-          {
-            &quot;type&quot;: &quot;smooth&quot;,
-            &quot;scale&quot;: 4,
-            &quot;amplitude&quot;: 0.25
-          }
-        ]
-      }
-    },
-    &quot;entries&quot;: {
-      &quot;radius&quot;: {
-        &quot;type&quot;: &quot;uniform&quot;,
-        &quot;min&quot;: 16.0,
-        &quot;max&quot;: 32.0
-      },
-      &quot;restrictions&quot;: {
-        &quot;type&quot;: &quot;and&quot;,
-        &quot;restrictions&quot;: [
-          {
-            &quot;type&quot;: &quot;threshold&quot;,
-            &quot;property&quot;: &quot;bigglobe:overworld/foliage&quot;,
-            &quot;min&quot;: 0.0,
-            &quot;max&quot;: 0.5
-          },
-          {
-            &quot;type&quot;: &quot;range&quot;,
-            &quot;property&quot;: &quot;bigglobe:overworld/temperature&quot;,
-            &quot;min&quot;: -0.5,
-            &quot;mid&quot;: 0.0,
-            &quot;max&quot;: 0.5
-          }
-        ]
-      },
-      &quot;weight&quot;: 10.0,
-      &quot;state&quot;: &quot;minecraft:sweet_berry_bush&quot;
-    }
-  }
+  &quot;replace&quot;: false,
+  &quot;values&quot;: [
+    &quot;#bigglobe:cold&quot;
+  ]
 }</code></pre>
         </div>
         

@@ -225,10 +225,20 @@
         &quot;)&quot;,
         &quot;else random.if (adjustedFoliage:&quot;,
         &quot;random.if (adjustedFoliage:&quot;,
+        &quot;if (below.isIn(&#39;#minecraft:sand&#39;):&quot;,
+        &quot;newState = BlockState?(&#39;minecraft:tall_dry_grass&#39;)&quot;,
+        &quot;)&quot;,
+        &quot;else (&quot;,
         &quot;newState = random.nextBoolean(0.125) ? &#39;minecraft:large_fern[half=lower]&#39; : &#39;minecraft:tall_grass[half=lower]&#39;&quot;,
+        &quot;)&quot;,
+        &quot;)&quot;,
+        &quot;else (&quot;,
+        &quot;if (below.isIn(&#39;#minecraft:sand&#39;):&quot;,
+        &quot;newState = BlockState?(&#39;minecraft:short_dry_grass&#39;)&quot;,
         &quot;)&quot;,
         &quot;else (&quot;,
         &quot;newState = random.nextBoolean(0.125) ? &#39;minecraft:fern&#39; : &#39;minecraft:grass&#39;&quot;,
+        &quot;)&quot;,
         &quot;)&quot;,
         &quot;)&quot;,
         &quot;else (&quot;,
@@ -252,7 +262,7 @@
         &quot;else (&quot;,
         &quot;return(false)&quot;,
         &quot;)&quot;,
-        &quot;return(placeBlockState(originX, originY, originZ, newState))&quot;
+        &quot;return(newState != null &amp;&amp; placeBlockState(originX, originY, originZ, newState))&quot;
       ]
     }
   }

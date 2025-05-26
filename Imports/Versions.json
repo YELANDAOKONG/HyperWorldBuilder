@@ -6,7 +6,7 @@
   },
   "BigGlobe": {
     "minecraft": "1.20.1",
-    "mod": "5.0.1",
+    "mod": "5.0.2",
     "loader": "fabric"
   }
 }
